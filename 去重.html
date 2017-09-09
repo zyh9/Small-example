@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var arr=[1,2,3,4,5,22,33,33,98,108,98];
+			//方法1
+			function Duplicate(arr){
+				// slice 不传参数返回完整新数组
+				// let arr1 =arr.slice();
+				
+				// 浅拷贝，拷贝的是属性值
+				// let arr1 = Object.assign(arr)
+				
+				// filter 可接收return布尔值
+				// true返回完整新数组  false返回新的空数组
+				let arr1 = arr.filter(e=>true);
+				
+				let arr2=[];
+				arr1.forEach((e,i)=>{
+					if(!arr2.includes(e)){
+						arr2.push(e)
+					}
+				})
+				return arr2;
+			}
+			console.log(Duplicate(arr))
+
+			//方法2
+			//使用es6集合（Set）对象
+			var set = new Set(arr);
+			//将类数组转化为数组
+			var arr1 = Array.from(set)
+			console.log(arr1)
+			//或者使用es6展开运算符...
+			console.log([...new Set(arr)])
+			
+			//方法3
+			var n = [];
+			for(var i=0;i<arr.length;i++){
+				//arr.indexOf返回第一次出现的数字下标
+				if(arr.indexOf(arr[i]) == i){
+					n.push(arr[i]);
+				}
+			}
+			console.log(n)
+		</script>
+	</body>
+</html>
