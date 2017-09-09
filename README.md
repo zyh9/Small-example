@@ -118,10 +118,10 @@
 		
 		// filter 可接收return布尔值
 		// true返回完整新数组  false返回新的空数组
-		let arr1 =arr.filter(e=>true);
+		let arr1 = arr.filter(e=>true);
 		
 		let arr2=[];
-		arr1.forEach((e,i)=>{
+		arr1.forEach((e)=>{
 			if(!arr2.includes(e)){
 				arr2.push(e)
 			}
