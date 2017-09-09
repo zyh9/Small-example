@@ -7,6 +7,8 @@
 	<body>
 		<script type="text/javascript">
 			var arr=[1,2,3,4,5,22,33,33,98,108,98];
+			
+			
 			//方法1
 			function Duplicate(arr){
 				// slice 不传参数返回完整新数组
@@ -29,6 +31,7 @@
 			}
 			console.log(Duplicate(arr))
 
+			
 			//方法2
 			//使用es6集合（Set）对象
 			var set = new Set(arr);
@@ -37,6 +40,7 @@
 			console.log(arr1)
 			//或者使用es6展开运算符...
 			console.log([...new Set(arr)])
+			
 			
 			//方法3
 			var n = [];
