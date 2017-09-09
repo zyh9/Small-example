@@ -87,10 +87,8 @@
 ```
 	var arr = [1,2,3,4,[0,1,2],{name:'leo'},function fn(){}];
 	
-	//var arr2 = deepclone(arr);
-	
 	//如果数据为纯数据：没有function(){}
-	var arr2 = JSON.parse(JSON.stringify(arr));
+	//var arr2 = JSON.parse(JSON.stringify(arr));
 	
 	function deepclone(obj){
 		var toSting = Object.prototype.toString;
@@ -104,6 +102,7 @@
 		}
 		return o;
 	}
+	var arr2 = deepclone(arr);
 	arr2[4].push('x');
 	console.log(arr2);
 ```
