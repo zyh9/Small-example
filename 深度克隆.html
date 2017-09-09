@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			//如果数据为纯数据：没有function(){}
+//			var arr = [1,2,3,4,[0,1,2],{name:'leo'}];
+//			
+//			var arr2 = JSON.parse(JSON.stringify(arr));
+			
+
+			//如果数据有function(){}
+			var arr = [1,2,3,4,[0,1,2],{name:'leo'},function fn(){}];
+			
+			function deepclone(obj){
+				//利用Object的toString中的特性，可以检查出来到底是不是数组
+				var toSting = Object.prototype.toString;
+				//判断数据有没有push方法，有就是数组，没有就是对象
+				var o = obj.push?[]:{};
+				//循环对象
+				for(var attr in obj){
+					if(toSting.call(obj[attr]) === '[object Object]' || toSting.call(obj[attr]) === '[object Array]'){
+						o[attr] = deepclone(obj[attr]);
+					}else{
+						o[attr] = obj[attr];
+					}
+				}
+				return o;
+			}
+			var arr2 = deepclone(arr);
+			console.log(arr)
+			arr2[4].push('x');
+			console.log(arr2);
+		</script>
+	</body>
+</html>
