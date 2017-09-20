@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var arr = [1,8,5,6,4,7,3,9,2];
+			function shellSort(arr){
+				function swap(arr,i,k){
+					var temp = arr[i];
+					arr[i] = arr[k];
+					arr[k] = temp;
+				}
+				// 先获取arr的length
+				var len = arr.length;
+				// 向下取整
+				var gap = Math.floor(len/2);
+				// 即使arr.length=2；也会走循环，arr.length<2，直接返回
+				while(gap>0){
+					for(var i=gap;i<len;i++){
+						for(var j=i;0<j;j-=gap){
+							if(arr[j-gap]>arr[j]){
+								swap(arr,j-gap,j)
+							}else{
+								break;
+							}
+						}		
+					}
+					gap = Math.floor(gap/2);
+				}
+				console.log(arr)
+				return arr;
+			}
+			console.log(shellSort(arr))
+		</script>
+	</body>
+</html>
