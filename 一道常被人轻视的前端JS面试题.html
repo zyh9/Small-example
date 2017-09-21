@@ -28,13 +28,13 @@
 			// 而window中的getName已经被修改为alert(1)，所以最终会输出1
 			Foo().getName();//1
 			
-			// 直接调用getName函数，相当于 window.getName()
+			// 直接调用getName函数，相当于： window.getName()
 			getName();//1
 			
-			// 点  . 的优先级高于new操作，相当于是:new (Foo.getName)()
+			// 点  . 的优先级高于new操作，相当于是：new (Foo.getName)()
 			new Foo.getName();//2
 			
-			// 运算符优先级括号高于new，实际执行为:(new Foo()).getName()
+			// 运算符优先级括号高于new，实际执行为：(new Foo()).getName()
 			// 返回的是this，而this在构造函数中本来就代表当前实例化对象，所以最终Foo函数返回实例化对象
 			// 之后调用实例化对象的getName函数，因为在Foo构造函数中没有为实例化对象添加任何属性
 			// 所以到当前对象的原型对象（prototype）中寻找getName
