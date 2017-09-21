@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			function Foo() {
+			    getName = function () { alert (1); };
+			    return this;
+			    //this指向window
+			}
+			Foo.getName = function () { alert (2);};
+			Foo.prototype.getName = function () { alert (3);};
+			var getName = function () { alert (4);};
+			function getName() { alert (5);}
+
+			//请写出以下输出结果：
+			Foo.getName();//2
+			getName();//4
+			//执行Foo之后getName被重新赋值
+			Foo().getName();//1
+			getName();//1
+			new Foo.getName();//2
+			new Foo().getName();//3
+			new new Foo().getName();//3
+		</script>
+	</body>
+</html>
