@@ -18,16 +18,26 @@
 
 			//请写出以下输出结果：
 			Foo.getName();//2
+			
 			// var getName;//只提升变量声明
 			// function getName() { alert (5);}//提升函数声明，覆盖var的声明
 			// getName = function () { alert (4);};//最终的赋值再次覆盖function getName声明
 			getName();//4
+			
 			// 执行Foo函数返回的是window对象，相当于执行 window.getName()
 			// 而window中的getName已经被修改为alert(1)，所以最终会输出1
 			Foo().getName();//1
+			
+			// 直接调用getName函数，相当于 window.getName()
 			getName();//1
+			
+			// 点  . 的优先级高于new操作，相当于是:new (Foo.getName)();
 			new Foo.getName();//2
+			
+			// 运算符优先级括号高于new，实际执行为:(new Foo()).getName()
 			new Foo().getName();//3
+			
+			
 			new new Foo().getName();//3
 		</script>
 	</body>
