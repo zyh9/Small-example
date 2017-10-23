@@ -169,3 +169,32 @@
 		margin-top权重最高
 		假使子级有margin-top，父级无margin-top
 		虽然父级无margin-top，但仍会使父级位置发生变化
+
+### 数据转换
+
+		let arr = [
+				{name:'abc',age:'A'},
+				{name:'def',age:'B'},
+				{name:'ghi',age:'C'},
+				{name:'jkl',age:'A'},
+				{name:'mno',age:'B'}
+			];
+	//	let obj = {
+	//			A:['abc','jkl'],
+	//			B:['def','mno'],
+	//			C:['ghi']
+	//		}
+		
+		function fn(arr){
+			let obj = {};
+			arr.forEach(e=>{
+				if(!(e.age in obj)){
+					obj[e.age] = [];
+					obj[e.age].push(e.name)
+				}else{
+					obj[e.age].push(e.name)
+				}
+			})
+			return obj;
+		}
+		console.log(fn(arr))

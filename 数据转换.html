@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			let arr = [
+					{name:'abc',age:'A'},
+					{name:'def',age:'B'},
+					{name:'ghi',age:'C'},
+					{name:'jkl',age:'A'},
+					{name:'mno',age:'B'}
+					];
+//			let obj = {
+//				A:['abc','jkl'],
+//				B:['def','mno'],
+//				C:['ghi']
+//			}
+
+			function fn(arr){
+				let obj = {};
+				arr.forEach(e=>{
+					if(!(e.age in obj)){
+						obj[e.age] = [];
+						obj[e.age].push(e.name)
+					}else{
+						obj[e.age].push(e.name)
+					}
+				})
+				return obj;
+			}
+			console.log(fn(arr))
+		</script>
+	</body>
+</html>
