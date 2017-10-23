@@ -202,3 +202,54 @@
 			return obj;
 		}
 		console.log(fn(arr))
+
+### HTML5，CSS3新增
+
+		CSS3选择器有哪些？
+		答：属性选择器、伪类选择器、伪元素选择器。
+		
+		CSS3新特性有哪些？
+			1.颜色：新增RGBA，HSLA模式
+			2.文字阴影（text-shadow、）
+			3.边框： 圆角（border-radius）边框阴影： box-shadow
+			4.盒子模型：box-sizing
+			5.背景：background-size 设置背景图片的尺寸background-origin 设置背景图片的原点
+				background-clip 设置背景图片的裁切区域，以","分隔可以设置多背景，用于自适应布局
+			6.渐变：linear-gradient、radial-gradient
+			7.过渡：transition，可实现动画
+			8.自定义动画
+			9.在CSS3中唯一引入的伪元素是::selection.
+			10.媒体查询，多栏布局
+			11.border-image
+			12.2D转换：transform：translate(x，y) rotate(x，y) skew(x，y) scale(x，y)
+			13.3D转换
+			
+		CSS3新增伪类有那些？
+			p:first-of-type 选择属于其父元素的首个 <p> 元素的每个 <p> 元素。
+		    p:last-of-type  选择属于其父元素的最后 <p> 元素的每个 <p> 元素。
+		    p:only-of-type  选择属于其父元素唯一的 <p> 元素的每个 <p> 元素。
+		    p:only-child    选择属于其父元素的唯一子元素的每个 <p> 元素。
+		    p:nth-child(2)  选择属于其父元素的第二个子元素的每个 <p> 元素。
+		    :enabled  :disabled 控制表单控件的禁用状态。
+			:checked 单选框或复选框被选中。
+			
+		HTML5有哪些新特性、移除了那些元素？如何处理HTML5新标签的浏览器兼容问题？如何区分 HTML 和 HTML5？
+		
+			新特性：
+				1.拖拽释放(Drag and drop) API 
+				2.语义化更好的内容标签（header,nav,footer,aside,article,section）
+				3.音频、视频API(audio,video)
+				4.画布(Canvas) API
+				5.地理(Geolocation) API
+				6.本地离线存储 localStorage 长期存储数据，浏览器关闭后数据不丢失；
+				7.sessionStorage 的数据在浏览器关闭后自动删除
+				8.表单控件，calendar、date、time、email、url、search  
+				9.新的技术webworker, websocket, Geolocation
+			支持HTML5新标签：
+				* IE8/IE7/IE6支持通过document.createElement方法产生的标签，
+					可以利用这一特性让这些浏览器支持HTML5新标签，
+					浏览器支持新标签后，还需要添加标签默认的样式
+				* 当然最好的方式是直接使用成熟的框架、使用最多的是html5shim框架
+			<!--[if lt IE 9]>
+				<script> src="网页链接
+			<![endif]-->
