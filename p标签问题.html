@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			p{
+				display: inline-block;
+				/*float: left;*/
+			}
+			#p1{
+				line-height: 50px;
+				background: red;
+			}
+			#p2{
+				background: yellow;
+			}
+			body{
+				display: flex;
+			}
+		</style>
+	</head>
+	<body>
+		<p id="p1">123</p>
+		<p id="p2">456</p>
+		<!--
+			display: inline-block;第二个在第一个中间
+			float: left;第二个在第一个上方
+			body{
+				display: flex;//撑起第二个高度为50px，但仍在上方
+			}
+		-->
+	</body>
+</html>
