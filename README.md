@@ -146,3 +146,26 @@
 		arr.sort(()=>Math.random()-0.5)
 		console.log(arr)
 ```
+
+### 定位
+
+        relative、absolute、fixed的定位原点
+		
+		relative{
+			自己
+		}
+		
+		absolute{
+			有定位父级走父级
+			没有走document
+		}
+		
+		fixed{
+			跟可视区窗口
+		}
+
+### margin-top
+
+		margin-top权重最高
+		假使子级有margin-top，父级无margin-top
+		虽然父级无margin-top，但仍会使父级位置发生变化
