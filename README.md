@@ -232,7 +232,7 @@
 		    p:only-child    选择属于其父元素的唯一子元素的每个 <p>元素。
 		    p:nth-child(2)  选择属于其父元素的第二个子元素的每个 <p>元素。
 		    :enabled  :disabled  控制表单控件的禁用状态。
-			:checked  单选框或复选框被选中。
+		    :checked  单选框或复选框被选中。
 			
 		HTML5有哪些新特性、移除了那些元素？如何处理HTML5新标签的浏览器兼容问题？如何区分HTML和HTML5？
 		
