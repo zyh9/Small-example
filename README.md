@@ -210,8 +210,9 @@
 			答：属性选择器、伪类选择器、伪元素选择器。
 		
 		CSS3新特性有哪些？
+		
 			1.颜色：新增RGBA，HSLA模式
-			2.文字阴影（text-shadow、）
+			2.文字阴影（text-shadow）
 			3.边框： 圆角（border-radius）边框阴影： box-shadow
 			4.盒子模型：box-sizing
 			5.背景：background-size 设置背景图片的尺寸background-origin 设置背景图片的原点
@@ -226,6 +227,7 @@
 			13.3D转换
 			
 		CSS3新增伪类有那些？
+		
 			p:first-of-type 选择属于其父元素的首个 <p>元素的每个 <p>元素。
 		    p:last-of-type  选择属于其父元素的最后 <p>元素的每个 <p>元素。
 		    p:only-of-type  选择属于其父元素唯一的 <p>元素的每个 <p>元素。
@@ -246,6 +248,7 @@
 				7.sessionStorage 的数据在浏览器关闭后自动删除
 				8.表单控件，calendar、date、time、email、url、search  
 				9.新的技术webworker, websocket, Geolocation
+				
 			支持HTML5新标签：
 				* IE8/IE7/IE6支持通过document.createElement方法产生的标签，
 					可以利用这一特性让这些浏览器支持HTML5新标签，
@@ -267,7 +270,7 @@
 			 		
 			 			写在函数内的
 			 			
-			 			局部变量/函数只能在该函数内部访问，外部访问不了
+			 			局部变量/函数只能在该函数内部访问，外部不可访问
 			 			
 			 		作用域链
 			 		
@@ -278,6 +281,9 @@
 
 			1.找var，有名函数，形参，提前创建，默认值是undefined，
 				有名函数默认值为函数块，有名字重复的只留一个
+				
 		 	2.赋值，形参赋值，小括号
+		 	
 		 	3.大括号，如果有有名函数，优先赋值给变量
+		 	
 		 	4.逐行执行代码，开始执行写的代码
