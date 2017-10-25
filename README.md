@@ -166,7 +166,7 @@
 
 ### margin
 
-		1.margin-top传递
+		1.margin传递
 			当父级元素包裹子元素时，子元素有margin-top或者margin-bottom，
 			那么第一个子元素的margin-top或者margin-bottom，会传递给父级元素
 		
