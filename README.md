@@ -287,3 +287,63 @@
 	 	3.大括号，如果有有名函数，优先赋值给变量
 	 	
 	 	4.逐行执行代码，开始执行写的代码
+
+### for循环、定时器、闭包
+
+```
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta charset="UTF-8">
+				<title></title>
+			</head>
+			<body>
+				<script type="text/javascript">
+		//			for(var i=0;i<5;i++){
+		//				setTimeout(function(){
+		//					console.log(new Date,i)
+		//				},1000)
+		//			}
+					/*
+						开了5个定时器，但定时器的延迟时间一致，所以new Data只是增加了1秒，输出5次，i一直输出为5
+					*/
+					
+					
+		//			for(var i=0;i<5;i++){
+		//				setTimeout(function(){
+		//					console.log(new Date,i)
+		//				},1000*i)
+		//			}
+					/*
+						开了5个定时器，但定时器的延迟时间不一致，所以new Data每次增加一秒，输出5次，i一直输出为5
+					*/
+					
+					
+		//			for(var i=0;i<5;i++){
+		//				(function (i){
+		//					setTimeout(function(){
+		//						console.log(new Date,i)
+		//					},1000)
+		//				})(i)
+		//			}
+					/*
+						利用闭包的特性来保存变量i不被销毁，定时器的延迟时间一致，所以输出时间一致，
+						new Data只是增加了1秒，输出5次，而的值会随着变量值的改变而改变i = 0,1,2,3,4
+					*/
+					
+					
+					for(var i=0;i<5;i++){
+						(function (i){
+							setTimeout(function(){
+								console.log(new Date,i)
+							},1000*i)
+						})(i)
+					}
+					/*
+						利用闭包的特性来保存变量i不被销毁，定时器的延迟时间不一致，所以输出时间不一致，
+						new Data每次增加一秒，而的值会随着变量值的改变而改变i = 0,1,2,3,4
+					*/
+				</script>
+			</body>
+		</html>
+```
