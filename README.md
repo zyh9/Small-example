@@ -169,6 +169,12 @@
 		1.margin-top传递
 			当父级元素包裹子元素时，子元素有margin-top，
 			那么第一个子元素的margin-top，会传递给父级元素
+			
+			解决办法 如下：
+				1.给父级添加border
+				2.父级使用overflow:hidden
+				
+				*margin值的解析：左右边界累加，上下边界重合。
 		
 		2.margin叠压
 			当父级容器包裹多个子元素时，子元素的margin-top，margin-bottom会叠压
