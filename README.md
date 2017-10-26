@@ -239,14 +239,14 @@
 		HTML5有哪些新特性、移除了那些元素？如何处理HTML5新标签的浏览器兼容问题？如何区分HTML和HTML5？
 		
 			新特性：
-				1.拖拽释放(Drag and drop) API 
+				1.拖拽释放(Drag and drop) API
 				2.语义化更好的内容标签（header,nav,footer,aside,article,section）
 				3.音频、视频API(audio,video)
 				4.画布(Canvas) API
 				5.地理(Geolocation) API
-				6.本地离线存储 localStorage 长期存储数据，浏览器关闭后数据不丢失；
+				6.本地离线存储 localStorage 长期存储数据，浏览器关闭后数据不丢失
 				7.sessionStorage 的数据在浏览器关闭后自动删除
-				8.表单控件，calendar、date、time、email、url、search  
+				8.表单控件，calendar、date、time、email、url、search
 				9.新的技术webworker, websocket, Geolocation
 				
 			支持HTML5新标签：
