@@ -254,7 +254,12 @@
 				7.sessionStorage 的数据在浏览器关闭后自动删除
 				8.表单控件，calendar、date、time、email、url、search
 				9.新的技术webworker, websocket, Geolocation
-				
+				10.获取class列表属性(classList)
+					length :  class的长度
+					add()  :  添加class方法
+					remove()  :  删除class方法
+					toggle() :  切换class方法
+					
 			支持HTML5新标签：
 				* IE8/IE7/IE6支持通过document.createElement方法产生的标签，
 					可以利用这一特性让这些浏览器支持HTML5新标签，
