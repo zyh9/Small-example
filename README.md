@@ -373,7 +373,7 @@
 ### 一些css的问题（无实际意义）
 
 ```
-<!DOCTYPE html>
+	<!DOCTYPE html>
 	<html>
 		<head>
 			<meta charset="UTF-8">
