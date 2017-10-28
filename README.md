@@ -369,3 +369,82 @@
 		</body>
 	</html>
 ```
+
+### 一些css的问题
+
+```
+<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="UTF-8">
+			<title></title>
+			<style type="text/css">
+				p{
+					/*display: inline-block;*/
+					float: left;
+				}
+				#p1{
+					line-height: 50px;
+					background: red;
+				}
+				#p2{
+					background: yellow;
+				}
+				/*body{
+					display: flex;
+				}*/
+			</style>
+		</head>
+		<body>
+			<p id="p1">123</p>
+			<p id="p2">456</p>
+			<!--
+				1.让两个p标签在一行居左显示
+					浮动、行内块、弹性盒模型都可以
+				2.假使给第一个p标签line-height: 50px;
+				那么第二个的p的内容在第一个p内容的上方，还是中间，还是下方
+					float: left;第二个在第一个上方
+					display: inline-block;第二个在第一个中间
+					body{
+						display: flex;//撑起第二个高度为50px，但仍在上方
+						justify-content: flex-start;
+					}
+			-->
+		</body>
+	</html>
+```
+
+### 数据转换
+
+> 在面对数据转换的时候，别看每项的数据有多复杂或者多难处理(可先不必在意每项的内容)，交给循环
+
+```
+		<script type="text/javascript">
+			let arr = [
+					{name:'abc',age:'A'},
+					{name:'def',age:'B'},
+					{name:'ghi',age:'C'},
+					{name:'jkl',age:'A'},
+					{name:'mno',age:'B'}
+					];
+		//	let obj = {
+		//		A:['abc','jkl'],
+		//		B:['def','mno'],
+		//		C:['ghi']
+		//		}
+			
+			function fn(arr){
+				let obj = {};
+				arr.forEach(e=>{
+					if(!(e.age in obj)){
+						obj[e.age] = [];
+						obj[e.age].push(e.name)
+					}else{
+						obj[e.age].push(e.name)
+					}
+				})
+				return obj;
+			}
+			console.log(fn(arr))
+		</script>
+```
