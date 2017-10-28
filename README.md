@@ -259,6 +259,8 @@
 					add()  :  添加class方法
 					remove()  :  删除class方法
 					toggle() :  切换class方法
+				11.history在h5中新增的属性和方法
+					h5中的history对象新增了两个新方法：history.pushState()和history.replaeState()
 					
 			支持HTML5新标签：
 				* IE8/IE7/IE6支持通过document.createElement方法产生的标签，
