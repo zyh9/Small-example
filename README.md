@@ -180,35 +180,6 @@
 			当父级容器包裹多个子元素时，子元素的margin-top，margin-bottom会叠压
 			当上下margin值不一样时，叠压范围取最大值
 
-### 数据转换
-
-		let arr = [
-				{name:'abc',age:'A'},
-				{name:'def',age:'B'},
-				{name:'ghi',age:'C'},
-				{name:'jkl',age:'A'},
-				{name:'mno',age:'B'}
-			];
-	//	let obj = {
-	//			A:['abc','jkl'],
-	//			B:['def','mno'],
-	//			C:['ghi']
-	//		}
-		
-		function fn(arr){
-			let obj = {};
-			arr.forEach(e=>{
-				if(!(e.age in obj)){
-					obj[e.age] = [];
-					obj[e.age].push(e.name)
-				}else{
-					obj[e.age].push(e.name)
-				}
-			})
-			return obj;
-		}
-		console.log(fn(arr))
-
 ### HTML5，CSS3新增
 
 		CSS3选择器有哪些？
