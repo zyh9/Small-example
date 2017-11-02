@@ -465,7 +465,7 @@
 			alert(!res*2+'1'+0+2) //2102
 		}
 
-> 此题涉及隐式类型转换
+> 此题涉及到隐式类型转换
 
 		显式类型转换(强制类型转换)：
 		
@@ -515,9 +515,6 @@
         <td style = "text-align:center">NaN</td>
     </tr>
 </table>
-| 原始数据类型 | 目标类型Number |
-| :--: | :--: |
-| undefined | NaN |
 
 <table>
     <tr>
