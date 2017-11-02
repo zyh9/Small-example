@@ -459,9 +459,9 @@
 
 		let n;
 		let res = n*2;
-		if(res==res){
+		if(res==res){ //NaN不等于自己
 			alert(res+'1'+0+2)
-		}else{
+		}else{ //NaN为false
 			alert(!res*2+'1'+0+2) //2102
 		}
 
@@ -475,77 +475,70 @@
 		
 		隐式类型转换：
 		
-		减(-)、乘(*)、除(/)、取模(%)可以将字符串转成数字
-		+ 加号可以将数字转成字符串
-		++ -- 加加、减减运算符可以把字符串转成数字
-		< > 大于号、小于号可以把字符串转成数字，一定要注意是进行数字的比较还是字符串的比较
-		! 取反 把右边的数据类型转成布尔值
-		== 比较两边的值，如果数据类型不同，会先转成相同类型，再比较值是否相等
+			减(-)、乘(*)、除(/)、取模(%)可以将字符串转成数字
+			+ 加号可以将数字转成字符串
+			++ -- 加加、减减运算符可以把字符串转成数字
+			< > 大于号、小于号可以把字符串转成数字，一定要注意是进行数字的比较还是字符串的比较
+			! 取反  把右边的数据类型转成布尔值
+			== 比较两边的值，如果数据类型不同，会先转成相同类型，再比较值是否相等
+			注意：undefined == null 结果为true
 
 > 另外还涉及到数据类型的转换
 
-		JavaScript操作符计算时，2个不同的类型的操作数如何变换类型，及类型转后后的目标值是什么。
-		在js中有5种基础类型数据：string、number、boolean、null、undefined，
-		其中，常用于计算或者比较的类型是前面三种。
+<table style = "text-align:center">
+    <tr>
+        <th style = "text-align:center">原始数据类型</th>
+        <th style = "text-align:center">目标类型Number</th>
+    </tr>
+    <tr>
+        <td style = "text-align:center">undefined</td>
+        <td style = "text-align:center">NaN</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">null</td>
+        <td style = "text-align:center">0</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">false</td>
+        <td style = "text-align:center">0</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">true</td>
+        <td style = "text-align:center">1</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">数字串</td>
+        <td style = "text-align:center">相应的数字</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">不能转化的字符串</td>
+        <td style = "text-align:center">NaN</td>
+    </tr>
+</table>
 
-> JavaScript其它类型转化数字：
-
-		<table style = "text-align:center">
-		    <tr>
-		        <th style = "text-align:center">原始数据类型</th>
-		        <th style = "text-align:center">目标类型Number</th>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">undefined</td>
-		        <td style = "text-align:center">NaN</td>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">null</td>
-		        <td style = "text-align:center">0</td>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">false</td>
-		        <td style = "text-align:center">0</td>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">true</td>
-		        <td style = "text-align:center">1</td>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">数字串</td>
-		        <td style = "text-align:center">相应的数字</td>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">不能转化的字符串</td>
-		        <td style = "text-align:center">NaN</td>
-		    </tr>
-		</table>
-
-> JavaScript其它类型转化为字符串
-
-		<table style = "text-align:center">
-		    <tr>
-		        <th style = "text-align:center">原始数据类型</th>
-		        <th style = "text-align:center">目标类型String</th>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">undefined</td>
-		        <td style = "text-align:center">undefined</td>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">null</td>
-		        <td style = "text-align:center">null</td>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">false</td>
-		        <td style = "text-align:center">false</td>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">true</td>
-		        <td style = "text-align:center">true</td>
-		    </tr>
-		    <tr>
-		        <td style = "text-align:center">数字</td>
-		        <td style = "text-align:center">数字字符串</td>
-		    </tr>
-		</table>
+<table style = "text-align:center">
+    <tr>
+        <th style = "text-align:center">原始数据类型</th>
+        <th style = "text-align:center">目标类型String</th>
+    </tr>
+    <tr>
+        <td style = "text-align:center">undefined</td>
+        <td style = "text-align:center">undefined</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">null</td>
+        <td style = "text-align:center">null</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">false</td>
+        <td style = "text-align:center">false</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">true</td>
+        <td style = "text-align:center">true</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">数字</td>
+        <td style = "text-align:center">数字字符串</td>
+    </tr>
+</table>
