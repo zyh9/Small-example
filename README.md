@@ -486,59 +486,62 @@
 > 另外还涉及到数据类型的转换
 
 <table>
-<tr>
-<th style = "text-align:center;width:300px;">原始数据类型</th>
-<th style = "text-align:center;width:300px;">目标类型Number</th>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">undefined</td>
-<td style = "text-align:center;width:300px;">NaN</td>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">null</td>
-<td style = "text-align:center;width:300px;">0</td>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">false</td>
-<td style = "text-align:center;width:300px;">0</td>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">true</td>
-<td style = "text-align:center;width:300px;">1</td>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">数字串</td>
-<td style = "text-align:center;width:300px;">相应的数字</td>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">不能转化的字符串</td>
-<td style = "text-align:center;width:300px;">NaN</td>
-</tr>
+    <tr>
+        <th style = "text-align:center">原始数据类型</th>
+        <th style = "text-align:center">目标类型Number</th>
+    </tr>
+    <tr>
+        <td style = "text-align:center">undefined</td>
+        <td style = "text-align:center">NaN</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">null</td>
+        <td style = "text-align:center">0</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">false</td>
+        <td style = "text-align:center">0</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">true</td>
+        <td style = "text-align:center">1</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">数字串</td>
+        <td style = "text-align:center">相应的数字</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">不能转化的字符串</td>
+        <td style = "text-align:center">NaN</td>
+    </tr>
 </table>
+|原始数据类型|目标类型Number|
+|::|::|
+|undefined|NaN|
 
 <table>
-<tr>
-<th style = "text-align:center;width:300px;">原始数据类型</th>
-<th style = "text-align:center;width:300px;">目标类型String</th>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">undefined</td>
-<td style = "text-align:center;width:300px;">undefined</td>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">null</td>
-<td style = "text-align:center;width:300px;">null</td>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">false</td>
-<td style = "text-align:center;width:300px;">false</td>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">true</td>
-<td style = "text-align:center;width:300px;">true</td>
-</tr>
-<tr>
-<td style = "text-align:center;width:300px;">数字</td>
-<td style = "text-align:center;width:300px;">数字字符串</td>
-</tr>
+    <tr>
+        <th style = "text-align:center">原始数据类型</th>
+        <th style = "text-align:center">目标类型String</th>
+    </tr>
+    <tr>
+        <td style = "text-align:center">undefined</td>
+        <td style = "text-align:center">undefined</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">null</td>
+        <td style = "text-align:center">null</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">false</td>
+        <td style = "text-align:center">false</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">true</td>
+        <td style = "text-align:center">true</td>
+    </tr>
+    <tr>
+        <td style = "text-align:center">数字</td>
+        <td style = "text-align:center">数字字符串</td>
+    </tr>
 </table>
