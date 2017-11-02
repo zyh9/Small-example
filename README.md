@@ -515,9 +515,9 @@
         <td style = "text-align:center">NaN</td>
     </tr>
 </table>
-|原始数据类型|目标类型Number|
-|::|::|
-|undefined|NaN|
+| 原始数据类型 | 目标类型Number |
+| :--: | :--: |
+| undefined | NaN |
 
 <table>
     <tr>
