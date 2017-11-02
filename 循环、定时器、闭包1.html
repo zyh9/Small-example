@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			/*
+				循环和定时器
+			*/
+			
+			//用bind实现
+//			for(var i=0;i<5;i++){
+//				setTimeout(function(i){
+//					console.log(i)
+//				}.bind(null,i),1000*i)
+//			}
+			
+			//用let实现
+//			for(let i=0;i<5;i++){
+//				setTimeout(function(){
+//					console.log(i)
+//				},1000*i)
+//			}
+			
+			//用闭包实现
+			for(var i=0;i<5;i++){
+				(function(i){
+					setTimeout(function(){
+						console.log(i)
+					},1000*i)
+				})(i)
+			}
+		</script>
+	</body>
+</html>
