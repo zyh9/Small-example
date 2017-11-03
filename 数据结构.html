@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			let arr = [
+				{
+					id:1,
+					name:'head',
+					pId:0
+				},
+				{
+					id:2,
+					name:'meta',
+					pId:1
+				},
+				{
+					id:3,
+					name:'title',
+					pId:1
+				},
+				{
+					id:6,
+					name:'div',
+					pId:2
+				},
+				{
+					id:4,
+					name:'p',
+					pId:2
+				},
+				{
+					id:5,
+					name:'span',
+					pId:2
+				}	
+			];
+			function Pid(arr,id){
+				return arr.filter(e=>e.pId==id)
+			}
+			//对象之间是赋址，所以arr1的数据更改也会引起arr的数据更改
+			let arr1 = Pid(arr,2)
+			arr1[0].name = 'zyh';
+			console.log(arr,arr1)
+		</script>
+	</body>
+</html>
