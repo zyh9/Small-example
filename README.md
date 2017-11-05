@@ -1,4 +1,63 @@
-﻿### 冒泡排序
+﻿### 如何实现ajax请求
+
+		通过实例化一个XMLHttpRequest对象得到一个实例，调用实例的open方法为这次 ajax请求设定相应的http方法、相应的地址和以及是否异步，
+		当然大多数情况下我们都是选异步， 以异步为例，之后调用send方法ajax请求，这个方法可以设定需要发送的报文主体，
+		然后通过 监听readystatechange事件，通过这个实例的readyState属性来判断这个ajax请求的状态，
+		其中分为0,1,2,3,4这四种 状态，当状态为4的时候也就是接收数据完成的时候，这时候可以通过实例的status属性判断这个请求是否成功
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open('get', '1.php', true);
+		xhr.send(null);
+		xhr.onreadystatechange = function() {
+		  	if(xhr.readyState==4) {
+		    	if(xhr.status==200) {
+		      		console.log(xhr.responseText);
+		    	}
+		  	}
+		}
+
+### 简要介绍ES6
+
+		ES6在变量的声明和定义方面增加了let、const声明变量，有局部变量的概念，赋值中有比较吸引人的结构赋值，
+		同时ES6对字符串、 数组、正则、对象、函数等拓展了一些方法，如字符串方面的模板字符串、函数方面的默认参数、对象方面属性的简洁表达方式，
+		ES6也引入了新的数据类型symbol，新的数据结构Set和Map,symbol可以通过typeof检测出来，
+		为解决异步回调问题，引入了promise和 generator，还有最为吸引人了实现Class和模块，
+		通过Class可以更好的面向对象编程，使用模块加载方便模块化编程，当然考虑到浏览器兼容性，我们在实际开发中需要使用babel进行编译。
+
+### 对js原型的理解
+
+		我们知道在es6之前，js没有类和继承的概念，js是通过原型来实现继承的。
+		在js中一个构造函数默认自带有一个prototype属性， 这个的属性值是一个对象，
+		同时这个prototype对象自带有一个constructor属性，这个属性指向这个构造函数，
+		同时每一个实例都有一个__proto__属性指向这个prototype对象，我们可以将这个叫做隐式原型，
+		我们在使用一个实例的方法的时候，会先检查这个实例中是否有这个方法，没有则会继续向上查找这个prototype对象是否有这个方法，
+		刚刚我们说到prototype是一个对象， 那么也即是说这个是一个对象的实例，那么这个对象同样也会有一个__proto__属性指向对象的prototype对象。
+
+### 对js模块化的理解
+
+		在ES6出现之前，js没有标准的模块化概念，这也就造成了js多人写作开发容易造成全局污染的情况，
+		以前我们可能会采用立即执行 函数、对象等方式来尽量减少变量这种情况，后面社区为了解决这个问题陆续提出了AMD规范和CMD规范，
+		这里不同于Node.js的 CommonJS的原因在于服务端所有的模块都是存在于硬盘中的，加载和读取几乎是不需要时间的，
+		而浏览器端因为加载速度取决于网速， 因此需要采用异步加载，AMD规范中使用define来定义一个模块，使用require方法来加载一个模块，
+		现在ES6也推出了标准的模块加载方案，通过exports和require来导出和导入模块。
+
+### 什么是深拷贝，什么是浅拷贝？
+
+		浅拷贝是指仅仅复制对象的引用，而不是复制对象本身；深拷贝则是把复制对象所引用的全部对象都复制一遍。
+
+### 如何阻止事件冒泡和默认事件？
+
+		标准的DOM对象中可以使用事件对象的stopPropagation()方法来阻止事件冒泡，
+		但在IE8以下中IE的事件对象通过设置事件对象的cancelBubble属性为true来阻止冒泡；
+		 默认事件的话通过事件对象的preventDefault()方法来阻止，
+		 而IE通过设置事件对象的returnValue属性为false来阻止默认事件。
+
+### addEventListener有哪些参数？
+
+		有三个参数，第一个是事件的类型，第二个是事件的回调函数，
+		第三个是一个表示事件是冒泡阶段还是捕获阶段捕获的布尔值，true表示捕获，false表示冒泡(默认为false)
+
+### 冒泡排序
 
 ```
 	    var arr = [1,2,5,3,8,7,6,4];
@@ -147,6 +206,76 @@
 		console.log(arr)
 ```
 
+### 数据转换
+
+> 在面对数据转换的时候，别看每项的数据有多复杂或者多难处理（可先忽视每项内容），交给循环
+
+```
+		<script type="text/javascript">
+			let arr = [
+					{name:'abc',age:'A'},
+					{name:'def',age:'B'},
+					{name:'ghi',age:'C'},
+					{name:'jkl',age:'A'},
+					{name:'mno',age:'B'}
+					];
+		//	let obj = {
+		//		A:['abc','jkl'],
+		//		B:['def','mno'],
+		//		C:['ghi']
+		//		}
+			
+			function fn(arr){
+				let obj = {};
+				arr.forEach(e=>{
+					if(!(e.age in obj)){
+						obj[e.age] = [];
+						obj[e.age].push(e.name)
+					}else{
+						obj[e.age].push(e.name)
+					}
+				})
+				return obj;
+			}
+			console.log(fn(arr))
+		</script>
+```
+
+### 单个for循环排序
+
+```
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="UTF-8">
+			<title></title>
+		</head>
+		<body>
+			<script type="text/javascript">
+				let arr = [1,3,7,8,4,6,2,5];
+				let n = 0;
+				let len = arr.length;
+				for(let i=0;i<len-1;i++){
+					//如果前边比后边大，交换位置
+					if(arr[i]>arr[i+1]){
+						let item = arr[i];
+						arr[i] = arr[i+1];
+						arr[i+1] = item;
+					}
+					//如果i==len-2，给i赋值为0，继续执行循环
+					if(i==len-2){
+						i = 0;
+						len--;
+					}
+					n++;
+				}
+				console.log(arr)
+				console.log(n)
+			</script>
+		</body>
+	</html>
+```
+
 ### 定位
 
         relative、absolute、fixed的定位原点
@@ -275,72 +404,6 @@
 	 	
 	 	4.逐行执行代码，开始执行写的代码
 
-### for循环、定时器、闭包
-
-```
-	<!DOCTYPE html>
-	<html>
-		<head>
-			<meta charset="UTF-8">
-			<title></title>
-		</head>
-		<body>
-			<script type="text/javascript">
-	//			for(var i=0;i<5;i++){
-	//				setTimeout(function(){
-	//					console.log(new Date,i)
-	//				},1000)
-	//			}
-				/*
-					开了5个定时器，但定时器的延迟时间一致，
-					所以new Data只是增加了1秒，输出5次，i一直输出为5
-				*/
-				
-				
-	//			for(var i=0;i<5;i++){
-	//				setTimeout(function(){
-	//					console.log(new Date,i)
-	//				},1000*i)
-	//			}
-				/*
-					开了5个定时器，但定时器的延迟时间不一致，
-					所以new Data每次增加一秒，输出5次，i一直输出为5
-				*/
-				
-				
-	//			for(var i=0;i<5;i++){
-	//				(function (i){
-	//					setTimeout(function(){
-	//						console.log(new Date,i)
-	//					},1000)
-	//				})(i)
-	//			}
-				/*
-					利用闭包的特性来保存变量i不被销毁，
-					定时器的延迟时间一致，所以输出时间一致，
-					new Data只是增加了1秒，输出5次，
-					而的值会随着变量值的改变而改变i = 0,1,2,3,4
-				*/
-				
-				
-				for(var i=0;i<5;i++){
-					(function (i){
-						setTimeout(function(){
-							console.log(new Date,i)
-						},1000*i)
-					})(i)
-				}
-				/*
-					利用闭包的特性来保存变量i不被销毁，
-					定时器的延迟时间不一致，所以输出时间不一致，
-					new Data每次增加一秒，输出5次，
-					而的值会随着变量值的改变而改变i = 0,1,2,3,4
-				*/
-			</script>
-		</body>
-	</html>
-```
-
 ### 一些css的问题（无实际意义）
 
 ```
@@ -381,76 +444,6 @@
 						justify-content: flex-start;
 					}
 			-->
-		</body>
-	</html>
-```
-
-### 数据转换
-
-> 在面对数据转换的时候，别看每项的数据有多复杂或者多难处理（可先忽视每项内容），交给循环
-
-```
-		<script type="text/javascript">
-			let arr = [
-					{name:'abc',age:'A'},
-					{name:'def',age:'B'},
-					{name:'ghi',age:'C'},
-					{name:'jkl',age:'A'},
-					{name:'mno',age:'B'}
-					];
-		//	let obj = {
-		//		A:['abc','jkl'],
-		//		B:['def','mno'],
-		//		C:['ghi']
-		//		}
-			
-			function fn(arr){
-				let obj = {};
-				arr.forEach(e=>{
-					if(!(e.age in obj)){
-						obj[e.age] = [];
-						obj[e.age].push(e.name)
-					}else{
-						obj[e.age].push(e.name)
-					}
-				})
-				return obj;
-			}
-			console.log(fn(arr))
-		</script>
-```
-
-### 单个for循环排序
-
-```
-	<!DOCTYPE html>
-	<html>
-		<head>
-			<meta charset="UTF-8">
-			<title></title>
-		</head>
-		<body>
-			<script type="text/javascript">
-				let arr = [1,3,7,8,4,6,2,5];
-				let n = 0;
-				let len = arr.length;
-				for(let i=0;i<len-1;i++){
-					//如果前边比后边大，交换位置
-					if(arr[i]>arr[i+1]){
-						let item = arr[i];
-						arr[i] = arr[i+1];
-						arr[i+1] = item;
-					}
-					//如果i==len-2，给i赋值为0，继续执行循环
-					if(i==len-2){
-						i = 0;
-						len--;
-					}
-					n++;
-				}
-				console.log(arr)
-				console.log(n)
-			</script>
 		</body>
 	</html>
 ```
