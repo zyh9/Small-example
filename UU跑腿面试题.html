@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			//1.写出输出的值
+			let arr = [1,3,5,7,9];
+			console.log(arr.map(String))
+			//String参数将数组每项转化为字符串
+			
+			//2.写出输出的值
+			let arr1 = ['U','u','跑','腿','就','是','跑','腿'];
+			let a = arr1.filter((e,i)=>arr1.indexOf(e)===i)
+			console.log(a)
+			
+			//3.将两个数组拼接，并且删除第二个数据
+			/*
+				splice(pos,length,val1,val2...)
+				pos:位置
+				length:长度
+				val1,val2:替换的数据
+			*/
+			let arr2 = [1,3,5,7,9];
+			let arr3 = [2,4,6,8,0];
+			
+			
+			let arr4 = arr2.concat(arr3);
+			console.log(arr4)
+			arr4.splice(1,1)
+			console.log(arr4)
+		</script>
+	</body>
+</html>
