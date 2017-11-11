@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			//1.你所知道的html5的新标签（至少5个），并说出你所理解的标签语义化
+			
+			
+			//2.请写出position和float的区别
+			
+			
+			//3.请用CSS写出下列布局：左侧100px的宽度，右侧自适应的宽度，高度均为100%
+			
+			
+			//4.请写出undefined和null的区别
+			
+			
+			//5.请封装一个函数，实现字符串去空格的功能
+				let str = '  zyhabc  ';
+				function fn(str){
+					let arr = str.split('');
+					let res = [];
+					arr.forEach(e=>{
+						if(e!=' '){
+							res.push(e)
+						}
+					})
+					return res.join('')
+				}
+				console.log(fn(str))
+			//6.假设现在时间为Sat Nov 11 2017 20:01:00，请写出输出时间
+				for(var i=0;i<5;i++){
+					setTimeout(function(){
+						console.log(new Date(),i)
+					},1000)
+				}
+		</script>
+	</body>
+</html>
