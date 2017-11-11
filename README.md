@@ -310,12 +310,12 @@
 			解决办法 如下：
 				1.给父级添加border
 				2.父级使用overflow:hidden
-				
-				*margin值的解析：左右边界累加，上下边界重合。
 		
 		2.margin叠压
 			当父级容器包裹多个子元素时，子元素的margin-top，margin-bottom会叠压
 			当上下margin值不一样时，叠压范围取最大值
+		
+		*margin值的解析：左右边界累加，上下边界重合
 
 ### HTML5，CSS3新增
 

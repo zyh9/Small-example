@@ -3,8 +3,21 @@
 	<head>
 		<meta charset="UTF-8">
 		<title></title>
+		<style type="text/css">
+			div{
+				width: 100px;
+				height: 100px;
+				background: red;
+				margin: 10px;
+			}
+			.div1{
+				
+			}
+		</style>
 	</head>
 	<body>
+		<div class="div1"></div>
+		<div></div>
 		<script type="text/javascript">
 			//1.说一下HTML5和CSS3的新特性
 			
@@ -17,24 +30,37 @@
 			//margin传递、叠压
 			
 			//4.请写出数组去重的方法
-			let arr = [1,3,8,3,7,9,8,7,7,1,4];
-			
-			console.log([...new Set(arr)])
+				let arr = [1,3,8,3,7,9,8,7,7,1,4];
+				
+				//方法1
+				console.log([...new Set(arr)])
+				
+				//方法2
+				function fn(arr){
+					let res = [];
+					arr.forEach(e=>{
+						if(!res.includes(e)){
+							res.push(e)
+						}
+					})
+					return res;
+				}
+				console.log(fn(arr))
 			
 			
 			//5.将下列数组转为对象
-			let arr = [
-					{name:'abc',age:'A'},
-					{name:'def',age:'B'},
-					{name:'ghi',age:'C'},
-					{name:'jkl',age:'A'},
-					{name:'mno',age:'B'}
-					];
-//			let obj = {
-//				A:['abc','jkl'],
-//				B:['def','mno'],
-//				C:['ghi']
-//			}
+				let arr1 = [
+						{name:'abc',age:'A'},
+						{name:'def',age:'B'},
+						{name:'ghi',age:'C'},
+						{name:'jkl',age:'A'},
+						{name:'mno',age:'B'}
+						];
+				let obj = {
+					A:['abc','jkl'],
+					B:['def','mno'],
+					C:['ghi']
+				}
 		</script>
 	</body>
 </html>
