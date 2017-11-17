@@ -596,4 +596,4 @@
 		
 		区别
 		
-		opacity会继承父元素的 opacity属性，而RGBA设置的元素的后代元素不会继承不透明属性。
+			opacity会继承父元素的 opacity属性，而RGBA设置的元素的后代元素不会继承不透明属性。
