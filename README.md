@@ -579,3 +579,24 @@
 		
 		4.阻止事件冒泡：ev.stopPropagation()，IE则是使用ev.cancelBubble = true
 
+### RGBA与opacity区别
+
+		rgba(r,g,b,a)
+		
+			R：红色值。正整数 | 百分数
+			G：绿色值。正整数 | 百分数
+			B：蓝色值。正整数 | 百分数
+			A：Alpha透明度。取值0~1之间。
+			
+			正整数为十进制0~255之间的任意值，百分数为0%~100%之间的任意值。
+			RGBA是在R（Red）G（Green）B（Blue）模式上增加了alpha通道，alpha通道是不透明度。
+		
+		opacity: value | inherit;		
+		
+			value:不透明度，从 0.0 （完全透明）到 1.0（完全不透明）。
+			
+			Tip：IE8 以及更早的版本支持替代的 filter属性。例如：filter:Alpha(opacity=50)。
+		
+		区别
+		
+		opacity会继承父元素的 opacity属性，而RGBA设置的元素的后代元素不会继承不透明属性。
