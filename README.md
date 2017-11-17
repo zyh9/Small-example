@@ -188,9 +188,6 @@
 			// slice 不传参数返回完整新数组
 			// let arr1 =arr.slice();
 			
-			// 浅拷贝，拷贝的是属性值
-			// let arr1 = Object.assign(arr)
-			
 			// filter 可接收return布尔值
 			// true返回完整新数组  false返回新的空数组
 			let arr1 = arr.filter(e=>true);
