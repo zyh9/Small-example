@@ -635,3 +635,34 @@
 		p2 line-height: 2自身字体大小的两倍
 		s5 数字无单位行高，继承原始值，s5的line-height继承的2，自身字体大小的两倍
 		s6 无需解释
+
+### CSS如何实现文字两端对齐
+
+		div{
+		  width:500px;
+		  border:1px solid red;
+		  text-align: justify;
+		}
+		
+		text-align: justify这是什么东西？CSS2中text-align有一个属性值为justify，为对齐之意
+		其实现的效果就是可以让一行文字两端对齐显示（文字内容要超过一行）。
+		
+		要使文字两端对齐，我们还得使用一个行内空标签来助阵，比如<span>、<i>等等，这里是我用<i>标签
+		
+		<div>这世间唯有梦想和好姑娘不可辜负！<i></i></div>
+		给这个i标签设置如下样式
+		
+		div i{
+		  display:inline-block;
+		  /*padding-left: 100%;*/
+		  width:100%;
+		}
+		padding-left: 100%和width:100%都可以达到效果，选用其一即可
+		
+		但是加入HTML元素又违反了结构表现分离的原则，我们可以改用after、before伪元素：
+		
+		div:after {
+		    content: " ";
+		    display: inline-block;
+		    width: 100%;
+		}
