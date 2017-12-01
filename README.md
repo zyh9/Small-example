@@ -733,11 +733,11 @@
 		感觉自己脑子瓦特了（你没有看错，只有这么几行）
 		
 		function fn(arr){
-        	arr.forEach(e=>{
-        		e.text = e.value = e.name;
-        		if(!e.data)return;
+			arr.forEach(e=>{
+				e.text = e.value = e.name;
+				if(!e.data)return;
 				fn(e.data);
-        	})
-        }
-        fn(data)
+			})
+		}
+		fn(data)
 		console.log(data)
