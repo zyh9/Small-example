@@ -666,3 +666,75 @@
 		    display: inline-block;
 		    width: 100%;
 		}
+
+### 递归小例子
+
+		有三级数据，数组包对象的形式，每一级的每个对象里都有一个name的key，
+		现要将username的值拿到，并给其自身增加两个key，一个是text，一个是value
+		let data = [
+					{
+						name:"a",
+						data:[
+							{
+								name:"a",
+								data:[{
+										name:"a"
+									},
+									{
+										name:"a"
+									}
+								]
+							},
+							{
+								name:"a",
+								data:[
+									{
+										name:"a"
+									},
+									{
+										name:"a"
+									}
+								]
+							}
+						]
+					},
+					{
+						name:"a",
+						data:[
+							{
+								name:"a",
+								data:[{
+										name:"a"
+									},
+									{
+										name:"a"
+									}
+								]
+							},
+							{
+								name:"a",
+								data:[
+									{
+										name:"a"
+									},
+									{
+										name:"a"
+									}
+								]
+							}
+						]
+					}
+				]
+		
+		想到用递归来解决，但是有思路无法下手
+		感觉自己脑子瓦特了（没有看错，只有这么几行）
+		
+		function fn(arr){
+        	arr.forEach(e=>{
+        		e.text = e.value = e.menu_name;
+        		if(!e.data)return;
+				fn(e.data);
+        	})
+        }
+        fn(data)
+		console.log(data)
