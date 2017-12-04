@@ -749,6 +749,7 @@
 					background: green;
 				}
 		}
+		
 		min-width	分辨率宽度大于等于设置值的时候识别
 
 ### max-width
@@ -757,7 +758,6 @@
 				div{
 					background: green;
 				}
-			}
-		</style>
+		}
+		
 		max-width	分辨率宽度小于等于设置值的时候识别
-
