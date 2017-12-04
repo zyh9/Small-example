@@ -741,3 +741,23 @@
 		}
 		fn(data)
 		console.log(data)
+
+### min-width
+
+		@media (min-width:400px){
+				div{
+					background: green;
+				}
+		}
+		min-width	分辨率宽度大于等于设置值的时候识别
+
+### max-width
+
+		@media (max-width:400px){
+				div{
+					background: green;
+				}
+			}
+		</style>
+		max-width	分辨率宽度小于等于设置值的时候识别
+
