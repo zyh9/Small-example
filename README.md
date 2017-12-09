@@ -802,3 +802,31 @@
 		
 		Javascript是单线程执行的，也就是无法同时执行多段代码，当某一段代码正在执行的时候，
 		所有后续的任务都必须等待，形成一个队列，一旦当前任务执行完毕，再从队列中取下一个任务，这也常被称为“阻塞式执行”
+
+### 禁用F12和右键菜单
+
+		// 禁用F12方法1
+		document.onkeydown = function(){
+			if(window.event && window.event.keyCode == 123){
+				event.keyCode = 0;
+				event.returnValue = false;
+				return false;
+			}
+		}
+
+
+		// 禁用F12方法2
+		document.onkeydown = function(e){
+			var currKey = 0,evt = e||window.event;
+			currKey = evt.keyCode||evt.which||evt.charCode;
+			if(currKey == 123){
+				window.event.cancelBubble = true;
+				window.event.returnValue = false;
+			}
+		}
+		
+		
+		// 禁用右键菜单
+		document.oncontextmenu = function(ev){
+			ev.preventDefault()
+		}
