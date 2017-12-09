@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+		// 禁用F12方法1
+		document.onkeydown = function(){
+			if(window.event && window.event.keyCode == 123){
+				event.keyCode = 0;
+				event.returnValue = false;
+				return false;
+			}
+		}
+
+
+		// 禁用F12方法2
+		document.onkeydown = function(e){
+			var currKey = 0,evt = e||window.event;
+			currKey = evt.keyCode||evt.which||evt.charCode;
+			if(currKey == 123){
+				window.event.cancelBubble = true;
+				window.event.returnValue = false;
+			}
+		}
+		
+		
+		// 禁用右键菜单
+		document.oncontextmenu = function(ev){
+			ev.preventDefault()
+		}
+		
+		</script>
+	</body>
+</html>
