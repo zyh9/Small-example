@@ -914,3 +914,11 @@
 			要特别注意的是：调用history.pushState和history.replaceState并不会触发 onpopstate 事件。
 			
 			总结：经过上面的分析，history 是可以用来进行路由控制的，只不过需要从 3 方面进行着手。
+
+### mouseover和mouseenter
+
+		当定点设备（通常指鼠标）移动到元素上时就会触发 mouseenter 事件
+		
+		类似 mouseover，它们两者之间的差别是 mouseenter 不会冒泡（bubble），也就是说当指针从它的子层物理空间移到它的物理空间上时不会触发
+
+> []()
