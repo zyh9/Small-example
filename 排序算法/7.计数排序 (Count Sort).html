@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var arr = [12,5,8,9,6,3,7,4];
+			function countSort(arr){
+				var len = arr.length,
+					a=[],
+					b=[];
+				min = max = arr[0];
+				for(var i=0;i<len;i++){
+					min = min <= arr[i]?min:arr[i];
+					max = max >= arr[i]?max:arr[i];
+					b[arr[i]] = b[arr[i]]?b[arr[i]]+1:1;
+				}
+				//计算排序后的元素下标
+				for(var j=min;j<max;j++){
+					b[j+1] = (b[j+1]||0)+(b[j]||0);
+				}
+				for(var k=len-1;k>=0;k--){
+					a[b[arr[k]]-1] = arr[k];
+					b[arr[k]]--;
+				}
+				return a;
+			}
+			console.log(countSort(arr))
+		</script>
+	</body>
+</html>

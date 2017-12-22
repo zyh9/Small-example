@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var arr = [12,5,8,9,6,3,7,4];
+			function mergeSort(arr) {
+			    function sort(arr, first, last) {
+			        first = (first === undefined) ? 0 : first
+			        last = (last === undefined) ? arr.length - 1 : last
+			        if (last - first < 1) {
+			            return;
+			        }
+			        var middle = Math.floor((first + last) / 2);
+			        sort(arr, first, middle);
+			        sort(arr, middle + 1, last);
+			        var f = first,
+			            m = middle,
+			            i,
+			            temp;
+			        while (f <= m && m + 1 <= last) {
+			            if (arr[f] >= arr[m + 1]) { // 这里使用了插入排序的思想
+			                temp = arr[m + 1];
+			                for (i = m; i >= f; i--) {
+			                    arr[i + 1] = arr[i];
+			                }
+			                arr[f] = temp;
+			                m++
+			            } else {
+			                f++
+			            }
+			        }
+			        return arr;
+			    }
+			    return sort(arr);
+			}
+			console.log(mergeSort(arr))
+		</script>
+	</body>
+</html>

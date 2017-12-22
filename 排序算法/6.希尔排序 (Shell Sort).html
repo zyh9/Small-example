@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var arr = [12,5,8,9,6,3,7,4];
+			function shellSort(arr) {
+			    function swap(arr, i, k) {
+			        var temp = arr[i];
+			        arr[i] = arr[k];
+			        arr[k] = temp;
+			    }
+			    var length = arr.length,
+			        gap = Math.floor(length / 2);
+			    while (gap > 0) {
+			        for (var i = gap; i < length; i++) {
+			            for (var j = i; 0 < j; j -= gap) {
+			                if (arr[j - gap] > arr[j]) {
+			                    swap(arr, j - gap, j);
+			                } else {
+			                    break;
+			                }
+			            }
+			        }
+			        gap = Math.floor(gap / 2);
+			    }
+			    return arr;
+			}
+			console.log(shellSort(arr))
+		</script>
+	</body>
+</html>

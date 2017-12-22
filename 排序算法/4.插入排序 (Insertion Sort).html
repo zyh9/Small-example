@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var arr = [12,5,8,9,6,3,7,4];
+			function insertSort(arr){
+				var temp;
+				for(var i=1;i<arr.length;i++){
+					if(arr[i]<arr[i-1]){
+						temp = arr[i];
+						for(var j = i-1;j>=0&&arr[j]>temp;j--){
+							arr[j+1] = arr[j];
+						}
+						arr[j+1] = temp;
+					}
+				}
+				return arr;
+			}
+			console.log(insertSort(arr))
+		</script>
+	</body>
+</html>

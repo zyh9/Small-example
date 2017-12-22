@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var arr = [12,5,8,9,6,3,7,4];
+			var n = 0;
+//			function bubbleSort(arr){
+//				// 比较多少轮
+//				for(var i=0;i<arr.length;i++){
+//					// 每一轮两两比较
+//					for(var j=0;j<arr.length;j++){
+//						if(arr[j]>arr[j+1]){
+//							var a = arr[j];
+//							arr[j] = arr[j+1];;
+//							arr[j+1] = a;
+//						}
+//						n++;
+//					}
+//				}
+//				return arr;
+//			}
+//			console.log(bubbleSort(arr))
+//			console.log(n)
+			
+			
+			//优化版
+			function bubbleSort(arr){
+			//比较多少轮，第一次得到最大，第二次得到第二大
+				for(var i=0;i<arr.length-1;i++){
+					//每一轮两两比较
+					var onOff = true;
+					for(var j=0;j<arr.length-1-i;j++){
+						//如果前边比后边大，交换位置
+						if(arr[j]>arr[j+1]){
+							var a = arr[j];
+							arr[j] = arr[j+1];
+							arr[j+1] = a;
+							//如果有交换，就变false
+							onOff = false;
+						}
+						n++;
+					}
+					//如果这一轮都没有交换，证明已经排好了，break
+					if(onOff){
+						break;
+					}
+				}
+				return arr;
+			}
+			console.log(bubbleSort(arr))
+			console.log(n)
+		</script>
+	</body>
+</html>

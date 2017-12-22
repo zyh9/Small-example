@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var arr = [12,5,8,9,6,3,7,4];
+			function heapSort(arr) {
+			  	function swap(arr, i, j) {
+			    	var temp = arr[i];
+			    	arr[i] = arr[j];
+			    	arr[j] = temp;
+			  	}
+			  	function maxHeapify(arr, index, heapSize) {
+			    	var iMax,
+			      	iLeft,
+			      	iRight;
+			    	while (true) {
+				      	iMax = index;
+				      	iLeft = 2 * index + 1;
+				      	iRight = 2 * (index + 1);
+				      	if (iLeft < heapSize && arr[index] < arr[iLeft]) {
+				        	iMax = iLeft;
+			      		}
+			      		if (iRight < heapSize && arr[iMax] < arr[iRight]) {
+			        		iMax = iRight;
+			      		}
+			      		if (iMax != index) {
+			        		swap(arr, iMax, index);
+			        		index = iMax;
+			      		} else {
+			        		break;
+			      		}
+			    	}
+			  	}
+			  	function buildMaxHeap(arr) {
+			    	var i,
+			      	iParent = Math.floor(arr.length / 2) - 1;
+			    	for (i = iParent; i >= 0; i--) {
+			      		maxHeapify(arr, i, arr.length);
+			    	}
+			  	}
+			  	function sort(arr) {
+			    	buildMaxHeap(arr);
+			    	for (var i = arr.length - 1; i > 0; i--) {
+			      		swap(arr, 0, i);
+			      		maxHeapify(arr, 0, i);
+			    	}
+			    	return arr;
+			  	}
+			  	return sort(arr);
+			}
+			console.log(heapSort(arr))
+		</script>
+	</body>
+</html>
