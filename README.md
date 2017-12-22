@@ -882,7 +882,9 @@
 			
 			下载静态片段 + Max(下载资源文件 + 应用初始化，请求首屏数据) + 首屏初始化 + 首屏渲染
 
-> [文章链接](https://zhuanlan.zhihu.com/p/26543645)
+> [知乎专栏文章链接](https://zhuanlan.zhihu.com/p/26543645)
+
+> [App Shell 模型](https://developers.google.cn/web/fundamentals/architecture/app-shell?hl=zh-cn)
 
 ### 单页面应用路由实现原理
 
