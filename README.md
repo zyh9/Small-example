@@ -505,63 +505,22 @@
 
 > 另外还涉及到数据类型的转换
 
-<table>
-    <tr>
-        <th style = "text-align:center">原始数据类型</th>
-        <th style = "text-align:center">目标类型Number</th>
-    </tr>
-    <tr>
-        <td style = "text-align:center">undefined</td>
-        <td style = "text-align:center">NaN</td>
-    </tr>
-    <tr>
-        <td style = "text-align:center">null</td>
-        <td style = "text-align:center">0</td>
-    </tr>
-    <tr>
-        <td style = "text-align:center">false</td>
-        <td style = "text-align:center">0</td>
-    </tr>
-    <tr>
-        <td style = "text-align:center">true</td>
-        <td style = "text-align:center">1</td>
-    </tr>
-    <tr>
-        <td style = "text-align:center">数字串</td>
-        <td style = "text-align:center">相应的数字</td>
-    </tr>
-    <tr>
-        <td style = "text-align:center">不能转化的字符串</td>
-        <td style = "text-align:center">NaN</td>
-    </tr>
-</table>
+|原始数据类型|目标类型Number|
+|---|---|---|---|
+|undefined|NaN|
+|null|0|
+|false|0|
+|true|1|
+|数字|相应的数字|
+|不能转化的字符串|NaN|
 
-<table>
-    <tr>
-        <th style = "text-align:center">原始数据类型</th>
-        <th style = "text-align:center">目标类型String</th>
-    </tr>
-    <tr>
-        <td style = "text-align:center">undefined</td>
-        <td style = "text-align:center">undefined</td>
-    </tr>
-    <tr>
-        <td style = "text-align:center">null</td>
-        <td style = "text-align:center">null</td>
-    </tr>
-    <tr>
-        <td style = "text-align:center">false</td>
-        <td style = "text-align:center">false</td>
-    </tr>
-    <tr>
-        <td style = "text-align:center">true</td>
-        <td style = "text-align:center">true</td>
-    </tr>
-    <tr>
-        <td style = "text-align:center">数字</td>
-        <td style = "text-align:center">数字字符串</td>
-    </tr>
-</table>
+|原始数据类型|目标类型String|
+|---|---|---|---|
+|undefined|undefined|
+|null|null|
+|false|false|
+|true|true|
+|数字|数字字符串|
 
 ### IE和火狐的事件机制有什么区别？如何阻止冒泡？
 
