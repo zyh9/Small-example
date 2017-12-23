@@ -945,7 +945,7 @@
 		类似 mouseover，它们两者之间的差别是 mouseenter 不会冒泡（bubble），
 		也就是说当指针从它的子层物理空间移到它的物理空间上时不会触发
 
-> [MDN文章链接](https://developer.mozilla.org/zh-CN/docs/Web/Events/mouseenter)
+> [可参考MDN的详细介绍](https://developer.mozilla.org/zh-CN/docs/Web/Events/mouseenter)
 
 ###  八种经典排序算法
 
