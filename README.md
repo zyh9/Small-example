@@ -506,7 +506,7 @@
 > 另外还涉及到数据类型的转换
 
 |原始数据类型|目标类型Number|
-|---|---|---|---|
+|---|---|
 |undefined|NaN|
 |null|0|
 |false|0|
@@ -515,7 +515,7 @@
 |不能转化的字符串|NaN|
 
 |原始数据类型|目标类型String|
-|---|---|---|---|
+|---|---|
 |undefined|undefined|
 |null|null|
 |false|false|
