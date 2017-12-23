@@ -947,7 +947,7 @@
 
 > [MDN文章链接](https://developer.mozilla.org/zh-CN/docs/Web/Events/mouseenter)
 
-### 八种经典排序算法
+###  八种经典排序算法
 
 		八种排序算法分别是： 
 			1.冒泡排序
@@ -1006,3 +1006,51 @@
 			二叉堆排序的时间复杂度是-O(N * log N)
 
 > [日本程序员norahiko排序算法的动画演示](http://jsdo.it/norahiko/oxIy/fullscreen)
+
+### WebSocket
+
+> 为什么需要 WebSocket？
+
+		因为 HTTP 协议有一个缺陷：通信只能由客户端发起。
+		HTTP 协议做不到服务器主动向客户端推送信息。
+		
+		而WebSocket：
+			服务器可以主动向客户端推送信息，
+			客户端也可以主动向服务器发送信息，是真正的双向平等对话
+
+> WebSocket特点
+
+		1.建立在 TCP 协议之上，服务器端的实现比较容易。
+		
+		2.与 HTTP 协议有着良好的兼容性。默认端口也是80和443，
+		  并且握手阶段采用 HTTP 协议，因此握手时不容易屏蔽，能通过各种 HTTP 代理服务器。
+		
+		3.数据格式比较轻量，性能开销小，通信高效。
+		
+		4.可以发送文本，也可以发送二进制数据。
+		
+		5.没有同源限制，客户端可以与任意服务器通信。
+		
+		6.协议标识符是ws（如果加密，则为wss），服务器网址就是 URL。
+
+> 客户端的简单示例
+
+```javascript
+	var ws = new WebSocket("wss://echo.websocket.org");
+	
+	ws.onopen = function(evt) { 
+	  	console.log("连接打开..."); 
+	  	ws.send("Hello WebSockets!");
+	};
+	
+	ws.onmessage = function(evt) {
+	  	console.log( "收到消息: " + evt.data);
+	  	ws.close();
+	};
+	
+	ws.onclose = function(evt) {
+	  	console.log("连接关闭");
+	};      
+```
+
+[详细内容可参考：阮一峰WebSocket教程](http://www.ruanyifeng.com/blog/2017/05/websocket.html)
