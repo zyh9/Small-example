@@ -786,30 +786,6 @@
 			ev.preventDefault()
 		}
 
-### Array.sort()
-
-		let n =[
-			{id: 2, team_name: "夏威夷草裙队", team_score: 2041, leader_id: 0},
-			{id: 1, team_name: "香水皇宫大保健", team_score: 582, leader_id: 0},
-			{id: 7, team_name: "云南艳遇队", team_score: 457, leader_id: 0},
-			{id: 9, team_name: "杭州白娘子队", team_score: 334, leader_id: 0},
-			{id: 8, team_name: "沙滩比基尼队", team_score: 134, leader_id: 0},
-			{id: 6, team_name: "泰国人妖队", team_score: 63, leader_id: 0},
-			{id: 5, team_name: "西藏高原红队", team_score: 43, leader_id: 0},
-			{id: 4, team_name: "办公室加班队", team_score: 39, leader_id: 0},
-			{id: 3, team_name: "撒哈拉骆驼队", team_score: 34, leader_id: 0}
-		]
-        
-		请求到这样一组数据，数组每项的team_score为每个队伍的分数，现要求每队分数从大到小排列。
-		
-		本来还想着封装一个函数做处理，做一个排序，但后来想想，是自己搞复杂了，其实可以更简单。
-		
-		解决办法：
-			
-			n.sort((a,b)=>b.team_score-a.team_score)
-			
-		返回排序后的数组，原数组已经被排序后的数组代替。
-
 ### 提高首屏性能
 
 		前端渲染常使用的 SPA 会把所有 JS 整体打包，无法忽视的问题就是文件太大，
