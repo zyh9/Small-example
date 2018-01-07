@@ -1036,3 +1036,18 @@
 		node_modules/
 		
 		那么这样所有的.json的文件就会被全部忽略，git就不会扫描和提交这些文件了
+
+### Chrome浏览器下小于12号字的解决方案
+
+		可以使用transform: scale来解决
+		
+		想要支持IE8及以下，再给其添加一个真实的字体大小
+		
+		.text1{
+			font-size: 12px;
+			transform: scale(0.75);
+			transform-origin: 0;
+		}
+		.text2{
+			font-size: 9px;
+		}
