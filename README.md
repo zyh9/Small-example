@@ -1051,3 +1051,14 @@
 		.text2{
 			font-size: 9px;
 		}
+
+### console.log版本号
+
+```javascript
+	console.log(
+	`%c WEB %c zhangyanhui %c`,
+	"background:#35495e ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff",
+	"background:#41b883 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff",
+	"background:transparent"
+	)
+```
