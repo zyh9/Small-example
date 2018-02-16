@@ -1052,7 +1052,7 @@
 			font-size: 9px;
 		}
 
-### console.log版本号
+### 控制台版本号
 
 ```javascript
 	console.log(
