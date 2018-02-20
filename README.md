@@ -877,7 +877,8 @@
 
 		当定点设备（通常指鼠标）移动到元素上时就会触发 mouseenter 事件
 		
-		类似 mouseover，它们两者之间的差别是 mouseenter 不会冒泡（bubble），
+		类似 mouseover，它们两者之间的差别是 mouseenter 不会冒泡（bubble）
+		
 		也就是说当指针从它的子层物理空间移到它的物理空间上时不会触发
 
 > [可参考MDN的详细介绍](https://developer.mozilla.org/zh-CN/docs/Web/Events/mouseenter)
