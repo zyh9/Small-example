@@ -976,16 +976,16 @@
 	ws.onopen = function(evt) { 
 	  	console.log("连接打开..."); 
 	  	ws.send("Hello WebSockets!");
-	};
+	}
 	
 	ws.onmessage = function(evt) {
 	  	console.log( "收到消息: " + evt.data);
 	  	ws.close();
-	};
+	}
 	
 	ws.onclose = function(evt) {
 	  	console.log("连接关闭");
-	};      
+	}
 ```
 
 [详细内容可参考：阮一峰WebSocket教程](http://www.ruanyifeng.com/blog/2017/05/websocket.html)
