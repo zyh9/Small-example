@@ -1080,3 +1080,15 @@
 |%o|转化成展开的DOM元素输出
 |%O|转化成JavaScript对象输出
 |%c|把字符串按照你提供的样式格式化后输出|
+
+### 文字竖向排列
+
+> 结合css来控制文字竖向排列
+
+```html
+	.element{
+		width:20px;
+		text-align:center;
+		line-height:20px;
+	}
+```
