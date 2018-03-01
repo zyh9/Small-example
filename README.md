@@ -1092,3 +1092,20 @@
 		line-height:20px;
 	}
 ```
+
+### 遮罩的另一种写法
+
+		第一层给定位（负数），也可以达到遮罩的效果，而我们通常是给遮罩定位
+		
+		而这这方法反其道而行之，也是可以的
+
+```html
+	.out {
+		width: 100%;
+		position: absolute;
+		opacity: 0;
+		height: 100%;
+		overflow: hidden;
+		z-index: -1;
+	}
+```
