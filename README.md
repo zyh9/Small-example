@@ -1118,3 +1118,18 @@
 		z-index: -1;
 	}
 ```
+
+### map的另一种用法
+
+> 这种写法会返回你所需要的key组成新数组
+
+```javascript
+	let arr = [
+		{text:1,value:1},
+		{text:2,value:2},
+		{text:3,value:4},
+		{text:4,value:4}
+	]
+	let array = arr.map(({text})=>({text}))
+	console.log(array)
+```
