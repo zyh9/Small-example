@@ -1109,7 +1109,7 @@
 		而这这方法反其道而行之，也是可以的
 
 ```html
-	.out {
+	.con {
 		width: 100%;
 		position: absolute;
 		opacity: 0;
@@ -1121,7 +1121,7 @@
 
 ### map的另一种用法
 
-> 这种写法会返回你所需要的key组成新数组
+> 返回你所需要的key组成新数组（很实用有木有）
 
 ```javascript
 	let arr = [
