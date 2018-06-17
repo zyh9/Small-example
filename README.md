@@ -1133,3 +1133,14 @@
 	let array = arr.map(({text})=>({text}))
 	console.log(array)
 ```
+
+### 文字渐变
+
+```html
+	.ele{
+        background: linear-gradient(to right, red, blue);
+        -webkit-background-clip: text;
+        color: transparent;
+    }
+```
+
