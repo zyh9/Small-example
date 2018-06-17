@@ -1138,9 +1138,23 @@
 
 ```html
 	.ele{
-        background: linear-gradient(to right, red, blue);
+        background-image: linear-gradient(to right, red, blue);
         -webkit-background-clip: text;
         color: transparent;
     }
 ```
 
+[background-clip](http://www.w3school.com.cn/cssref/pr_background-clip.asp)
+
+
+		-webkit-background-clip: text;
+		
+		background-clip		规定背景的绘制区域
+		
+		background-clip: border-box|padding-box|content-box;
+		
+		上面没有说取值 text 的情况，看到前面的前缀，大家应该也能想到，它的兼容性问题了，目前还不是能所有浏览器都支持。
+		
+		取值为text的意思，就是以区块内的文字作为裁剪区域向外裁剪，文字的背景即为区块的背景，文字之外的区域都将被裁剪掉。
+		
+		所以，我们最后写color: transparent; 让文字为透明色，就是让后面背景色显示出来。
