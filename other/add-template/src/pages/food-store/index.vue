@@ -122,6 +122,10 @@
                         <i class="icon icon_offer"></i>
                         <p>我的优惠券</p>
                     </div>
+                    <div class="options" @click="goVip">
+                        <i class="icon icon_vip"></i>
+                        <p>我的会员卡</p>
+                    </div>
                 </div>
             </swiper-item>
         </swiper>
@@ -210,11 +214,11 @@
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
                 <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"> 
-                                                                                                    <cover-view class="shareCover" >
-                                                                                                    <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                                    <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                                    </cover-view>
-                                                                                                    </canvas>
+                                                                                                                            <cover-view class="shareCover" >
+                                                                                                                            <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
+                                                                                                                            <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
+                                                                                                                            </cover-view>
+                                                                                                                            </canvas>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -331,20 +335,20 @@
             this.minShopLogo = '';
             //优惠券列表
             this.couponList = [];
-            if (this.$root.$mp.query.type == 1 || this.$root.$mp.query.back == 1) {
-                console.log('不走分享')
-                // 获取店铺信息以及商品信息 catch用来捕获异常
-                this.shopInfoSum().catch(err => {
-                    console.log(err)
-                    wx.hideLoading();
-                    this.msg(err.Msg)
-                    setTimeout(_ => {
-                        wx.switchTab({
-                            url: '/pages/nearby-shop/main'
-                        })
-                    }, 1000)
-                })
-            }
+            // if (this.$root.$mp.query.type == 1 || this.$root.$mp.query.back == 1) {
+            //     console.log('不走分享')
+            //     // 获取店铺信息以及商品信息 catch用来捕获异常
+            //     this.shopInfoSum().catch(err => {
+            //         console.log(err)
+            //         wx.hideLoading();
+            //         this.msg(err.Msg)
+            //         setTimeout(_ => {
+            //             wx.switchTab({
+            //                 url: '/pages/nearby-shop/main'
+            //             })
+            //         }, 1000)
+            //     })
+            // }
             //  else {
             //     console.log('走分享')
             //     this.util.qqMapInfo().then(res => {
@@ -366,6 +370,19 @@
                 this.shopInfoSum().catch(err => {
                     wx.hideLoading();
                     this.msg(err.Msg)
+                })
+            } else {
+                console.log('不走分享')
+                // 获取店铺信息以及商品信息 catch用来捕获异常
+                this.shopInfoSum().catch(err => {
+                    console.log(err)
+                    wx.hideLoading();
+                    this.msg(err.Msg)
+                    setTimeout(_ => {
+                        wx.switchTab({
+                            url: '/pages/nearby-shop/main'
+                        })
+                    }, 1000)
                 })
             }
         },
@@ -1337,7 +1354,26 @@
                         this.msg('您已经领取过了哦')
                     }
                 }
-            }
+            },
+            goVip() {
+                if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
+                    this.msg('您还没有登录哦')
+                    setTimeout(_ => {
+                        wx.navigateTo({
+                            url: '/pages/login/main'
+                        })
+                    }, 1000)
+                } else {
+                    if (wx.getStorageSync('shopInfo').IsShowVipMenu == 0) {
+                        this.msg('店铺暂未开启会员服务，敬请期待')
+                        return;
+                    } else {
+                        wx.navigateTo({
+                            url: `/pages/my-vip/main`
+                        })
+                    }
+                }
+            },
         },
         computed: {
             //购物车商品总价

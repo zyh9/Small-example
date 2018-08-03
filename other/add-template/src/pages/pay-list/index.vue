@@ -4,14 +4,12 @@
     <div class="container">
       <scroll-view scroll-y="true" lower-threshold="60" @scrolltolower="scrollHandler" style="height:100%;padding:0 36rpx;box-sizing:border-box;">
         <p class="no_info" v-if="noInfo">暂无明细信息</p>
-        <div class="list-item" v-for="(v,i) in 10" :key="i">
+        <div class="list-item" v-for="(v,i) in walletList" :key="i">
           <div class="wallet-info">
-            <div class="text">会员卡充值</div>
-            <div class="time">2018-02-02 12:12:12</div>
+            <div class="text">{{v.SubjectName}}</div>
+            <div class="time">{{v.TradeTime}}</div>
           </div>
-          <div class="price">
-            +22
-          </div>
+          <div class="price">{{v.TradeMoney}}</div>
         </div>
       </scroll-view>
     </div>
@@ -22,14 +20,55 @@
   export default {
     data() {
       return {
+        walletList: [], //钱包明细数组
+        quest: true,
+        page: 1,
+        PageSize: 10,
         noInfo: false
       }
     },
     onReady() {},
-    methods: {},
-    watch: {},
-    onUnload() {}
-  }
+    onShow() {
+      this.noInfo = false;
+      this.walletList = [];
+      this.quest = true;
+      this.page = 1;
+      this.getData();
+    },
+    methods: {
+      getData() {
+        this.util.post({
+          url: '/api/Customer/VipMember/BalanceTradeList',
+          data: {
+            ShopID: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+            VipNo: wx.getStorageSync('vipUserInfo').VipNo || '',
+            PageSize: this.PageSize,
+            PageIndex: this.page,
+          }
+        }).then(res => {
+          res.Body.forEach(e => {
+            e.TradeTime = this.util.FmtTime(new Date(e.TradeTime), 'yyyy-MM-dd')
+          });
+          if (res.Body.length < this.PageSize && this.page > 1) {
+            this.quest = false;
+            this.msg('已经没有更多信息了')
+          } else if (!res.Body.length && this.page == 1) {
+            this.noInfo = true;
+          }
+          this.walletList.push(...res.Body)
+        }).catch(err => {
+          this.msg(err.Msg)
+        })
+      },
+      scrollHandler() {
+        if (this.quest) {
+          this.page++;
+          this.getData()
+        }
+      }
+    },
+    components: {}
+  };
 </script>
 
 <style lang="less">

@@ -2,20 +2,19 @@
     <div class="vip_recharge">
         <div class="recharge_con">
             <div class="info">
-                <i class="icon icon_price"></i>
-                <p>送1000元成为高级会员</p>
+                <i class="icon icon_price" v-if="tips"></i>
+                <p>{{tips}}</p>
             </div>
-            <ul class="recharge_list">
-                <li v-for="(v,i) in 7" :key="i" :class="{active:lisActive==i}">100<span>元</span></li>
-                <li><input type="number" placeholder="其他金额" maxlength="5" class="other" placeholder-style="color:#ccc;" /></li>
+            <ul class="recharge_list" v-if="rechargeList&&rechargeList.length">
+                <li v-for="(v,i) in rechargeList" :key="i" :class="{active:lisActive==i}" @click="selectMoney(i)">{{v.RechargeMoney}}<span>元</span></li>
+                <li @click="selectMoney(-1)" :class="{active_other:lisActive==-1}"><input type="number" placeholder="其他金额" maxlength="5" class="other" placeholder-style="color:#ccc;" v-model="inpMoney" /></li>
             </ul>
         </div>
         <div class="recharge_bot">
             <div class="bot_left">
-                <div class="money_sum"><span>合计:</span><i>¥</i><b>111</b></div>
-                <p>送200元余额成为高级会员送200元余额成为高级会员</p>
+                <span>合计:</span><i>¥</i><b>{{MoneySum}}</b>
             </div>
-            <button class="sum" plain="true">立即充值</button>
+            <button class="sum" plain="true" @click="MoneyRecharge">立即充值</button>
         </div>
     </div>
 </template>
@@ -25,11 +24,95 @@
         data() {
             return {
                 lisActive: 0,
+                rechargeList: [],
+                tips: '',
+                payOnoff: true,
+                MoneySum: 0,
+                inpMoney:'',
             }
         },
-        onShow() {},
-        methods: {},
+        onReady() {
+            this.rechargeList = [];
+            this.payOnoff = true;
+            this.getRecharge()
+        },
+        methods: {
+            getRecharge() {
+                this.util.post({
+                    url: '/api/Customer/VipMember/GetVipRechargeRule',
+                    data: {
+                        ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+                    }
+                }).then(res => {
+                    this.rechargeList = res.Body;
+                    this.tips = this.rechargeList[0].NoticeMessage;
+                    this.MoneySum = this.rechargeList[0].RechargeMoney;
+                }).catch(err => {
+                    this.msg(err.Msg)
+                })
+            },
+            MoneyRecharge() {
+                if (this.payOnoff) {
+                    this.payOnoff = false;
+                    this.util.post({
+                        url: '/api/Customer/VipMember/VipRecharge',
+                        data: {
+                            ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+                            VipNo: wx.getStorageSync('vipUserInfo').VipNo || '',
+                            RechargeMoney: 10
+                        }
+                    }).then(res => {
+                        wx.requestPayment({
+                            timeStamp: res.Body.timeStamp,
+                            nonceStr: res.Body.nonceStr,
+                            package: res.Body.package,
+                            signType: res.Body.signType,
+                            paySign: res.Body.paySign,
+                            success: payres => {
+                                this.payOnoff = true;
+                                console.log(payres)
+                                wx.redirectTo({
+                                    url: `/pages/pay-ok/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
+                                })
+                            },
+                            fail: error => {
+                                this.payOnoff = true;
+                                console.log(error.errMsg)
+                                if (error.errMsg == 'requestPayment:fail cancel') {
+                                    this.msg('您已取消支付')
+                                } else { //支付失败
+                                    wx.redirectTo({
+                                        url: `/pages/pay-error/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
+                                    })
+                                }
+                            }
+                        })
+                    }).catch(err => {
+                        this.payOnoff = true;
+                        this.msg(err.Msg)
+                    })
+                }
+            },
+            selectMoney(i) {
+                // console.log(i)
+                this.lisActive = i;
+                if (this.rechargeList.length) {
+                    if (i == -1) {
+                        this.tips = '';
+                        this.MoneySum = this.inpMoney?this.inpMoney:0;
+                    } else {
+                        this.tips = this.rechargeList[i].NoticeMessage;
+                        this.MoneySum = this.rechargeList[i].RechargeMoney;
+                    }
+                }
+            }
+        },
         computed: {},
+        watch: {
+            inpMoney:function(newVal,oldVal){
+                this.MoneySum = newVal;
+            }
+        }
     }
 </script>
 
@@ -52,6 +135,7 @@
                 display: flex;
                 justify-content: flex-start;
                 align-items: center;
+                height: 40rpx;
                 p {
                     font-size: 28rpx;
                     color: #1a1a1a;
@@ -79,6 +163,8 @@
                     line-height: 110rpx;
                     color: #ccc;
                     font-weight: 700;
+                    box-sizing: border-box;
+                    border: 1px solid #f5f5f5;
                     span,
                     input {
                         font-weight: 400;
@@ -92,6 +178,9 @@
                 .active {
                     background-color: #ff4d3a;
                     color: #fff;
+                }
+                .active_other {
+                    border: 1px solid #ff4d3a;
                 }
             }
         }
@@ -125,35 +214,24 @@
             .bot_left {
                 flex: 1;
                 line-height: 1;
-                .money_sum {
-                    font-size: 48rpx;
-                    color: #ff4d3a;
-                    flex: 1;
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-start;
-                    margin-bottom: 10rpx;
-                    span {
-                        font-size: 30rpx;
-                        margin-right: 10rpx;
-                        color: #1a1a1a;
-                        font-weight: 700;
-                    }
-                    i {
-                        font-size: 30rpx;
-                        margin-right: 6rpx;
-                    }
-                    b{
-                        transform: translateY(-6rpx);
-                    }
+                font-size: 48rpx;
+                color: #ff4d3a;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                span {
+                    font-size: 30rpx;
+                    margin-right: 10rpx;
+                    color: #1a1a1a;
+                    font-weight: 700;
                 }
-                p {
-                    font-size: 28rpx;
-                    color: #666;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    width: 350rpx;
+                i {
+                    font-size: 30rpx;
+                    margin-right: 6rpx;
+                }
+                b {
+                    transform: translateY(-6rpx);
                 }
             }
             .sum {

@@ -616,7 +616,7 @@
                         })
                     } else {
                         wx.redirectTo({
-                            url: `/pages/food-store/main?ShopId=${this.goodsInfo.ShopId}&back=1`
+                            url: `/pages/food-store/main?ShopId=${this.goodsInfo.ShopId}`
                         })
                     }
                 } else {
@@ -630,11 +630,11 @@
                 let ShopId = wx.getStorageSync('ShopId');
                 if (this.$root.$mp.query.temp == 1 || this.ShopTemplateId == 1) {
                     wx.redirectTo({
-                        url: `/pages/food-store/main?ShopId=${ShopId}&back=1`
+                        url: `/pages/food-store/main?ShopId=${ShopId}`
                     })
                 } else if (this.$root.$mp.query.temp == 2 || this.ShopTemplateId == 2) {
                     wx.redirectTo({
-                        url: `/pages/business/main?ShopId=${ShopId}&back=1`
+                        url: `/pages/business/main?ShopId=${ShopId}`
                     })
                 }
             }

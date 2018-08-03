@@ -3,7 +3,7 @@
         <div v-if='!isNew'>
             <div class="list-main">
                 <div class="list-item ">
-                    <p class=".label">原密码</p>
+                    <p class="label">原密码</p>
                     <input  type="number" password='true' maxlength="6" placeholder-class='placeholderStyle' placeholder="请输入原密码" v-model="oldPassword">
                 </div>
             </div>
@@ -12,11 +12,11 @@
         <div v-else>
             <div class="list-main">
                 <div class="list-item ">
-                    <p class=".label">设置密码</p>
+                    <p class="label">设置密码</p>
                     <input  type="number" password='true' maxlength="6" placeholder-class='placeholderStyle' placeholder="6位数字" v-model="newPassword">
                 </div>
                 <div class="list-item ">
-                    <p class=".label">再次输入</p>
+                    <p class="label">再次输入</p>
                     <input  type="number" password='true' maxlength="6" placeholder-class='placeholderStyle' placeholder="请再输入一遍" v-model="againPassword">
                 </div>
             </div>
@@ -47,9 +47,10 @@
             next() {
                 if (this.oldPassword.length == 6) {
                     this.util.post({
-                        url: '/api/Merchant/Personal/VerifyTradersPwd',
+                        url: '/api/Customer/VipMember/VerifyVipTradersPwd',
                         data: {
-                            TradersPwd: this.oldPassword
+                            TradersPwd: this.oldPassword,
+                            VipNo: wx.getStorageSync('vipUserInfo').VipNo || '',
                         }
                     }).then(res => {
                         if (res.State == 1) {
@@ -62,6 +63,8 @@
                     }).catch(err => {
                         this.msg(err.Msg)
                     })
+                }else{
+                    this.msg('请输入原密码')
                 }
             },
             submit() {
@@ -76,10 +79,11 @@
                         return;
                     }
                     this.util.post({
-                        url: '/api/Merchant/Personal/ChangeTradersPwd',
+                        url: '/api/Customer/VipMember/ChangeVipTradersPwd',
                         data: {
                             TradersPwd: this.newPassword,
-                            Token: this.token
+                            Token: this.token,
+                            VipNo: wx.getStorageSync('vipUserInfo').VipNo || '',
                         }
                     }).then(res => {
                         if (res.State == 1) {
@@ -88,18 +92,13 @@
                                 wx.navigateBack({
                                     delta: 1
                                 });
-                            }, 300)
+                            }, 800)
                         }
                     }).catch(err => {
                         this.msg(err.Msg)
                     })
                 }
-            },
-            editPass() {
-                wx.navigateTo({
-                    url: "/pages/edit-new-pay-password/main"
-                });
-            },
+            }
         },
         components: {}
     };

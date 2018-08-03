@@ -10,7 +10,7 @@
       <input type="number" placeholder="请输入验证码" v-model="authVal" maxlength="4">
       <div class="sms_click" @click="sendSms">{{countdownInfo}}</div>
     </div>
-    <button class="btn" plain="true" hover-class="none" open-type="getUserInfo" @getuserinfo="getInfo" style="color:#fff;">下一步</button>
+    <button class="btn" plain="true" hover-class="none" style="color:#fff;" @click="commitSms">下一步</button>
   </div>
 </template>
 
@@ -33,20 +33,12 @@
       this.countdownInfo = '获取验证码';
       this.countdownTimer = null;
       this.isSend = true;
+      this.authTel = this.authVal = '';
     },
     methods: {
-      getInfo(res) {
-        if (res.target.userInfo) {
-          wx.setStorageSync('userInfo', JSON.stringify(res.target.userInfo))
-          //提交验证码
-          this.commitSms(res.target.userInfo)
-        } else {
-          this.util.loginModel()
-        }
-      },
       //发送验证码
       sendSms() {
-        console.log(this.authTel)
+        // console.log(this.authTel)
         if (this.phone(this.authTel)) {
           if (this.isSend) {
             this.isSend = false;
@@ -54,7 +46,7 @@
               url: '/api/Customer/VerifyCode/SendSmsCode',
               data: {
                 Mobile: this.authTel,
-                BizType: 1
+                BizType: 8
               }
             }).then(res => {
               this.msg(res.Msg)
@@ -77,43 +69,39 @@
         }
       },
       commitSms(userInfo) {
-        let QQmap = wx.getStorageSync('QQmap');
-        var result = gcoord.transform(
-          [QQmap.longitude, QQmap.latitude], // 经纬度坐标
-          gcoord.WGS84, // 当前坐标系
-          gcoord.BD09 // 目标坐标系
-        );
-        console.log(result)
         if (this.phone(this.authTel) && this.smsCoding(this.authVal)) {
+          let QQmap = wx.getStorageSync('QQmap');
+          var result = gcoord.transform(
+            [QQmap.longitude, QQmap.latitude], // 经纬度坐标
+            gcoord.WGS84, // 当前坐标系
+            gcoord.BD09 // 目标坐标系
+          );
+          console.log(result)
           this.util.post({
             url: '/api/Customer/VerifyCode/CommitSmsCode',
             data: {
               Mobile: this.authTel,
-              BizType: 1,
+              BizType: 8,
               VerifyCode: this.authVal,
               Loction: `${result[0]},${result[1]}`,
               CityName: QQmap.city,
-              wxUserInfo: JSON.stringify(userInfo)
+              wxUserInfo: ''
             }
           }).then(res => {
-            if (res.State == 1) {
-              this.msg(res.Msg)
-              //登录成功修改绑定手机号状态，以便于其它页面获取用户绑定手机号状态
-              let loginInfo = Object.assign({}, wx.getStorageSync('loginInfo'), {
-                IsBindPhone: 1
-              })
-              wx.setStorageSync('loginInfo', loginInfo)
-              this.authTel = this.authVal = '';
-              //登录成功清除定时器
-              this.timer = null;
-              clearInterval(this.countdownTimer)
-              //返回至上一页
-              wx.navigateBack({
-                delta: 1
-              })
-            } else {
-              this.msg(res.Msg)
+            console.log(res)
+            //登录成功清除定时器
+            this.timer = null;
+            clearInterval(this.countdownTimer)
+            //存储信息
+            let vipObj = {
+              token:res.Body.Token,
+              tel:this.authTel
             }
+            wx.setStorageSync('InpVip',vipObj)
+            //跳转至信息填写页
+            wx.redirectTo({
+              url: '/pages/inp-info/main'
+            })
           }).catch(err => {
             this.msg(err.Msg)
           })

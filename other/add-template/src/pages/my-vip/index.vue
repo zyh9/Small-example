@@ -1,26 +1,26 @@
 <template>
-    <div class="my_vip">
-        <div class="no_vip" v-if="false">
+    <div class="my_vip" v-if="block">
+        <div class="no_vip" v-if="!isVip">
             <div class="vip_con">
-                <img class="vip_bg" src="../../../static/red-vip.png" alt="">
+                <img class="vip_bg fade_in" src="../../../static/red-vip.png" alt="">
                 <div class="vip_card_info">
-                    <img src="" alt="">
-                    <p>什么鬼</p>
+                    <img :src="shopLogo?shopLogo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="">
+                    <p>{{shopName}}</p>
                 </div>
             </div>
-            <div class="vip_btn">立即成为会员</div>
+            <div class="vip_btn" @click="loginVip">立即成为会员</div>
         </div>
-        <div class="is_vip">
+        <div class="is_vip" v-else>
             <div class="vip_card_con">
                 <div class="vip_con">
-                    <img class="vip_bg" src="../../../static/red-vip.png" alt="">
+                    <img class="vip_bg fade_in" src="../../../static/red-vip.png" alt="">
                     <div class="vip_card_info">
-                        <img src="" alt="">
-                        <p>什么鬼</p>
+                        <img :src="shopLogo?shopLogo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="">
+                        <p>{{shopName}}</p>
                     </div>
                 </div>
-                <img class="qrcode" src="" alt="">
-                <p class="qrcode_num">4656-4546-4565-13256</p>
+                <canvas class="qrcode" canvas-id="barcode" />
+                <p class="qrcode_num">{{info.VipNo}}</p>
                 <div class="pay_vip">
                     <i class="icon icon_over"></i>
                     <p>余额支付</p>
@@ -29,7 +29,7 @@
             </div>
             <div class="vip_card_bot" :class="{vip_card_bot_active:active}">
                 <div @click="openCartNum" class="open_cart_num">
-                    <p class="rmb">456</p>
+                    <p class="rmb">{{info.AccountMoney}}</p>
                     <div class="pay_cart_money">
                         <p>卡内余额(元)</p>
                         <i class="icon icon_money_right"></i>
@@ -47,19 +47,64 @@
 </template>
 
 <script>
+    import wxbarcode from 'wxbarcode';
     export default {
         data() {
             return {
                 active: false,
                 qrcodeImg: require('../../../static/qrcode.png'),
                 qrcodeTop: require('../../../static/qrcode-top.png'),
+                shopLogo: '',
+                shopName: '',
+                isVip: false,
+                block: false,
+                info: {}
             }
         },
-        onReady() {
+        onLoad() {
             this.active = false;
+            this.info = {};
+            this.shopLogo = wx.getStorageSync('shopInfo').Logo;
+            this.shopName = wx.getStorageSync('shopInfo').ShopName;
+            this.block = false;
+            wx.showLoading({
+                title: '加载中',
+                mask: true
+            })
+            this.getVipInfo()
         },
         onShow() {},
         methods: {
+            getVipInfo() {
+                this.util.post({
+                    url: '/api/Customer/VipMember/GetVipInfo',
+                    data: {
+                        ShopId: this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+                    }
+                }).then(res => {
+                    wx.hideLoading();
+                    this.block = true;
+                    this.info = res.Body;
+                    this.isVip = res.Body.VipNo == 0 ? false : true;
+                    if (res.Body.VipNo != 0) {
+                        //生成二维码
+                        wxbarcode.barcode('barcode', String(res.Body.VipNo), 358, 154);
+                        //存储用户vip信息
+                        console.log(res.Body.AccountMoney)
+                        wx.setStorageSync('vipUserInfo', {
+                            Birthday: this.util.FmtTime(new Date(res.Body.Birthday), 'yyyy-MM-dd'),
+                            Mobile: res.Body.Mobile,
+                            Name: res.Body.Name,
+                            Sex: res.Body.Sex,
+                            VipNo: res.Body.VipNo,
+                            AccountMoney:res.Body.AccountMoney,
+                        })
+                    }
+                }).catch(err => {
+                    wx.hideLoading();
+                    this.msg(err.Msg)
+                })
+            },
             rotate() {
                 this.active = !this.active;
             },
@@ -68,14 +113,19 @@
                     url: '/pages/vip-recharge/main'
                 })
             },
-            openCartNum(){
+            openCartNum() {
                 wx.navigateTo({
                     url: '/pages/card-money/main'
                 })
             },
-            vipInfo(){
-                 wx.navigateTo({
+            vipInfo() {
+                wx.navigateTo({
                     url: '/pages/vip-info/main'
+                })
+            },
+            loginVip() {
+                wx.redirectTo({
+                    url: '/pages/login-vip/main'
                 })
             }
         },
@@ -158,7 +208,6 @@
                 width: 358rpx;
                 height: 154rpx;
                 margin-top: 50rpx;
-                background-color: red;
             }
             .qrcode_num {
                 line-height: 30rpx;
@@ -193,6 +242,9 @@
             align-items: center;
             position: relative;
             .open_cart_num {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
                 margin-bottom: 36rpx;
             }
             .rmb {

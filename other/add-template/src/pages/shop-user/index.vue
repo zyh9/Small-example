@@ -25,10 +25,10 @@
         <i class="icon icon_offer"></i>
         <p>我的优惠券</p>
       </div>
-      <!-- <div class="options" @click="goVip">
-          <i class="icon icon_vip"></i>
-          <p>我的会员卡</p>
-        </div> -->
+      <div class="options" @click="goVip">
+        <i class="icon icon_vip"></i>
+        <p>我的会员卡</p>
+      </div>
       <div class="options" @click="goShop">
         <i class="icon icon_shop_img"></i>
         <p>关于店铺</p>
@@ -56,13 +56,10 @@
     data() {
       return {
         wxInfo: {},
-        isBindPhone: true,
-        clickInfo:true,
+        clickInfo: true,
       }
     },
     onShow() {
-      // 判断是否已绑定手机号
-      this.isBindPhone = wx.getStorageSync('loginInfo').IsBindPhone == 1 ? false : true;
       if (wx.getStorageSync('wxInfo')) {
         this.wxInfo = wx.getStorageSync('wxInfo')
         this.clickInfo = false;
@@ -83,7 +80,7 @@
         }
       },
       address() {
-        if (this.isBindPhone) {
+        if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
           this.msg('您还没有登录哦')
           return;
         }
@@ -92,7 +89,7 @@
         })
       },
       order() {
-        if (this.isBindPhone) {
+        if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
           this.msg('您还没有登录哦')
           return;
         }
@@ -101,12 +98,23 @@
         })
       },
       goVip() {
-        if (this.isBindPhone) {
+        if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
           this.msg('您还没有登录哦')
           return;
         }
-        wx.navigateTo({
-          url: '/pages/my-vip/main'
+        this.util.post({
+          url: '/api/Customer/VipMember/GetVipInfo',
+          data: {
+            ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || ''
+          }
+        }).then(res => {
+          console.log(res)
+          let isVip = res.Body.VipNo == 0 ? 0 : res.Body.VipNo;
+          wx.navigateTo({
+            url: `/pages/my-vip/main?isVip=${isVip}`
+          })
+        }).catch(err => {
+          this.msg(err.Msg)
         })
       },
       goShop() {
@@ -114,35 +122,9 @@
           url: '/pages/shop-details/main'
         })
       },
-      userData() {
-        if (wx.getStorageSync('loginInfo')) {
-          this.util.post({
-              url: '/api/Customer/PersonerCenter/UserCenter',
-              data: {},
-            })
-            .then(res => {
-              if (res.State == 1) {
-                this.userInfo = res.Body;
-                this.userInfo.UserMobile = this.userInfo.UserMobile.substr(0, 3).padEnd(7, '*') + this.userInfo.UserMobile.substr(7);
-                this.userInfo.NickName = this.userInfo.NickName.length > 8 ? this.userInfo.NickName.slice(0, 8) + '...' : this.userInfo.NickName;
-                // console.log(this.userInfo)
-                wx.setStorageSync('user', this.userInfo)
-              }
-            }).catch(err => {
-              this.msg(err.Msg)
-            })
-        }
-      },
-      login() {
-        if (!this.userInfo.HeadImg) {
-          wx.navigateTo({
-            url: '/pages/login/main'
-          })
-        }
-      },
       goCoupon() {
         let ShopId = wx.getStorageSync('shopInfo').ShopId;
-        if (this.isBindPhone) {
+        if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
           this.msg('您还没有登录哦')
           return;
         }
@@ -154,13 +136,11 @@
         wx.redirectTo({
           url: '/pages/business/main'
         })
-        // this.util.openBusiness(this, 'user', 'business')
       },
       openCart() {
         wx.redirectTo({
           url: '/pages/cart/main'
         })
-        // this.util.openCart(this, 'user', 'cart')
       },
     },
     computed: {},

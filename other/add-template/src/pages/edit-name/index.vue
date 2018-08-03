@@ -2,16 +2,48 @@
   <div class="edit_name">
     <div class="options">
       <p>姓名</p>
-      <input type="text" placeholder="支持数字、汉字、字母和符号" maxlength="16" v-model="authTel" />
+      <input type="text" placeholder="支持数字、汉字、字母和符号" maxlength="16" v-model="editName" />
     </div>
-    <button class="btn" plain="true" hover-class="none" style="color:#fff;">确认修改</button>
+    <button class="btn" plain="true" hover-class="none" style="color:#fff;" @click="okEdit">确认修改</button>
   </div>
 </template>
 
 <script>
   export default {
     data() {
-      return {}
+      return {
+        editName: ''
+      }
+    },
+    onLoad() {
+      this.editName = '';
+    },
+    methods: {
+      okEdit() {
+        if (this.editName.replace(/\s/g, '') == '') {
+          this.msg('请输入会员名')
+          return;
+        }
+        this.util.post({
+          url: '/api/Customer/VipMember/UpdateVipMember',
+          data: {
+            VipNo: wx.getStorageSync('vipUserInfo').VipNo||'',
+            Name: this.editName
+          }
+        }).then(res => {
+          this.msg('会员名修改成功')
+          wx.setStorageSync('vipUserInfo', Object.assign({}, wx.getStorageSync('vipUserInfo'), {
+            Name: this.editName
+          }))
+          setTimeout(_ => {
+            wx.navigateBack({
+              delta: 1
+            })
+          }, 800)
+        }).catch(err => {
+          this.msg(err.Msg)
+        })
+      }
     },
     components: {}
   }

@@ -25,6 +25,7 @@
 </template>
 
 <script>
+    import gcoord from 'gcoord';
     export default {
         data() {
             return {
@@ -71,66 +72,70 @@
                     return
                 };
                 this.time = 60;
-                const that = this;
                 this.isSend = false;
                 this.util.post({
-                    url: '/api/Merchant/VerifyCode/SendSmsCode',
+                    url: '/api/Customer/VerifyCode/SendSmsCode',
                     data: {
                         Mobile: this.tel,
-                        BizType: 5,
-                        Token: wx.getStorageSync('loginInfo').Token || ''
+                        BizType: 9,
+                        ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
                     }
                 }).then(res => {
                     if (res.State == 1) {
                         this.countdownInfo = this.time + 'S后重新获取'
-                        this.createTiem = setInterval(function() {
-                            that.time--;
-                            if (that.time > 0) {
-                                that.countdownInfo = that.time + 'S后重新获取'
+                        this.createTiem = setInterval(_ => {
+                            this.time--;
+                            if (this.time > 0) {
+                                this.countdownInfo = this.time + 'S后重新获取'
                             } else {
-                                that.isSend = true;
-                                clearInterval(that.createTiem);
-                                that.countdownInfo = '重新获取';
+                                this.isSend = true;
+                                clearInterval(this.createTiem);
+                                this.countdownInfo = '重新获取';
                             }
                         }, 1000)
                     }
                 }).catch(err => {
-                    that.isSend = true;
+                    this.isSend = true;
                     this.msg(err.Msg)
                 })
             },
             submit() {
+                if(this.tel.length<11){
+                    this.msg('请输入手机号');
+                    return;
+                }
                 if (this.code.length == 4) {
                     if (this.password.length == 6) {
                         if (this.againPassword.length == 6) {
                             if (this.password != this.againPassword) {
                                 this.msg('支付密码输入不一致')
                             } else {
+                                let QQmap = wx.getStorageSync('QQmap');
+                                var result = gcoord.transform(
+                                    [QQmap.longitude, QQmap.latitude], // 经纬度坐标
+                                    gcoord.WGS84, // 当前坐标系
+                                    gcoord.BD09 // 目标坐标系
+                                );
+                                console.log(result)
                                 this.util.post({
-                                    url: '/api/Merchant/VerifyCode/CommitSmsCode',
+                                    url: '/api/Customer/VerifyCode/CommitSmsCode',
                                     data: {
                                         Mobile: this.tel,
-                                        BizType: 5,
+                                        BizType: 9,
                                         VerifyCode: this.code,
-                                        Loction: this.shopInfo.ShopLoc,
-                                        CityName: this.shopInfo.ShopCity,
-                                        // Token: wx.getStorageSync('loginInfo').Token || '',
-                                        PassWord: this.password
+                                        Loction: `${result[0]},${result[1]}`,
+                                        CityName: QQmap.city,
+                                        PassWord: this.password,
+                                        wxUserInfo: '',
+                                        ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
                                     }
                                 }).then(res => {
-                                    if (res.State == 1) {
-                                        if (this.type == 1) {
-                                            /* 绑定银行卡 */
-                                            wx.redirectTo({
-                                                url: '/pages/bond-bank-card'
-                                            });
-                                        } else {
-                                            /* 返回到密码管理页面 */
-                                            wx.navigateBack({
-                                                delta: 1
-                                            });
-                                        }
-                                    }
+                                    this.msg(res.Msg)
+                                    setTimeout(_ => {
+                                        wx.navigateBack({
+                                            delta: 1
+                                        });
+                                    }, 800)
                                 }).catch(err => {
                                     this.msg(err.Msg)
                                 })

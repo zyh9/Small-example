@@ -36,9 +36,19 @@
       },
       openShop() {
         setTimeout(_ => {
-          wx.redirectTo({
-            url: `/pages/my-store/main?ShopId=${this.info.shopId||wx.getStorageSync('ShopId')}&type=1`
-          })
+          if (this.info.temp == 1) {
+            setTimeout(_ => {
+              wx.redirectTo({
+                url: `/pages/food-store/main?ShopId=${this.info.shopId||wx.getStorageSync('ShopId')}`
+              })
+            }, 600)
+          } else {
+            setTimeout(_ => {
+              wx.redirectTo({
+                url: `/pages/business/main?ShopId=${this.info.shopId||wx.getStorageSync('ShopId')}`
+              })
+            }, 600)
+          }
         }, 400)
       }
     },

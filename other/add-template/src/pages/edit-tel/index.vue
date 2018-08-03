@@ -2,11 +2,11 @@
   <div class="edit_tel">
     <div class="options">
       <p>手机号</p>
-      <input type="number" placeholder="请输入您的手机号" maxlength="11" v-model="authTel">
+      <input type="number" placeholder="请输入您的手机号" maxlength="11" v-model="tel">
     </div>
     <div class="password">
       <p>验证码</p>
-      <input type="number" placeholder="请输入验证码" v-model="authVal" maxlength="4">
+      <input type="number" placeholder="请输入验证码" v-model="val" maxlength="4">
       <div class="sms_click" @click="sendSms">{{countdownInfo}}</div>
     </div>
     <button class="btn" plain="true" hover-class="none" style="color:#fff;" @click="okTel">下一步</button>
@@ -18,47 +18,34 @@
   export default {
     data() {
       return {
-        authTel: '',
-        authVal: '',
+        tel: '',
+        val: '',
         countdown: null,
         countdownInfo: '获取验证码',
         countdownTimer: null,
         isSend: true,
       }
     },
-    onReady() {
+    onShow() { //页面渲染就会触发
       clearInterval(this.countdownTimer)
-      this.countdown = null;
-      this.countdownInfo = '获取验证码';
-      this.countdownTimer = null;
+      this.tel = this.val = '';
       this.isSend = true;
+      this.countdown = null;
+      this.countdownTimer = null;
+      this.countdownInfo = '获取验证码';
     },
     methods: {
-      okTel() {
-        wx.navigateTo({
-          url: '/pages/ok-tel/main'
-        })
-      },
-      getInfo(res) {
-        if (res.target.userInfo) {
-          wx.setStorageSync('userInfo', JSON.stringify(res.target.userInfo))
-          //提交验证码
-          this.commitSms(res.target.userInfo)
-        } else {
-          this.util.loginModel()
-        }
-      },
       //发送验证码
       sendSms() {
-        console.log(this.authTel)
-        if (this.phone(this.authTel)) {
+        if (this.phone(this.tel)) {
           if (this.isSend) {
             this.isSend = false;
             this.util.post({
               url: '/api/Customer/VerifyCode/SendSmsCode',
               data: {
-                Mobile: this.authTel,
-                BizType: 1
+                Mobile: this.tel,
+                BizType: 10,
+                ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
               }
             }).then(res => {
               this.msg(res.Msg)
@@ -66,11 +53,12 @@
               this.countdownInfo = `${this.countdown}s后重新获取`;
               this.countdownTimer = setInterval(() => {
                 this.countdown--;
-                this.countdownInfo = `${this.countdown}s后重新获取`;
                 if (this.countdown <= 0) {
                   clearInterval(this.countdownTimer)
                   this.countdownInfo = '重新获取';
                   this.isSend = true;
+                } else {
+                  this.countdownInfo = `${this.countdown}s后重新获取`;
                 }
               }, 1000)
             }).catch(err => {
@@ -78,49 +66,6 @@
               this.msg(err.Msg)
             })
           }
-        }
-      },
-      commitSms(userInfo) {
-        let QQmap = wx.getStorageSync('QQmap');
-        var result = gcoord.transform(
-          [QQmap.longitude, QQmap.latitude], // 经纬度坐标
-          gcoord.WGS84, // 当前坐标系
-          gcoord.BD09 // 目标坐标系
-        );
-        console.log(result)
-        if (this.phone(this.authTel) && this.smsCoding(this.authVal)) {
-          this.util.post({
-            url: '/api/Customer/VerifyCode/CommitSmsCode',
-            data: {
-              Mobile: this.authTel,
-              BizType: 1,
-              VerifyCode: this.authVal,
-              Loction: `${result[0]},${result[1]}`,
-              CityName: QQmap.city,
-              wxUserInfo: JSON.stringify(userInfo)
-            }
-          }).then(res => {
-            if (res.State == 1) {
-              this.msg(res.Msg)
-              //登录成功修改绑定手机号状态，以便于其它页面获取用户绑定手机号状态
-              let loginInfo = Object.assign({}, wx.getStorageSync('loginInfo'), {
-                IsBindPhone: 1
-              })
-              wx.setStorageSync('loginInfo', loginInfo)
-              this.authTel = this.authVal = '';
-              //登录成功清除定时器
-              this.timer = null;
-              clearInterval(this.countdownTimer)
-              //返回至上一页
-              wx.navigateBack({
-                delta: 1
-              })
-            } else {
-              this.msg(res.Msg)
-            }
-          }).catch(err => {
-            this.msg(err.Msg)
-          })
         }
       },
       //检测手机号
@@ -150,19 +95,50 @@
           return false;
         }
       },
+      okTel() {
+        if (this.phone(this.tel) && this.smsCoding(this.val)) {
+          let QQmap = wx.getStorageSync('QQmap');
+          var result = gcoord.transform(
+            [QQmap.longitude, QQmap.latitude], // 经纬度坐标
+            gcoord.WGS84, // 当前坐标系
+            gcoord.BD09 // 目标坐标系
+          );
+          this.util.post({
+            url: '/api/Customer/VerifyCode/CommitSmsCode',
+            data: {
+              Mobile: this.tel,
+              BizType: 10,
+              VerifyCode: this.val,
+              Loction: `${result[0]},${result[1]}`,
+              CityName: QQmap.city,
+              ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+              wxUserInfo: ''
+            }
+          }).then(res => {
+            // this.msg(res.Msg)
+            this.tel = this.val = '';
+            //登录成功清除定时器
+            this.timer = null;
+            clearInterval(this.countdownTimer)
+            wx.setStorageSync('editToken', res.Body.Token);
+            wx.redirectTo({
+              url: '/pages/ok-tel/main'
+            })
+          }).catch(err => {
+            this.msg(err.Msg)
+          })
+        }
+      }
     },
     watch: {
-      authTel: function(newVal, oldVal) {
-        this.authTel = newVal.replace(/[^\d]/g, '');
+      tel: function(newVal, oldVal) {
+        //不是数字的替换为空
+        this.tel = newVal.replace(/[^\d]/g, '');
       },
-      authVal: function(newVal, oldVal) {
-        this.authVal = newVal.replace(/[^\d]/g, '');
+      val: function(newVal, oldVal) {
+        this.val = newVal.replace(/[^\d]/g, '');
       },
     },
-    onUnload() {
-      clearInterval(this.countdownTimer)
-      this.countdownTimer = null;
-    }
   }
 </script>
 

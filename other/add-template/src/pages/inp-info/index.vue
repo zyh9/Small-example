@@ -3,12 +3,12 @@
     <h3 class="login">填写会员信息</h3>
     <div class="options">
       <p>姓名</p>
-      <input type="text" placeholder="请输入您的姓名" maxlength="4" v-model="authTel" password="true">
+      <input type="text" placeholder="支持数字、汉字、字母和符号" maxlength="16" v-model="vipName">
     </div>
     <div class="options">
       <p>性别</p>
       <div class="sex">
-        <div class="sex_lis" v-for="(v,i) in info" :key="i"><i class="icon icon_check" :class="{icon_checked:v.checked}"></i><span>{{v.text}}</span></div>
+        <div class="sex_lis" v-for="(v,i) in info" :key="i" @click="sexCheck(i)"><i class="icon icon_check" :class="{icon_checked:checkIndex==i}"></i><span>{{v.text}}</span></div>
       </div>
     </div>
     <div class="options">
@@ -17,21 +17,24 @@
         <input type="text" placeholder="请选择您的生日" v-model="dateInfo" disabled="true">
       </picker>
     </div>
-    <button class="btn" plain="true" hover-class="none" open-type="getUserInfo" @getuserinfo="getInfo" style="color:#fff;">下一步</button>
+    <div class="options">
+      <p>设置密码</p>
+      <input type="number" placeholder="请输入6位数支付密码" maxlength="6" v-model="password" password="true">
+    </div>
+    <div class="options">
+      <p>再次输入</p>
+      <input type="number" placeholder="请再输入一遍" v-model="againPassword" maxlength="6" password="true">
+    </div>
+    <button class="btn" plain="true" hover-class="none" style="color:#fff;" @click="infoOver">下一步</button>
+    <p class="tips">注：生日和性别保存后不能进行更改</p>
   </div>
 </template>
 
 <script>
-  import gcoord from 'gcoord';
   export default {
     data() {
       return {
-        authTel: '',
-        authVal: '',
-        countdown: null,
-        countdownInfo: '获取验证码',
-        countdownTimer: null,
-        isSend: true,
+        vipName: '',
         info: [{
           text: '男',
           checked: true
@@ -39,144 +42,70 @@
           text: '女',
           checked: false
         }],
-        dateInfo:'',//生日记录
+        dateInfo: '', //生日记录
+        checkIndex: 0,
+        password: '',
+        againPassword: '',
       }
     },
     onReady() {
-      clearInterval(this.countdownTimer)
-      this.countdown = null;
-      this.countdownInfo = '获取验证码';
-      this.countdownTimer = null;
-      this.isSend = true;
+      this.vipName = '';
+      this.dateInfo = '';
+      this.password = '';
+      this.againPassword = '';
     },
     methods: {
-      DateChange(e){
+      DateChange(e) {
         this.dateInfo = e.mp.detail.value;
       },
-      getInfo(res) {
-        if (res.target.userInfo) {
-          wx.setStorageSync('userInfo', JSON.stringify(res.target.userInfo))
-          //提交验证码
-          this.commitSms(res.target.userInfo)
-        } else {
-          this.util.loginModel()
-        }
+      sexCheck(i) {
+        // console.log(i)
+        this.checkIndex = i;
       },
-      //发送验证码
-      sendSms() {
-        console.log(this.authTel)
-        if (this.phone(this.authTel)) {
-          if (this.isSend) {
-            this.isSend = false;
-            this.util.post({
-              url: '/api/Customer/VerifyCode/SendSmsCode',
-              data: {
-                Mobile: this.authTel,
-                BizType: 1
-              }
-            }).then(res => {
-              this.msg(res.Msg)
-              this.countdown = 60;
-              this.countdownInfo = `${this.countdown}s后重新获取`;
-              this.countdownTimer = setInterval(() => {
-                this.countdown--;
-                this.countdownInfo = `${this.countdown}s后重新获取`;
-                if (this.countdown <= 0) {
-                  clearInterval(this.countdownTimer)
-                  this.countdownInfo = '重新获取';
-                  this.isSend = true;
-                }
-              }, 1000)
-            }).catch(err => {
-              this.isSend = true;
-              this.msg(err.Msg)
-            })
-          }
+      infoOver() {
+        if (this.vipName.replace(/\s/g, '') == '' && this.dateInfo == '') {
+          this.msg('信息还没有填写完整哦')
+          return;
         }
-      },
-      commitSms(userInfo) {
-        let QQmap = wx.getStorageSync('QQmap');
-        var result = gcoord.transform(
-          [QQmap.longitude, QQmap.latitude], // 经纬度坐标
-          gcoord.WGS84, // 当前坐标系
-          gcoord.BD09 // 目标坐标系
-        );
-        console.log(result)
-        if (this.phone(this.authTel) && this.smsCoding(this.authVal)) {
-          this.util.post({
-            url: '/api/Customer/VerifyCode/CommitSmsCode',
-            data: {
-              Mobile: this.authTel,
-              BizType: 1,
-              VerifyCode: this.authVal,
-              Loction: `${result[0]},${result[1]}`,
-              CityName: QQmap.city,
-              wxUserInfo: JSON.stringify(userInfo)
-            }
-          }).then(res => {
-            if (res.State == 1) {
-              this.msg(res.Msg)
-              //登录成功修改绑定手机号状态，以便于其它页面获取用户绑定手机号状态
-              let loginInfo = Object.assign({}, wx.getStorageSync('loginInfo'), {
-                IsBindPhone: 1
-              })
-              wx.setStorageSync('loginInfo', loginInfo)
-              this.authTel = this.authVal = '';
-              //登录成功清除定时器
-              this.timer = null;
-              clearInterval(this.countdownTimer)
-              //返回至上一页
-              wx.navigateBack({
-                delta: 1
-              })
+        if (this.password.length == 6) {
+          if (this.againPassword.length == 6) {
+            if (this.password != this.againPassword) {
+              this.msg('支付密码输入不一致')
             } else {
-              this.msg(res.Msg)
+              this.util.post({
+                url: '/api/Customer/VipMember/CreateVipMember',
+                data: {
+                  ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+                  Token: wx.getStorageSync('InpVip').token || '',
+                  Mobile: wx.getStorageSync('InpVip').tel || '',
+                  Name: this.vipName,
+                  Sex: this.checkIndex == 0 ? 1 : 0, //男1，女0
+                  Birthday: this.dateInfo || '',
+                  TradePwd: this.password || ''
+                }
+              }).then(res => {
+                // console.log(res.Body)
+                wx.removeStorageSync('InpVip');
+                this.msg("开通会员卡成功")
+                setTimeout(_ => {
+                  wx.redirectTo({
+                    url: `/pages/my-vip/main?isVip=1`
+                  })
+                }, 800)
+              }).catch(err => {
+                this.msg(err.Msg)
+              })
             }
-          }).catch(err => {
-            this.msg(err.Msg)
-          })
-        }
-      },
-      //检测手机号
-      phone(tel) {
-        let reg = /^[1][3,4,5,6,7,8,9]\d{9}$/;
-        if (reg.test(tel)) {
-          return true;
-        } else {
-          if (tel != '') {
-            this.msg('请输入正确的手机号')
           } else {
-            this.msg('请输入手机号')
+            this.msg(this.againPassword.length < 6 && this.againPassword.length > 0 ? '再次输入支付密码不完整' : '请再次输入支付密码')
           }
-          return false;
-        }
-      },
-      smsCoding(val) { //短信4位
-        let reg = /^\d{4}$/;
-        if (reg.test(val)) {
-          return true;
         } else {
-          if (val != '') {
-            this.msg('请输入完整的短信验证码')
-          } else {
-            this.msg('请输入短信验证码')
-          }
-          return false;
+          this.msg(this.password.length < 6 && this.password.length > 0 ? '输入支付密码不完整' : '请输入支付密码')
         }
-      },
+      }
     },
-    watch: {
-      authTel: function(newVal, oldVal) {
-        this.authTel = newVal.replace(/[^\d]/g, '');
-      },
-      authVal: function(newVal, oldVal) {
-        this.authVal = newVal.replace(/[^\d]/g, '');
-      },
-    },
-    onUnload() {
-      clearInterval(this.countdownTimer)
-      this.countdownTimer = null;
-    }
+    watch: {},
+    onUnload() {}
   }
 </script>
 
@@ -198,14 +127,23 @@
       padding: 20rpx 0;
       margin: 0 36rpx;
       position: relative;
-      .picker{
+      .picker {
         flex: 1;
       }
       p {
+        width: 112rpx;
         font-size: 28rpx;
         color: #333;
         margin-right: 38rpx;
         transform: translateY(3rpx);
+        text-align: justify;
+        height: 60rpx;
+        line-height: 60rpx;
+        &:after {
+          content: "";
+          display: inline-block;
+          width: 100%;
+        }
       }
       input {
         flex: 1;
@@ -251,6 +189,11 @@
       border-radius: 8rpx;
       color: #fff;
       font-size: 30rpx;
+    }
+    .tips{
+      color: #999;
+      font-size: 22rpx;
+      margin-left: 36rpx;
     }
   }
 </style>

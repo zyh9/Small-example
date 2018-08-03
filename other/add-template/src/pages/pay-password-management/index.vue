@@ -21,12 +21,12 @@ export default {
   mounted() {},
   methods: {
     editPass() {
-      wx.navigateTo({
+      wx.redirectTo({
         url: "/pages/edit-pay-password/main"
       });
     },
     forgetPass() {
-      wx.navigateTo({
+      wx.redirectTo({
         url: "/pages/forget-pay-password/main"
       });
     }

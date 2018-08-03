@@ -10,7 +10,6 @@
 		"pages/my-vip/main",
 		"pages/inp-info/main",
 		"pages/login-vip/main",
-		"pages/pay-password/main",
 		"pages/card-money/main",
 		"pages/vip-recharge/main",
 		"pages/submit-order/main",
@@ -41,7 +40,8 @@
 		"pages/ok-tel/main",
 		"pages/pay-password-management/main",
 		"pages/edit-pay-password/main",
-		"pages/forget-pay-password/main"
+		"pages/forget-pay-password/main",
+		"pages/uu-pay/main"
 	],
 	"window": {
 		"backgroundTextStyle": "light",

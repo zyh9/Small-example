@@ -3,28 +3,28 @@
     <div class="options" @click="editName">
       <p>姓名</p>
       <div class="op_right">
-        <span class="info_text">张燕辉</span>
+        <span class="info_text">{{vipInfo.Name}}</span>
         <i class="icon icon_arrowRight"></i>
       </div>
     </div>
     <div class="options">
       <p>性别</p>
       <div class="op_right">
-        <span class="info_text">男</span>
+        <span class="info_text">{{vipInfo.Sex==1?'男':'女'}}</span>
         <i></i>
       </div>
     </div>
     <div class="options">
       <p>生日</p>
       <div class="op_right">
-        <span class="info_text">1994-11-09</span>
+        <span class="info_text">{{vipInfo.Birthday}}</span>
         <i></i>
       </div>
     </div>
     <div class="options" @click="editTel">
       <p>绑定手机</p>
       <div class="op_right">
-        <span class="info_text">13837987714</span>
+        <span class="info_text">{{vipInfo.Mobile}}</span>
         <i class="icon icon_arrowRight"></i>
       </div>
     </div>
@@ -34,7 +34,13 @@
 <script>
   export default {
     data() {
-      return {}
+      return {
+        vipInfo:{}
+      }
+    },
+    onShow(){
+      this.vipInfo = wx.getStorageSync('vipUserInfo');
+      // console.log(this.vipInfo)
     },
     methods: {
       editName() {

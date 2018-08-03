@@ -1,6 +1,5 @@
 <template>
     <div class="code_pay" v-if="block">
-        <p class="title">付款给商户</p>
         <div class="pay_info">
             <p class="pay_title">支付金额</p>
             <div class="pay_money">
@@ -12,11 +11,7 @@
             </div>
             <div class="line"></div>
             <p class="pay_shop">您的款项将直接支付给 <span>{{'('+ShopName+')'}}</span></p>
-            <p class="money_num">可用余额：¥890.98</p>
-            <div class="check_balance"><i class="icon icon_checked"></i>
-                <p>使用会员余额进行支付</p>
-            </div>
-            <div class="pay_btn" :class="{payOk:val}" @click="payCode">微信支付</div>
+            <div class="pay_btn" :class="{payOk:val}" @click="payCode">前往支付</div>
         </div>
     </div>
 </template>
@@ -32,19 +27,22 @@
                 block: false,
                 ShopName: '',
                 payOnoff: true,
+                ShopTemplateId:'',//模板id
             }
         },
         onLoad(options) {
             //options 中的 scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
             this.scene = options.scene;
             wx.setStorageSync('scene', this.scene);
-            this.block = false;
-            wx.showLoading({
-                title: '加载中',
-                mask: true
-            })
+            // this.block = false;
+            // wx.showLoading({
+            //     title: '加载中',
+            //     mask: true
+            // })
+            this.block = true;
             this.payOnoff = true;
             this.val = '';
+            this.ShopTemplateId = '';
             this.util.qqMapInfo().then(res => {
                 console.log(res)
                 this.mapInfo = wx.getStorageSync('QQmap')
@@ -67,6 +65,7 @@
                     this.block = true;
                     wx.hideLoading();
                     this.ShopId = res.Body.ShopId;
+                    this.ShopTemplateId = res.Body.ShopTemplateId;
                     wx.setStorageSync('ShopId', this.ShopId)
                     this.shopInfo()
                 }).catch(err => {
@@ -117,7 +116,7 @@
                                         this.payOnoff = true;
                                         console.log(payres)
                                         wx.redirectTo({
-                                            url: `/pages/pay-ok/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
+                                            url: `/pages/pay-ok/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}&temp=${this.ShopTemplateId}`
                                         })
                                     },
                                     fail: error => {
@@ -153,20 +152,18 @@
 
 <style lang="less">
     page {
-        background: #eeeef4;
+        background: #fafafa;
     }
     .code_pay {
-        padding: 0 36rpx;
-        .title {
-            height: 98rpx;
-            font-size: 28rpx;
-            line-height: 98rpx;
-            color: #999;
-        }
+        padding: 36rpx 36rpx;
+        height: 100%;
+        box-sizing: border-box;
+        position: relative;
         .pay_info {
-            background: #fff;
             border-radius: 6rpx;
-            padding: 46rpx 36rpx 36rpx;
+            padding-top: 46rpx;
+            background-color: #fff;
+            padding: 36rpx;
             .pay_title {
                 font-size: 30rpx;
                 line-height: 40rpx;
@@ -219,7 +216,7 @@
                 font-size: 24rpx;
                 line-height: 88rpx;
                 color: #666;
-                margin-bottom: 30rpx;
+                margin-bottom: 130rpx;
                 span {
                     color: #1a1a1a;
                 }
@@ -240,7 +237,6 @@
             }
         }
         .pay_btn {
-            margin-top: 180rpx;
             height: 88rpx;
             color: #fff;
             background: #ccc;

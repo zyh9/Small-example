@@ -4,12 +4,12 @@
             <div class="card_info">
                 <img src="../../../static/vip-bg.png" alt="">
                 <div class="info">
-                    <p class="rmb">456</p>
+                    <p class="rmb">{{money}}</p>
                     <p class="money">卡内余额(元)</p>
                 </div>
             </div>
-            <div class="vip_card_bot" :class="{vip_card_bot_active:active}">
-                <div class="recharge">充值</div>
+            <div class="vip_card_bot">
+                <div class="recharge" @click="openRecharge">充值</div>
                 <div class="options top" @click="payPassword">
                     <p>支付密码管理</p>
                 </div>
@@ -25,10 +25,12 @@
     export default {
         data() {
             return {
-                active: false
+                money:0
             }
         },
-        onShow() {},
+        onShow() {
+            this.money = wx.getStorageSync('vipUserInfo').AccountMoney;
+        },
         methods: {
             rotate() {
                 this.active = !this.active;
@@ -42,7 +44,12 @@
                 wx.navigateTo({
                     url: '/pages/pay-password-management/main'
                 })
-            }
+            },
+            openRecharge() {
+                wx.navigateTo({
+                    url: '/pages/vip-recharge/main'
+                })
+            },
         },
         computed: {},
     }
@@ -76,6 +83,9 @@
                 left: 50%;
                 top: 50%;
                 transform: translate(-50%, -50%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
                 .rmb {
                     font-size: 72rpx;
                     color: #1a1a1a;

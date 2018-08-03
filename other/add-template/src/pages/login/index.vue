@@ -77,14 +77,14 @@
         }
       },
       commitSms(userInfo) {
-        let QQmap = wx.getStorageSync('QQmap');
-        var result = gcoord.transform(
-          [QQmap.longitude, QQmap.latitude], // 经纬度坐标
-          gcoord.WGS84, // 当前坐标系
-          gcoord.BD09 // 目标坐标系
-        );
-        console.log(result)
         if (this.phone(this.authTel) && this.smsCoding(this.authVal)) {
+          let QQmap = wx.getStorageSync('QQmap');
+          var result = gcoord.transform(
+            [QQmap.longitude, QQmap.latitude], // 经纬度坐标
+            gcoord.WGS84, // 当前坐标系
+            gcoord.BD09 // 目标坐标系
+          );
+          console.log(result)
           this.util.post({
             url: '/api/Customer/VerifyCode/CommitSmsCode',
             data: {

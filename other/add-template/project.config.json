@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 10,
+			"current": 13,
 			"list": [
 				{
 					"id": 1,
@@ -97,6 +97,23 @@
 					"name": "会员信息",
 					"pathName": "pages/vip-info/main",
 					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "咔哧咔哧",
+					"pathName": "pages/business/main",
+					"query": "ShopId=1799741589111815"
+				},
+				{
+					"id": 12,
+					"name": "大叔的小店",
+					"pathName": "pages/food-store/main",
+					"query": "ShopId=1777087142298629"
+				},
+				{
+					"id": -1,
+					"name": "uu支付",
+					"pathName": "pages/uu-pay/main"
 				}
 			]
 		}
