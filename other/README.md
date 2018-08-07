@@ -641,7 +641,6 @@
 
 [参考链接](http://fszer.github.io/2018/01/21/vue%E4%B8%8Ethroltte%E7%9A%84%E5%9D%91/)
 
-[其它](https://github.com/zyh9/Small-example/tree/master/other/)
 
 ### 小程序分包
 
@@ -669,4 +668,21 @@
 			}
 		},
 	]
+```
+
+### 虚拟导航层级处理
+
+> 判断当前路径是否在路径数组中，存在即回退，不存在则导向新的路径，可解决层级过深的问题
+
+```javascript
+	let index = getCurrentPages().findIndex(e => e.route == 'pages/shop-user/main');
+	if (index > -1) {
+		wx.navigateBack({
+			delta: getCurrentPages().length - 1 - index
+		})
+	} else {
+		wx.navigateTo({
+			url: '/pages/shop-user/main'
+		})
+	}
 ```
