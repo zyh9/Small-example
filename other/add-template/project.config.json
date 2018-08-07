@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 13,
+			"current": 2,
 			"list": [
 				{
 					"id": 1,
@@ -45,10 +45,10 @@
 					"query": ""
 				},
 				{
-					"id": -1,
+					"id": 2,
 					"name": "支付",
 					"pathName": "pages/code-pay/main",
-					"query": ""
+					"query": "scene=1823938750629893"
 				},
 				{
 					"id": -1,
@@ -113,7 +113,8 @@
 				{
 					"id": -1,
 					"name": "uu支付",
-					"pathName": "pages/uu-pay/main"
+					"pathName": "pages/uu-pay/main",
+					"query": ""
 				}
 			]
 		}

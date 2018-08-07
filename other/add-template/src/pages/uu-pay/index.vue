@@ -2,31 +2,24 @@
   <div class="uu_pay">
     <div class="uu_top">
       <p class="pay_text">支付金额</p>
-      <p class="pay_money"><span>¥</span>88</p>
-      <p class="pay_shop">支付给<span>大橙子的小店</span></p>
+      <p class="pay_money"><span>¥</span>{{payInfo.PayAmount}}</p>
+      <p class="pay_shop">支付给<span>{{payInfo.ShopName}}</span></p>
     </div>
     <div class="uu_con">
       <p class="pay_title">支付方式 :</p>
       <div class="pay_list">
-        <div class="pay_item">
-          <i class="icon icon_over"></i>
+        <div class="pay_item" @click="selectPay(v)" v-for="(v,i) in payInfo.PaymentChannels" :key="i">
+          <i class="icon icon_wx_pay" v-if="v.PaymentType==1"></i>
+          <i class="icon icon_over" v-if="v.PaymentType==2"></i>
           <div class="pay_left">
-            <p>会员余额</p>
-            <span>使用会员卡余额支付</span>
+            <p>{{v.PaymentName}}</p>
+            <span v-if="v.PaymentType==2">{{v.PaymentStatus==-3?'余额不足':'可用余额: ¥ '+payInfo.Balance}}</span>
           </div>
-          <i class="icon icon_normal" :class="{icon_checked:checkedIndex==0}"></i>
-        </div>
-        <div class="pay_item">
-          <i class="icon icon_wx_pay"></i>
-          <div class="pay_left">
-            <p>微信支付</p>
-            <span>使用微信进行支付</span>
-          </div>
-          <i class="icon icon_normal" :class="{icon_checked:checkedIndex==1}"></i>
+          <i class="icon icon_normal" :class="{icon_checked:v.checked}"></i>
         </div>
       </div>
     </div>
-    <div class="pay_btn" :class="{payOk:val}" @click="payCode">立即支付</div>
+    <div class="pay_btn" :class="{payOk:val}" @click="payCode">{{checkedIndex==0?'余额支付':'微信支付'}}</div>
     <div class="vip_mask" @click="vipMask=false" v-if="vipMask"></div>
     <div class="vip_con" v-if="vipMask">
       <div class="pay_title">
@@ -37,8 +30,8 @@
       </div>
       <div class="vip_pay_info">
         <p class="vip_pay_text"><i class="icon icon_over"></i><span>余额支付</span></p>
-        <p class="vip_pay_money"><span>¥</span>88</p>
-        <p class="shop_name">付款给大橙子的小店</p>
+        <p class="vip_pay_money"><span>¥</span>{{payInfo.PayAmount}}</p>
+        <p class="shop_name">付款给 {{payInfo.ShopName}}</p>
       </div>
       <div class="vip_code">
         <input type="number" focus="true" maxlength="6" v-model="code" placeholder-style="color:transparent;" />
@@ -52,16 +45,370 @@
   export default {
     data() {
       return {
-        vipMask: true,
+        vipMask: false,
         code: '',
         codeLen: 6,
-        checkedIndex:0,//0=>余额支付  1=>微信支付
+        checkedIndex: 0, //0=>余额支付  1=>微信支付
+        payInfo: {}, //待支付信息
+        uuPayInfo: {},
+        payOnoff: true, //支付开关
+        ample: false, //余额是否充足
       }
     },
+    onLoad() {
+      this.code = '';
+      this.vipInfo = {};
+      this.isVip = false;
+      this.ample = false;
+      this.uuPayInfo = {};
+    },
+    onReady() {
+      this.uuPayInfo = this.$root.$mp.query;
+      // console.log(this.uuPayInfo)
+      this.getPayInfo()
+    },
+    onShow() {
+      this.payOnoff = true;
+      this.vipMask = false;
+    },
     methods: {
+      getPayInfo() {
+        this.util.post({
+          url: '/api/Customer/Order/GetPrePaymentOrder',
+          data: {
+            ShopId: this.uuPayInfo.shopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+            OrderId: this.uuPayInfo.OrderId ? this.uuPayInfo.OrderId : 0,
+            PayAmount: this.uuPayInfo.money ? this.uuPayInfo.money : 0, //线下扫码付款订支付金额(在线支付订单忽略此参数)
+          }
+        }).then(res => {
+          // console.log(res)
+          //1 正常 -1 店铺未开通会员卡服务 -2 非Vip会员无法使用 -3 余额不足
+          res.Body.PaymentChannels = res.Body.PaymentChannels.filter(e => e.PaymentStatus != -2 && e.PaymentStatus != -1);
+          // console.log(res.Body.PaymentChannels)
+          res.Body.PaymentChannels.forEach(e => e.checked = false);
+          //是否包含余额支付
+          let info = res.Body.PaymentChannels.filter(e => e.PaymentType == 2);
+          if (info.length) { //有余额支付
+            // console.log(res.Body.Balance,res.Body.PayAmount)
+            if (res.Body.Balance >= res.Body.PayAmount) { //余额充足
+              console.log('余额充足')
+              res.Body.PaymentChannels.forEach(e => e.PaymentType == 2 && (e.checked = true))
+              this.checkedIndex = 0;
+              this.ample = true;
+            } else { //余额不足
+              console.log('余额不足')
+              res.Body.PaymentChannels.forEach(e => e.PaymentType == 1 && (e.checked = true))
+              this.checkedIndex = 1;
+              this.ample = false;
+            }
+          } else {
+            res.Body.PaymentChannels.forEach(e => e.checked = true);
+            this.checkedIndex = 1;
+          }
+          // console.log(res.Body.PaymentChannels)
+          this.payInfo = res.Body;
+        }).catch(err => {
+          this.msg(err.Msg)
+        })
+      },
+      selectPay(v) { //0=>余额支付  1=>微信支付
+        // console.log(v)
+        if (v.PaymentType == 2) {
+          if (this.ample) {
+            this.payInfo.PaymentChannels.forEach(e => e.checked = false);
+            this.payInfo.PaymentChannels.forEach(e => {
+              e.PaymentType == 2 && (e.checked = true);
+            })
+            this.checkedIndex = 0;
+          } else {
+            this.msg('余额不足')
+            this.payInfo.PaymentChannels.forEach(e => e.checked = false);
+            this.payInfo.PaymentChannels.forEach(e => {
+              e.PaymentType == 1 && (e.checked = true);
+            })
+            this.checkedIndex = 1;
+          }
+        } else {
+          this.payInfo.PaymentChannels.forEach(e => e.checked = false);
+          this.payInfo.PaymentChannels.forEach(e => {
+            e.PaymentType == 1 && (e.checked = true);
+          })
+          this.checkedIndex = 1;
+        }
+      },
       payCode() {
-        this.vipMask = true;
-      }
+        if (this.checkedIndex == 0) { //余额支付
+          this.vipMask = true;
+        } else { //微信支付
+          if (this.uuPayInfo.OrderId) {
+            this.wxPay()
+          } else {
+            this.scanCode('', 1)
+          }
+        }
+      },
+      wxPay() {
+        if (this.payOnoff) {
+          this.payOnoff = false;
+          this.util.post({
+              url: '/api/Customer/Order/OrderRePay',
+              data: {
+                OrderId: this.uuPayInfo.OrderId ? this.uuPayInfo.OrderId : 0
+              }
+            })
+            .then(res => {
+              if (res.State == 1) {
+                this.packageId = res.Body.package;
+                wx.requestPayment({
+                  timeStamp: res.Body.timeStamp,
+                  nonceStr: res.Body.nonceStr,
+                  package: res.Body.package,
+                  signType: res.Body.signType,
+                  paySign: res.Body.paySign,
+                  success: payres => {
+                    if (this.$mp.query.again == 0) {
+                      // console.log('no再来')
+                      let cartListSum = wx.getStorageSync('cartListSum') || [];
+                      let shopCartInfo = cartListSum.filter(e => e.ShopId == wx.getStorageSync('shopInfo').ShopId);
+                      let cartSum = shopCartInfo[0].cartList ? shopCartInfo[0].cartList : [];
+                      let filtercartSum = cartSum.filter(e => e.check == false);
+                      // console.log(filtercartSum)
+                      //存在false的情况
+                      if (filtercartSum.length) {
+                        console.log('存在未勾选商品')
+                        //走设置
+                        cartListSum.forEach(e => {
+                          if (e.ShopId == wx.getStorageSync('shopInfo').ShopId) {
+                            e.cartList = filtercartSum;
+                          }
+                        })
+                        //针对商品列表为空的店铺做清空处理
+                        cartListSum = cartListSum.filter(e => e.cartList.length > 0);
+                        // 再设置缓存数据
+                        wx.setStorageSync('cartListSum', cartListSum);
+                        //缓存length不存在，直接清除
+                        !cartListSum.length && wx.removeStorageSync('cartListSum');
+                      } else {
+                        cartListSum = cartListSum.filter(e => e.ShopId != wx.getStorageSync('shopInfo').ShopId);
+                        // console.log(cartListSum)
+                        // 再设置缓存数据
+                        wx.setStorageSync('cartListSum', cartListSum);
+                        //缓存length不存在，直接清除
+                        !cartListSum.length && wx.removeStorageSync('cartListSum');
+                      }
+                      wx.removeStorageSync('note');
+                      wx.removeStorageSync('selectAddress');
+                    }
+                    this.payOnoff = true;
+                    setTimeout(_ => {
+                      /* 支付成功跳转订单列表 */
+                      wx.redirectTo({
+                        url: `/pages/order-details/main?orderId=${this.uuPayInfo.OrderId}&type=1`
+                      });
+                    }, 800)
+                  },
+                  fail: err => {
+                    console.log(err)
+                    this.msg('您已取消支付')
+                    if (this.$mp.query.again == 0) {
+                      // console.log('no再来')
+                      let cartListSum = wx.getStorageSync('cartListSum') || [];
+                      let shopCartInfo = cartListSum.filter(e => e.ShopId == wx.getStorageSync('shopInfo').ShopId);
+                      let cartSum = shopCartInfo[0].cartList ? shopCartInfo[0].cartList : [];
+                      let filtercartSum = cartSum.filter(e => e.check == false);
+                      // console.log(filtercartSum)
+                      //存在false的情况
+                      if (filtercartSum.length) {
+                        console.log('存在未勾选商品')
+                        //走设置
+                        cartListSum.forEach(e => {
+                          if (e.ShopId == wx.getStorageSync('shopInfo').ShopId) {
+                            e.cartList = filtercartSum;
+                          }
+                        })
+                        //针对商品列表为空的店铺做清空处理
+                        cartListSum = cartListSum.filter(e => e.cartList.length > 0);
+                        // 再设置缓存数据
+                        wx.setStorageSync('cartListSum', cartListSum);
+                        //缓存length不存在，直接清除
+                        !cartListSum.length && wx.removeStorageSync('cartListSum');
+                      } else {
+                        cartListSum = cartListSum.filter(e => e.ShopId != wx.getStorageSync('shopInfo').ShopId);
+                        // console.log(cartListSum)
+                        // 再设置缓存数据
+                        wx.setStorageSync('cartListSum', cartListSum);
+                        //缓存length不存在，直接清除
+                        !cartListSum.length && wx.removeStorageSync('cartListSum');
+                      }
+                      wx.removeStorageSync('note');
+                      wx.removeStorageSync('selectAddress');
+                    }
+                    this.payOnoff = true;
+                    setTimeout(_ => {
+                      /* 取消支付跳转订单列表 */
+                      wx.redirectTo({
+                        url: `/pages/order-details/main?orderId=${this.uuPayInfo.OrderId}&type=1`
+                      });
+                    }, 800)
+                  }
+                })
+              } else if (res.State == -13) {
+                this.orderMsg = res.Msg;
+                this.orderMask = true;
+                let cartListSum = wx.getStorageSync('cartListSum') || [];
+                cartListSum = cartListSum.filter(e => e.ShopId != wx.getStorageSync('shopInfo').ShopId);
+                // console.log(cartListSum)
+                // 再设置缓存数据
+                wx.setStorageSync('cartListSum', cartListSum);
+                //缓存length不存在，直接清除
+                !cartListSum.length && wx.removeStorageSync('cartListSum');
+                wx.removeStorageSync('note');
+                wx.removeStorageSync('selectAddress');
+                wx.removeStorageSync('couponInfo');
+              }
+            }).catch(err => {
+              this.payOnoff = true;
+              this.msg(err.Msg)
+            })
+        }
+      },
+      authPassword() {
+        //先验证支付密码
+        this.util.post({
+          url: '/api/Customer/VipMember/VerifyVipTradersPwd',
+          data: {
+            VipNo: this.payInfo.VipNo,
+            TradersPwd: this.code
+          }
+        }).then(res => {
+          wx.showLoading({
+            title: '支付中',
+            mask: true
+          })
+          if (this.uuPayInfo.OrderId) {
+            this.vipPay(res.Body.Token)
+          } else {
+            this.scanCode(res.Body.Token, 2)
+          }
+        }).catch(err => {
+          this.msg(err.Msg)
+          setTimeout(_ => {
+            this.code = '';
+          }, 200)
+        })
+      },
+      vipPay(token) {
+        //余额支付
+        this.util.post({
+          url: '/api/Customer/Order/OrderAccountPayment',
+          data: {
+            OrderId: this.uuPayInfo.OrderId ? this.uuPayInfo.OrderId : 0,
+            Token: token
+          }
+        }).then(res => {
+          if (this.$mp.query.again == 0) {
+            // console.log('no再来')
+            let cartListSum = wx.getStorageSync('cartListSum') || [];
+            let shopCartInfo = cartListSum.filter(e => e.ShopId == wx.getStorageSync('shopInfo').ShopId);
+            let cartSum = shopCartInfo[0].cartList ? shopCartInfo[0].cartList : [];
+            let filtercartSum = cartSum.filter(e => e.check == false);
+            // console.log(filtercartSum)
+            //存在false的情况
+            if (filtercartSum.length) {
+              console.log('存在未勾选商品')
+              //走设置
+              cartListSum.forEach(e => {
+                if (e.ShopId == wx.getStorageSync('shopInfo').ShopId) {
+                  e.cartList = filtercartSum;
+                }
+              })
+              //针对商品列表为空的店铺做清空处理
+              cartListSum = cartListSum.filter(e => e.cartList.length > 0);
+              // 再设置缓存数据
+              wx.setStorageSync('cartListSum', cartListSum);
+              //缓存length不存在，直接清除
+              !cartListSum.length && wx.removeStorageSync('cartListSum');
+            } else {
+              cartListSum = cartListSum.filter(e => e.ShopId != wx.getStorageSync('shopInfo').ShopId);
+              // console.log(cartListSum)
+              // 再设置缓存数据
+              wx.setStorageSync('cartListSum', cartListSum);
+              //缓存length不存在，直接清除
+              !cartListSum.length && wx.removeStorageSync('cartListSum');
+            }
+            wx.removeStorageSync('note');
+            wx.removeStorageSync('selectAddress');
+          }
+          //支付成功跳转
+          setTimeout(_ => {
+            wx.hideLoading();
+            this.vipMask = false;
+            /* 取消支付跳转订单列表 */
+            wx.redirectTo({
+              url: `/pages/order-details/main?orderId=${this.uuPayInfo.OrderId}&type=1`
+            });
+          }, 800)
+        }).catch(err => {
+          wx.hideLoading();
+          this.msg(err.Msg)
+        })
+      },
+      scanCode(token, type) {
+        if (this.payOnoff) {
+          this.payOnoff = false;
+          this.util.post({
+            url: '/api/Customer/Browse/CustomerPayment',
+            data: {
+              PaymentType: type,
+              ShopId: this.uuPayInfo.shopId,
+              Money: this.uuPayInfo.money,
+              Token: token
+            }
+          }).then(res => {
+            if (type == 2) { //余额支付
+              console.log('余额支付')
+              setTimeout(_ => {
+                wx.redirectTo({
+                  url: `/pages/pay-ok/main?money=${this.uuPayInfo.money}&shopName=${this.uuPayInfo.shopName}&shopId=${this.uuPayInfo.shopId}&temp=${this.uuPayInfo.temp}`
+                })
+              }, 800)
+            } else {
+              console.log('微信支付')
+              wx.requestPayment({
+                timeStamp: res.Body.wxPayInfo.timeStamp,
+                nonceStr: res.Body.wxPayInfo.nonceStr,
+                package: res.Body.wxPayInfo.package,
+                signType: res.Body.wxPayInfo.signType,
+                paySign: res.Body.wxPayInfo.paySign,
+                success: payres => {
+                  this.payOnoff = true;
+                  console.log(payres)
+                  setTimeout(_ => {
+                    wx.redirectTo({
+                      url: `/pages/pay-ok/main?money=${this.uuPayInfo.money}&shopName=${this.uuPayInfo.shopName}&shopId=${this.uuPayInfo.shopId}&temp=${this.uuPayInfo.temp}`
+                    })
+                  }, 800)
+                },
+                fail: error => {
+                  this.payOnoff = true;
+                  console.log(error.errMsg)
+                  if (error.errMsg == 'requestPayment:fail cancel') {
+                    this.msg('您已取消支付')
+                  } else { //支付失败
+                    setTimeout(_ => {
+                      wx.redirectTo({
+                        url: `/pages/pay-error/main?money=${this.uuPayInfo.money}&shopName=${this.uuPayInfo.shopName}&shopId=${this.uuPayInfo.shopId}`
+                      })
+                    }, 800)
+                  }
+                }
+              })
+            }
+          }).catch(err => {
+            this.msg(err.Msg)
+          })
+        }
+      },
     },
     computed: {
       codeArr() {
@@ -73,6 +420,7 @@
     watch: {
       code: function(newVal, oldVal) {
         // console.log(newVal)
+        newVal.length == 6 && this.authPassword();
       }
     },
     components: {}
@@ -243,6 +591,9 @@
         .shop_name {
           font-size: 28rpx;
           color: #1a1a1a;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
       }
       .vip_code {
@@ -261,7 +612,7 @@
           bottom: 0;
           opacity: 0;
           font-size: 20rpx;
-          color: transparent;
+          color: #fff;
         }
         .item_code {
           width: 98rpx;

@@ -609,7 +609,7 @@
             },
             goIndex() {
                 if (this.$root.$mp.query.temp == 1 || this.ShopTemplateId == 1) {
-                    console.log('餐饮模板')
+                    // console.log('餐饮模板')
                     if (this.$root.$mp.query.type == 1) {
                         wx.navigateBack({
                             delta: 1
@@ -620,7 +620,7 @@
                         })
                     }
                 } else {
-                    console.log('电商模板');
+                    // console.log('电商模板');
                     wx.navigateTo({
                         url: `/pages/cart/main`
                     })

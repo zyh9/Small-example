@@ -2,10 +2,10 @@
     <div class="my_vip" v-if="block">
         <div class="no_vip" v-if="!isVip">
             <div class="vip_con">
-                <img class="vip_bg fade_in" src="../../../static/red-vip.png" alt="">
+                <img class="vip_bg fade_in" :src="info.CardImage?info.CardImage:defaultCard" alt="">
                 <div class="vip_card_info">
                     <img :src="shopLogo?shopLogo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="">
-                    <p>{{shopName}}</p>
+                    <p class="vip_shop_name">{{shopName}}</p>
                 </div>
             </div>
             <div class="vip_btn" @click="loginVip">立即成为会员</div>
@@ -13,19 +13,14 @@
         <div class="is_vip" v-else>
             <div class="vip_card_con">
                 <div class="vip_con">
-                    <img class="vip_bg fade_in" src="../../../static/red-vip.png" alt="">
+                    <img class="vip_bg fade_in" :src="info.CardImage?info.CardImage:defaultCard" alt="">
                     <div class="vip_card_info">
                         <img :src="shopLogo?shopLogo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="">
-                        <p>{{shopName}}</p>
+                        <p class="vip_shop_name">{{info.Name}}</p>
                     </div>
                 </div>
-                <canvas class="qrcode" canvas-id="barcode" />
+                <img class="qrcode" :src="info.VipCardBarcode" alt="">
                 <p class="qrcode_num">{{info.VipNo}}</p>
-                <div class="pay_vip">
-                    <i class="icon icon_over"></i>
-                    <p>余额支付</p>
-                    <i class="icon icon_red_pay"></i>
-                </div>
             </div>
             <div class="vip_card_bot" :class="{vip_card_bot_active:active}">
                 <div @click="openCartNum" class="open_cart_num">
@@ -35,7 +30,10 @@
                         <i class="icon icon_money_right"></i>
                     </div>
                 </div>
-                <div class="recharge" @click="openRecharge">充值</div>
+                <div class="recharge_btn">
+                    <div class="recharge" @click="openRecharge">充值</div>
+                    <div class="recharge recharge_right" @click="vipCodePay">余额支付</div>
+                </div>
                 <div class="options" @click="vipInfo">
                     <p>会员信息</p>
                 </div>
@@ -47,7 +45,6 @@
 </template>
 
 <script>
-    import wxbarcode from 'wxbarcode';
     export default {
         data() {
             return {
@@ -58,10 +55,13 @@
                 shopName: '',
                 isVip: false,
                 block: false,
-                info: {}
+                info: {},
+                qrCodeImg: '',
+                defaultCard: require('../../../static/red-vip.png')
             }
         },
         onLoad() {
+            this.qrCodeImg = '';
             this.active = false;
             this.info = {};
             this.shopLogo = wx.getStorageSync('shopInfo').Logo;
@@ -71,9 +71,10 @@
                 title: '加载中',
                 mask: true
             })
-            this.getVipInfo()
         },
-        onShow() {},
+        onShow() {
+            this.getVipInfo();
+        },
         methods: {
             getVipInfo() {
                 this.util.post({
@@ -87,17 +88,15 @@
                     this.info = res.Body;
                     this.isVip = res.Body.VipNo == 0 ? false : true;
                     if (res.Body.VipNo != 0) {
-                        //生成二维码
-                        wxbarcode.barcode('barcode', String(res.Body.VipNo), 358, 154);
                         //存储用户vip信息
-                        console.log(res.Body.AccountMoney)
+                        // console.log(res.Body.AccountMoney)
                         wx.setStorageSync('vipUserInfo', {
-                            Birthday: this.util.FmtTime(new Date(res.Body.Birthday), 'yyyy-MM-dd'),
+                            Birthday: res.Body.Birthday.split(' ')[0],
                             Mobile: res.Body.Mobile,
                             Name: res.Body.Name,
                             Sex: res.Body.Sex,
                             VipNo: res.Body.VipNo,
-                            AccountMoney:res.Body.AccountMoney,
+                            AccountMoney: res.Body.AccountMoney,
                         })
                     }
                 }).catch(err => {
@@ -127,6 +126,11 @@
                 wx.redirectTo({
                     url: '/pages/login-vip/main'
                 })
+            },
+            vipCodePay() {
+                wx.navigateTo({
+                    url: `/pages/code-pay/main?shopName=${wx.getStorageSync('shopInfo').ShopName}&shopId=${wx.getStorageSync('shopInfo').ShopId}&temp=${wx.getStorageSync('shopInfo').ShopTemplateId}`
+                })
             }
         },
         computed: {},
@@ -154,12 +158,13 @@
                 .vip_bg {
                     width: 100%;
                     height: 380rpx;
+                    border-radius: 30rpx;
                 }
                 .vip_card_info {
                     position: absolute;
                     top: 36rpx;
                     left: 36rpx;
-                    width: 400rpx;
+                    width: 600rpx;
                     height: 72rpx;
                     display: flex;
                     align-items: center;
@@ -167,15 +172,36 @@
                     img {
                         width: 72rpx;
                         height: 72rpx;
-                        margin-right: 12rpx;
+                        margin-right: 26rpx;
                         border-radius: 36rpx;
                     }
-                    p {
+                    .vip_shop_name {
                         font-size: 40rpx;
-                        line-height: 72px;
+                        line-height: 72rpx;
                         color: #fff;
                     }
+                    .vip_user_info {
+                        overflow: hidden;
+                        .vip_user_info_name {
+                            font-size: 32rpx;
+                            color: #fff;
+                        }
+                        .vip_user_info_num {
+                            font-size: 28rpx;
+                            color: rgba(255, 255, 255, 0.5);
+                        }
+                    }
                 }
+            }
+            .qrcode {
+                width: 358rpx;
+                height: 154rpx;
+                margin-top: 50rpx;
+            }
+            .qrcode_num {
+                margin: 10rpx 0;
+                font-size: 28rpx;
+                color: #666;
             }
             .vip_btn {
                 height: 88rpx;
@@ -196,51 +222,25 @@
             padding: 0;
         }
         .vip_card_con {
-            background: #fafafa;
-            padding: 36rpx 36rpx 0;
+            background: #fff;
+            padding: 36rpx;
             overflow: hidden;
             position: relative;
-            z-index: -1;
+            z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
-            .qrcode {
-                width: 358rpx;
-                height: 154rpx;
-                margin-top: 50rpx;
-            }
-            .qrcode_num {
-                line-height: 30rpx;
-                font-size: 28rpx;
-                color: #666;
-                text-align: center;
-                height: 30rpx;
-                margin-top: 12rpx;
-            }
-            .pay_vip {
-                height: 36rpx;
-                display: flex;
-                align-items: center;
-                margin: 56rpx 0 60rpx;
-                .icon_over {
-                    width: 34rpx;
-                    height: 34rpx;
-                }
-                p {
-                    font-size: 28rpx;
-                    color: #ff4d3a;
-                }
-            }
         }
         .vip_card_bot {
             transition: margin 0.5s ease;
-            margin-top: -580rpx;
+            margin-top: -480rpx;
             background-color: #fff;
             padding: 36rpx;
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
+            z-index: 5;
             .open_cart_num {
                 display: flex;
                 flex-direction: column;
@@ -260,16 +260,29 @@
                     color: #999;
                 }
             }
+            .recharge_btn {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 56rpx;
+            }
             .recharge {
-                width: 478rpx;
+                width: 266rpx;
                 height: 88rpx;
                 background-color: #ff4d3a;
+                border: 1px solid #ff4d3a;
                 border-radius: 6rpx;
                 font-size: 30rpx;
                 color: #fff;
                 line-height: 88rpx;
                 text-align: center;
-                margin-bottom: 56rpx;
+                box-sizing: border-box;
+            }
+            .recharge_right {
+                border: 1px solid #999;
+                color: #1a1a1a;
+                background-color: #fff;
+                margin-left: 28rpx;
             }
             .options {
                 background: url('../../../static/black-right.png') no-repeat right center;
@@ -329,9 +342,6 @@
                 transform: rotate(0deg);
                 transition: transform 0.5s ease;
                 z-index: 10;
-            }
-            .rotate_deg {
-                transform: rotate(180deg);
             }
         }
         .vip_card_bot_active {

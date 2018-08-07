@@ -222,6 +222,7 @@
             margin: 0 36rpx;
             height: 88rpx;
             line-height: 88rpx;
+            border-radius: 6rpx;
             text-align: center;
             font-size: 28rpx;
             color: #fff;

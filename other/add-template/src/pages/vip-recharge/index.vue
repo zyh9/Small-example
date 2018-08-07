@@ -3,16 +3,20 @@
         <div class="recharge_con">
             <div class="info">
                 <i class="icon icon_price" v-if="tips"></i>
-                <p>{{tips}}</p>
+                <p v-if="tips">充值{{MoneySum}}元送{{tips}}</p>
             </div>
-            <ul class="recharge_list" v-if="rechargeList&&rechargeList.length">
-                <li v-for="(v,i) in rechargeList" :key="i" :class="{active:lisActive==i}" @click="selectMoney(i)">{{v.RechargeMoney}}<span>元</span></li>
-                <li @click="selectMoney(-1)" :class="{active_other:lisActive==-1}"><input type="number" placeholder="其他金额" maxlength="5" class="other" placeholder-style="color:#ccc;" v-model="inpMoney" /></li>
+            <ul class="recharge_list">
+                <li v-if="rechargeList&&rechargeList.length" v-for="(v,i) in rechargeList" :key="i" :class="{active:lisActive==i}" @click="selectMoney(i)">{{v.RechargeMoney}}<span>元</span></li>
+                <li @click="selectMoney(-1)" :class="{active:lisActive==-1}"><span>其它金额</span></li>
             </ul>
+            <div class="other_money" :class="{heightActive:blockOther}">
+                <p>其他金额(元) :</p>
+                <input type="digit" placeholder="请输入其它金额" maxlength="5" placeholder-style="color:#ccc;" v-model="inpMoney" />
+            </div>
         </div>
         <div class="recharge_bot">
             <div class="bot_left">
-                <span>合计:</span><i>¥</i><b>{{MoneySum}}</b>
+                <span>合计:</span><i>¥</i><b>{{MoneySum==''?0:MoneySum}}</b>
             </div>
             <button class="sum" plain="true" @click="MoneyRecharge">立即充值</button>
         </div>
@@ -28,12 +32,24 @@
                 tips: '',
                 payOnoff: true,
                 MoneySum: 0,
-                inpMoney:'',
+                inpMoney: '',
+                blockOther: false,
+                block: false,
             }
         },
-        onReady() {
+        onLoad() {
+            this.inpMoney = '';
+            this.lisActive = 0;
+            this.blockOther = false;
             this.rechargeList = [];
             this.payOnoff = true;
+            this.block = false;
+            wx.showLoading({
+                title: '加载中',
+                mask: true
+            })
+        },
+        onReady() {
             this.getRecharge()
         },
         methods: {
@@ -44,14 +60,55 @@
                         ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
                     }
                 }).then(res => {
+                    this.block = true;
+                    wx.hideLoading();
                     this.rechargeList = res.Body;
-                    this.tips = this.rechargeList[0].NoticeMessage;
-                    this.MoneySum = this.rechargeList[0].RechargeMoney;
+                    if (res.Body.length) {
+                        this.tips = this.rechargeList[0].Gift;
+                        this.MoneySum = this.rechargeList[0].RechargeMoney;
+                    } else {
+                        this.lisActive = -1;
+                        this.blockOther = true;
+                    }
                 }).catch(err => {
+                    wx.hideLoading();
                     this.msg(err.Msg)
                 })
             },
             MoneyRecharge() {
+                if (this.lisActive == -1) { //自定义
+                    if (this.inpMoney) {
+                        if (this.authMoney(this.inpMoney) && Number(this.inpMoney) > 0) {
+                            this.payRecharge(this.inpMoney);
+                        } else {
+                            this.inpMoney = '';
+                            this.msg('请输入合法的金额')
+                        }
+                    } else {
+                        this.msg('您还没有输入支付金额哦')
+                    }
+                } else { //列表项
+                    let money = this.rechargeList[this.lisActive].RechargeMoney;
+                    // console.log(money)
+                    this.payRecharge(money);
+                }
+            },
+            selectMoney(i) {
+                // console.log(i)
+                this.lisActive = i;
+                if (this.rechargeList.length) {
+                    if (i == -1) {
+                        this.tips = '';
+                        this.MoneySum = this.inpMoney = '';
+                        this.blockOther = true;
+                    } else {
+                        this.tips = this.rechargeList[i].Gift;
+                        this.MoneySum = this.rechargeList[i].RechargeMoney;
+                        this.blockOther = false;
+                    }
+                }
+            },
+            payRecharge(money) {
                 if (this.payOnoff) {
                     this.payOnoff = false;
                     this.util.post({
@@ -59,7 +116,7 @@
                         data: {
                             ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
                             VipNo: wx.getStorageSync('vipUserInfo').VipNo || '',
-                            RechargeMoney: 10
+                            RechargeMoney: money || 0
                         }
                     }).then(res => {
                         wx.requestPayment({
@@ -71,9 +128,11 @@
                             success: payres => {
                                 this.payOnoff = true;
                                 console.log(payres)
-                                wx.redirectTo({
-                                    url: `/pages/pay-ok/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
-                                })
+                                setTimeout(_ => {
+                                    wx.redirectTo({
+                                        url: `/pages/pay-ok/main?money=${money}&shopName=${wx.getStorageSync('shopInfo').ShopName}&shopId=${wx.getStorageSync('shopInfo').ShopId}&temp=${wx.getStorageSync('shopInfo').ShopTemplateId}`
+                                    })
+                                }, 800)
                             },
                             fail: error => {
                                 this.payOnoff = true;
@@ -81,9 +140,11 @@
                                 if (error.errMsg == 'requestPayment:fail cancel') {
                                     this.msg('您已取消支付')
                                 } else { //支付失败
-                                    wx.redirectTo({
-                                        url: `/pages/pay-error/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
-                                    })
+                                    setTimeout(_ => {
+                                        wx.redirectTo({
+                                            url: `/pages/pay-error/main?money=${money}&shopName=${wx.getStorageSync('shopInfo').ShopName}&shopId=${wx.getStorageSync('shopInfo').ShopId}`
+                                        })
+                                    }, 800)
                                 }
                             }
                         })
@@ -93,24 +154,17 @@
                     })
                 }
             },
-            selectMoney(i) {
-                // console.log(i)
-                this.lisActive = i;
-                if (this.rechargeList.length) {
-                    if (i == -1) {
-                        this.tips = '';
-                        this.MoneySum = this.inpMoney?this.inpMoney:0;
-                    } else {
-                        this.tips = this.rechargeList[i].NoticeMessage;
-                        this.MoneySum = this.rechargeList[i].RechargeMoney;
-                    }
-                }
-            }
+            authMoney(val) {
+                let reg = /(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/;
+                return reg.test(val) ? true : false;
+            },
         },
         computed: {},
         watch: {
-            inpMoney:function(newVal,oldVal){
+            inpMoney: function(newVal, oldVal) {
                 this.MoneySum = newVal;
+                let Len = this.rechargeList.filter(e => e.RechargeMoney == newVal);
+                this.tips = Len.length ? Len[0].Gift : '';
             }
         }
     }
@@ -142,6 +196,7 @@
                     overflow: hidden;
                     white-space: nowrap;
                     text-overflow: ellipsis;
+                    flex: 1;
                 }
                 i {
                     transform: translateY(-2rpx);
@@ -179,9 +234,41 @@
                     background-color: #ff4d3a;
                     color: #fff;
                 }
-                .active_other {
-                    border: 1px solid #ff4d3a;
+            }
+            .other_money {
+                height: 0;
+                margin-top: 60rpx;
+                transition: height 0.3s ease;
+                overflow: hidden;
+                p {
+                    height: 30rpx;
+                    line-height: 30rpx;
+                    font-size: 28rpx;
+                    color: #1a1a1a;
                 }
+                input {
+                    margin-top: 30rpx;
+                    height: 100rpx;
+                    width: 100%;
+                    font-size: 28rpx;
+                    color: #1a1a1a;
+                    position: relative;
+                    &:after {
+                        content: '';
+                        display: block;
+                        width: 100%;
+                        height: 0;
+                        border-bottom: 1px solid #ebebeb;
+                        position: absolute;
+                        left: 0;
+                        bottom: 0;
+                        transform: scaleY(0.5);
+                        transform-origin: 0 0;
+                    }
+                }
+            }
+            .heightActive {
+                height: 174rpx;
             }
         }
         .recharge_bot {
@@ -231,7 +318,7 @@
                     margin-right: 6rpx;
                 }
                 b {
-                    transform: translateY(-6rpx);
+                    transform: translateY(-4rpx);
                 }
             }
             .sum {

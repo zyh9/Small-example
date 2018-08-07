@@ -232,9 +232,9 @@
       background: #333;
       margin: 50rpx 36rpx 20rpx;
       text-align: center;
-      height: 80rpx;
-      line-height: 80rpx;
-      border-radius: 8rpx;
+      height: 88rpx;
+      line-height: 88rpx;
+      border-radius: 6rpx;
       color: #fff;
       font-size: 30rpx;
     }

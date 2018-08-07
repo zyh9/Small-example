@@ -313,7 +313,7 @@ input::-webkit-input-placeholder {
   width: 26rpx;
   height: 26rpx;
   background-image: url('../../static/del-shop.png');
-  transform: translateY(-2rpx);
+  transform: translateY(-1rpx);
 }
 .icon_index {
   width: 36rpx;

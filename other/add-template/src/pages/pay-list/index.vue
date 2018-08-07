@@ -46,9 +46,10 @@
             PageIndex: this.page,
           }
         }).then(res => {
-          res.Body.forEach(e => {
-            e.TradeTime = this.util.FmtTime(new Date(e.TradeTime), 'yyyy-MM-dd')
-          });
+          console.log(res.Body)
+          // res.Body.forEach(e => {
+          //   e.TradeTime = e.TradeTime.split(' ')[0]
+          // });
           if (res.Body.length < this.PageSize && this.page > 1) {
             this.quest = false;
             this.msg('已经没有更多信息了')

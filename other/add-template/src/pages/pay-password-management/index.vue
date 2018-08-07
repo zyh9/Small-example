@@ -1,11 +1,11 @@
 <template>
   <div class="container">
     <div class="list-main">
-      <div class="list-item  border-bottom" @click="editPass">
+      <div class="list-item border-bottom" @click="editPass">
         <p>支付密码修改</p>
         <i class="icon icon_arrowRight"></i>
       </div>
-      <div class="list-item" @click="forgetPass">
+      <div class="list-item border-bottom" @click="forgetPass">
         <p>忘记支付密码</p>
         <i class="icon icon_arrowRight"></i>
       </div>
@@ -51,7 +51,6 @@ export default {
       p {
         flex: 1;
         font-size: 28rpx;
-        margin-left:20rpx;
         color: #1a1a1a;
       }
       .icon {

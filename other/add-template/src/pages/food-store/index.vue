@@ -214,11 +214,11 @@
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
                 <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"> 
-                                                                                                                            <cover-view class="shareCover" >
-                                                                                                                            <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                                                            <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                                                            </cover-view>
-                                                                                                                            </canvas>
+                                                                                                                                <cover-view class="shareCover" >
+                                                                                                                                <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
+                                                                                                                                <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
+                                                                                                                                </cover-view>
+                                                                                                                                </canvas>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -859,7 +859,7 @@
                 let {
                     info
                 } = e.target.dataset;
-                console.log(info)
+                // console.log(info)
                 if (info.MultiSpec == 0) {
                     if (info.GoodsType == -1) { //折扣商品
                         if (info.PriceOffRule.DiscountRule == 1) { //购买规格  每人限一份
@@ -1362,7 +1362,7 @@
                         wx.navigateTo({
                             url: '/pages/login/main'
                         })
-                    }, 1000)
+                    }, 800)
                 } else {
                     if (wx.getStorageSync('shopInfo').IsShowVipMenu == 0) {
                         this.msg('店铺暂未开启会员服务，敬请期待')

@@ -76,7 +76,7 @@
             gcoord.WGS84, // 当前坐标系
             gcoord.BD09 // 目标坐标系
           );
-          console.log(result)
+          // console.log(result)
           this.util.post({
             url: '/api/Customer/VerifyCode/CommitSmsCode',
             data: {
@@ -88,7 +88,7 @@
               wxUserInfo: ''
             }
           }).then(res => {
-            console.log(res)
+            // console.log(res)
             //登录成功清除定时器
             this.timer = null;
             clearInterval(this.countdownTimer)
@@ -243,9 +243,9 @@
       background: #333;
       margin: 50rpx 36rpx 20rpx;
       text-align: center;
-      height: 80rpx;
-      line-height: 80rpx;
-      border-radius: 8rpx;
+      height: 88rpx;
+      line-height: 88rpx;
+      border-radius: 6rpx;
       color: #fff;
       font-size: 30rpx;
     }

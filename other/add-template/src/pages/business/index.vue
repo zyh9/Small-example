@@ -88,7 +88,7 @@
         SectionSecond: [],
         SectionThird: [],
         GoodsTypeBlock: false,
-        openState:null,
+        openState: null,
       }
     },
     onPullDownRefresh() { //下拉刷新
@@ -138,6 +138,8 @@
             this.pageName = this.IndexInfoList.TemplateData.GoodsType.Name;
             this.pageId = this.IndexInfoList.TemplateData.GoodsType.ID;
             this.shopPageInfo(pg)
+          } else {
+            wx.stopPullDownRefresh();
           }
           wx.setStorageSync('shopInfo', this.IndexInfoList)
           this.GoodsTypeBlock = this.IndexInfoList.TemplateData.GoodsType ? true : false;
@@ -198,16 +200,14 @@
         })
       },
       openCart() {
-        wx.redirectTo({
+        wx.navigateTo({
           url: '/pages/cart/main'
         })
-        // this.util.openCart(this, 'business', 'cart')
       },
       openUser() {
-        wx.redirectTo({
+        wx.navigateTo({
           url: '/pages/shop-user/main'
         })
-        // this.util.openUser(this, 'business', 'user')
       },
       goDetails(item) {
         // console.log(item)

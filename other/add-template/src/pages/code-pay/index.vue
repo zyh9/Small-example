@@ -6,7 +6,7 @@
                 <i>¥</i>
                 <div class="input_val">
                     <p v-if="!val">请输入要支付的金额</p>
-                    <input type="digit" v-model="val" maxlength="7" />
+                    <input type="digit" v-model="val" maxlength="5" />
                 </div>
             </div>
             <div class="line"></div>
@@ -27,31 +27,39 @@
                 block: false,
                 ShopName: '',
                 payOnoff: true,
-                ShopTemplateId:'',//模板id
+                ShopTemplateId: '', //模板id
             }
         },
         onLoad(options) {
             //options 中的 scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
             this.scene = options.scene;
             wx.setStorageSync('scene', this.scene);
-            // this.block = false;
-            // wx.showLoading({
-            //     title: '加载中',
-            //     mask: true
-            // })
-            this.block = true;
             this.payOnoff = true;
             this.val = '';
             this.ShopTemplateId = '';
-            this.util.qqMapInfo().then(res => {
-                console.log(res)
-                this.mapInfo = wx.getStorageSync('QQmap')
-                if (this.scene) {
-                    this.sceneInfo()
-                }
-            }).catch(err => {
-                console.log(err)
-            })
+            if (this.scene) {//扫码支付
+                this.block = false;
+                wx.showLoading({
+                    title: '加载中',
+                    mask: true
+                })
+                // this.block = true;
+                this.util.qqMapInfo().then(res => {
+                    console.log(res)
+                    this.mapInfo = wx.getStorageSync('QQmap')
+                    if (this.scene) {
+                        this.sceneInfo()
+                    }
+                }).catch(err => {
+                    console.log(err)
+                })
+            } else {//会员页点击
+                this.block = true;
+                let obj = this.$root.$mp.query;
+                this.ShopName = obj.shopName;
+                this.ShopId = obj.shopId;
+                this.ShopTemplateId = obj.temp;
+            }
         },
         methods: {
             //二维码信息获取
@@ -97,46 +105,49 @@
                 // return
                 if (this.val) {
                     if (this.authMoney(this.val) && Number(this.val) > 0) {
-                        if (this.payOnoff) {
-                            this.payOnoff = false;
-                            this.util.post({
-                                url: '/api/Customer/Browse/CustomerPayment',
-                                data: {
-                                    ShopId: this.ShopId || '',
-                                    Money: this.val || ''
-                                }
-                            }).then(res => {
-                                wx.requestPayment({
-                                    timeStamp: res.Body.wxPayInfo.timeStamp,
-                                    nonceStr: res.Body.wxPayInfo.nonceStr,
-                                    package: res.Body.wxPayInfo.package,
-                                    signType: res.Body.wxPayInfo.signType,
-                                    paySign: res.Body.wxPayInfo.paySign,
-                                    success: payres => {
-                                        this.payOnoff = true;
-                                        console.log(payres)
-                                        wx.redirectTo({
-                                            url: `/pages/pay-ok/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}&temp=${this.ShopTemplateId}`
-                                        })
-                                    },
-                                    fail: error => {
-                                        this.payOnoff = true;
-                                        console.log(error.errMsg)
-                                        if (error.errMsg == 'requestPayment:fail cancel') {
-                                            this.msg('您已取消支付')
-                                        } else { //支付失败
-                                            wx.redirectTo({
-                                                url: `/pages/pay-error/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
-                                            })
-                                        }
-                                    }
-                                })
-                            }).catch(err => {
-                                this.payOnoff = true;
-                                console.log(err)
-                                this.msg(err.Msg)
-                            })
-                        }
+                        // if (this.payOnoff) {
+                        //     this.payOnoff = false;
+                        //     this.util.post({
+                        //         url: '/api/Customer/Browse/CustomerPayment',
+                        //         data: {
+                        //             ShopId: this.ShopId || '',
+                        //             Money: this.val || ''
+                        //         }
+                        //     }).then(res => {
+                        //         wx.requestPayment({
+                        //             timeStamp: res.Body.wxPayInfo.timeStamp,
+                        //             nonceStr: res.Body.wxPayInfo.nonceStr,
+                        //             package: res.Body.wxPayInfo.package,
+                        //             signType: res.Body.wxPayInfo.signType,
+                        //             paySign: res.Body.wxPayInfo.paySign,
+                        //             success: payres => {
+                        //                 this.payOnoff = true;
+                        //                 console.log(payres)
+                        //                 wx.redirectTo({
+                        //                     url: `/pages/pay-ok/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}&temp=${this.ShopTemplateId}`
+                        //                 })
+                        //             },
+                        //             fail: error => {
+                        //                 this.payOnoff = true;
+                        //                 console.log(error.errMsg)
+                        //                 if (error.errMsg == 'requestPayment:fail cancel') {
+                        //                     this.msg('您已取消支付')
+                        //                 } else { //支付失败
+                        //                     wx.redirectTo({
+                        //                         url: `/pages/pay-error/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
+                        //                     })
+                        //                 }
+                        //             }
+                        //         })
+                        //     }).catch(err => {
+                        //         this.payOnoff = true;
+                        //         console.log(err)
+                        //         this.msg(err.Msg)
+                        //     })
+                        // }
+                        wx.redirectTo({
+                            url: `/pages/uu-pay/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}&temp=${this.ShopTemplateId}`
+                        })
                     } else {
                         this.val = '';
                         this.msg('请输入合法的金额')

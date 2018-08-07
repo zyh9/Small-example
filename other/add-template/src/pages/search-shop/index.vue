@@ -127,7 +127,7 @@
                     ShopId,
                     ShopTemplateId
                 } = info;
-                console.log(ShopId, ShopTemplateId)
+                // console.log(ShopId, ShopTemplateId)
                 if (ShopTemplateId == 1) {
                     wx.redirectTo({
                         url: `/pages/food-store/main?ShopId=${ShopId}&type=1`

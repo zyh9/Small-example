@@ -35,7 +35,7 @@
       },
       openLis(v) {
         wx.navigateTo({
-          url: `/pages/page-list/main?id=${v.ID}`
+          url: `/pages/page-list/main?id=${v.ID}&title=${v.Name}`
         })
       }
     },

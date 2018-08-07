@@ -100,16 +100,28 @@
     },
     methods: {
       openBusiness() {
-        wx.redirectTo({
-          url: '/pages/business/main'
-        })
-        // this.util.openBusiness(this,'cart','business')
+        let index = getCurrentPages().findIndex(e => e.route == 'pages/business/main');
+        if (index > -1) {
+          wx.navigateBack({
+            delta: getCurrentPages().length - 1 - index
+          })
+        } else {
+          wx.navigateTo({
+            url: '/pages/business/main'
+          })
+        }
       },
       openUser() {
-        wx.redirectTo({
-          url: '/pages/shop-user/main'
-        })
-        // this.util.openUser(this,'cart','user')
+        let index = getCurrentPages().findIndex(e => e.route == 'pages/shop-user/main');
+        if (index > -1) {
+          wx.navigateBack({
+            delta: getCurrentPages().length - 1 - index
+          })
+        } else {
+          wx.navigateTo({
+            url: '/pages/shop-user/main'
+          })
+        }
       },
       isCheck(v) {
         // console.log(v.check)

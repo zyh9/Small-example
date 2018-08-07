@@ -8,7 +8,7 @@
             <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
             <ul class="lis_bottom_btn">
                 <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)' @click="cancelOrder">取消订单</li>
-                <li @click='againOrder' v-if='orderInfo.State>=2||orderInfo.State<0'>再来一单</li>
+                <li @click='againOrder' v-if='orderInfo.State>=2||orderInfo.State<0' :class="{btn_other:orderInfo.State==10}">再来一单</li>
                 <li class="btn_other" v-if="orderInfo.State==4" @click="okOrder">确认收货</li>
                 <li v-if='orderInfo.State==2&&orderInfo.CancelApplyState==1' @click="cancelOrder">已申请取消</li>
                 <li class="btn_other" v-if='orderInfo.State==0' @click='OrderRePay'>继续支付</li>
@@ -102,7 +102,7 @@
             </div>
             <div class="options">
                 <p>支付方式</p>
-                <p style="color:#1a1a1a;">{{orderInfo.PayType==1?'微信支付':'其他'}}</p>
+                <p style="color:#1a1a1a;">{{orderInfo.PayType==1?'微信支付':'会员卡支付'}}</p>
             </div>
             <div class="options other">
                 <p>备注</p>

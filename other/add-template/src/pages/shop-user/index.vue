@@ -67,7 +67,7 @@
         this.wxInfo = {};
         this.clickInfo = true;
       }
-      console.log(this.wxInfo)
+      // console.log(this.wxInfo)
     },
     methods: {
       getInfo(res) {
@@ -100,22 +100,21 @@
       goVip() {
         if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
           this.msg('您还没有登录哦')
-          return;
-        }
-        this.util.post({
-          url: '/api/Customer/VipMember/GetVipInfo',
-          data: {
-            ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || ''
+          setTimeout(_ => {
+            wx.navigateTo({
+              url: '/pages/login/main'
+            })
+          }, 800)
+        } else {
+          if (wx.getStorageSync('shopInfo').IsShowVipMenu == 0) {
+            this.msg('店铺暂未开启会员服务，敬请期待')
+            return;
+          } else {
+            wx.navigateTo({
+              url: `/pages/my-vip/main`
+            })
           }
-        }).then(res => {
-          console.log(res)
-          let isVip = res.Body.VipNo == 0 ? 0 : res.Body.VipNo;
-          wx.navigateTo({
-            url: `/pages/my-vip/main?isVip=${isVip}`
-          })
-        }).catch(err => {
-          this.msg(err.Msg)
-        })
+        }
       },
       goShop() {
         wx.navigateTo({
@@ -133,14 +132,28 @@
         });
       },
       openBusiness() {
-        wx.redirectTo({
-          url: '/pages/business/main'
-        })
+        let index = getCurrentPages().findIndex(e => e.route == 'pages/business/main');
+        if (index > -1) {
+          wx.navigateBack({
+            delta: getCurrentPages().length - 1 - index
+          })
+        } else {
+          wx.navigateTo({
+            url: '/pages/business/main'
+          })
+        }
       },
       openCart() {
-        wx.redirectTo({
-          url: '/pages/cart/main'
-        })
+        let index = getCurrentPages().findIndex(e => e.route == 'pages/cart/main');
+        if (index > -1) {
+          wx.navigateBack({
+            delta: getCurrentPages().length - 1 - index
+          })
+        } else {
+          wx.navigateTo({
+            url: '/pages/cart/main'
+          })
+        }
       },
     },
     computed: {},

@@ -43,7 +43,12 @@
       this.nomore = false;
     },
     onReady() {
-      // console.log(this.$root.$mp.query.id)
+      // console.log(this.$root.$mp.query)
+      if (this.$root.$mp.query.title) {
+        wx.setNavigationBarTitle({
+          title: this.$root.$mp.query.title
+        })
+      }
       this.getPageList()
     },
     methods: {

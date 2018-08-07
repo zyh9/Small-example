@@ -153,6 +153,7 @@
             text-align: center;
             line-height: 88rpx;
             height: 88rpx;
+            border-radius: 6rpx;
             font-size: 28rpx;
             color: #fff;
             &.on {

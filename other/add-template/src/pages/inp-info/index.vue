@@ -48,6 +48,16 @@
         againPassword: '',
       }
     },
+    onLoad() {
+      this.checkIndex = 0;
+      this.info = [{
+        text: '男',
+        checked: true
+      }, {
+        text: '女',
+        checked: false
+      }];
+    },
     onReady() {
       this.vipName = '';
       this.dateInfo = '';
@@ -131,7 +141,7 @@
         flex: 1;
       }
       p {
-        width: 112rpx;
+        width: 130rpx;
         font-size: 28rpx;
         color: #333;
         margin-right: 38rpx;
@@ -184,13 +194,13 @@
       background: #333;
       margin: 50rpx 36rpx 20rpx;
       text-align: center;
-      height: 80rpx;
-      line-height: 80rpx;
-      border-radius: 8rpx;
+      height: 88rpx;
+      line-height: 88rpx;
+      border-radius: 6rpx;
       color: #fff;
       font-size: 30rpx;
     }
-    .tips{
+    .tips {
       color: #999;
       font-size: 22rpx;
       margin-left: 36rpx;

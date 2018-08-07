@@ -17,18 +17,20 @@
     },
     onLoad() {
       this.payOnoff = true;
-      this.info = this.$mp.query;
-      console.log(this.info)
+      this.info = this.$root.$mp.query;
+      // console.log(this.info)
     },
     methods: {
       againPay() {
         if (this.payOnoff) {
           this.payOnoff = false;
           this.util.post({
-            url: '/api/Customer/Order/CustomerPayment',
+            url: '/api/Customer/Browse/CustomerPayment',
             data: {
+              PaymentType: 1, //微信
               ShopId: this.info.shopId || wx.getStorageSync('ShopId') || '',
-              Money: this.info.money || ''
+              Money: this.info.money || '',
+              Token: ''
             }
           }).then(res => {
             wx.requestPayment({
@@ -40,9 +42,11 @@
               success: payres => {
                 console.log(payres)
                 this.payOnoff = true;
-                wx.redirectTo({
-                  url: `/pages/pay-ok/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
-                })
+                setTimeout(_ => {
+                  wx.redirectTo({
+                    url: `/pages/pay-ok/main?money=${this.info.money}&shopName=${this.info.shopName}&shopId=${this.info.shopId}&temp=${this.info.temp}`
+                  })
+                }, 800)
               },
               fail: error => {
                 this.payOnoff = true;
@@ -50,9 +54,11 @@
                 if (error.errMsg == 'requestPayment:fail cancel') {
                   this.msg('您已取消支付')
                 } else { //支付失败
-                  wx.redirectTo({
-                    url: `/pages/pay-error/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
-                  })
+                  setTimeout(_ => {
+                    wx.redirectTo({
+                      url: `/pages/pay-error/main?money=${this.info.money}&shopName=${this.info.shopName}&shopId=${this.info.shopId}`
+                    })
+                  }, 800)
                 }
               }
             })
