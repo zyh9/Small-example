@@ -33,7 +33,8 @@
       this.countdownInfo = '获取验证码';
       this.countdownTimer = null;
       this.isSend = true;
-      this.authTel = this.authVal = '';
+      this.authTel = wx.getStorageSync('loginInfo') ? wx.getStorageSync('loginInfo').Phone : '';
+      this.authVal = '';
     },
     methods: {
       //发送验证码
@@ -94,10 +95,10 @@
             clearInterval(this.countdownTimer)
             //存储信息
             let vipObj = {
-              token:res.Body.Token,
-              tel:this.authTel
+              token: res.Body.Token,
+              tel: this.authTel
             }
-            wx.setStorageSync('InpVip',vipObj)
+            wx.setStorageSync('InpVip', vipObj)
             //跳转至信息填写页
             wx.redirectTo({
               url: '/pages/inp-info/main'

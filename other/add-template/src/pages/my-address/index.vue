@@ -1,35 +1,33 @@
 <template>
     <div class="my_address set-flex set-ver" v-if="block">
-        <div class="main">
-            <div class="pageTitle">我的地址</div>
-            <p class="no_address" v-if="noAddress">您还没有地址，可点击底部按钮进行添加</p>
-            <ul class="my_address_list set-grow" v-if="addressList.length">
-                <li v-for="(v,i) in addressList" :key="i" :data-index="i" @touchstart="touchS" @touchmove="touchM" @touchend="touchE" :style="{marginLeft:v.leftVal}">
-                    <div class="address_item_left set-align" @click="setAddress(v)">
-                        <i class="icon " v-if='type==1' :class="checkId==v.Id?'icon_checked':'icon_check'"></i>
-                        <div class="address_item_info">
-                            <p class="name">{{v.LinkMan}} {{v.LinkManMobile}}</p>
-                            <p class="pos">{{v.AddressTitle}}{{v.UserNote}}</p>
-                            <p class="local_address">{{v.textInfo}}</p>
-                        </div>
+        <div class="pageTitle pl36">我的地址</div>
+        <p class="no_address" v-if="noAddress">您还没有地址，可点击底部按钮进行添加</p>
+        <ul class="my_address_list set-grow" v-if="addressList.length">
+            <li v-for="(v,i) in addressList" :key="i" :data-index="i" @touchstart="touchS" @touchmove="touchM" @touchend="touchE" :style="{marginLeft:v.leftVal}">
+                <div class="address_item_left set-align" @click="setAddress(v)">
+                    <i class="icon " v-if='type==1' :class="checkId==v.Id?'icon_checked':'icon_check'"></i>
+                    <div class="address_item_info">
+                        <p class="name">{{v.LinkMan}} {{v.LinkManMobile}}</p>
+                        <p class="pos">{{v.AddressTitle}}{{v.UserNote}}</p>
+                        <p class="local_address">{{v.textInfo}}</p>
                     </div>
-                    <div class="edit_box" @click='goEdit(v)'><i class="icon  icon_edit"></i></div>
-                    <div class="list_item_del" @click='delAddress(v)' :style="{right:-delBtnWidth+'px',width:delBtnWidth+'px'}" :data-item="v">删除</div>
-                </li>
-            </ul>
-            <ul class="my_address_list set-grow" v-if="uuptList.length">
-                <li v-for="(v,i) in uuptList" :key="i" :data-index="i">
-                    <div class="address_item_left set-align" @click="setAddress(v)">
-                        <i class="icon " v-if='type==1' :class="checkId==v.Id?'icon_checked':'icon_check'"></i>
-                        <div class="address_item_info">
-                            <p class="name">{{v.LinkMan}} {{v.LinkManMobile}}</p>
-                            <p class="pos">{{v.AddressTitle}}{{v.UserNote}}</p>
-                            <p class="local_address">{{v.textInfo}}</p>
-                        </div>
+                </div>
+                <div class="edit_box" @click='goEdit(v)'><i class="icon  icon_edit"></i></div>
+                <div class="list_item_del" @click='delAddress(v)' :style="{right:-delBtnWidth+'px',width:delBtnWidth+'px'}" :data-item="v">删除</div>
+            </li>
+        </ul>
+        <ul class="my_address_list set-grow" v-if="uuptList.length">
+            <li v-for="(v,i) in uuptList" :key="i" :data-index="i">
+                <div class="address_item_left set-align" @click="setAddress(v)">
+                    <i class="icon " v-if='type==1' :class="checkId==v.Id?'icon_checked':'icon_check'"></i>
+                    <div class="address_item_info">
+                        <p class="name">{{v.LinkMan}} {{v.LinkManMobile}}</p>
+                        <p class="pos">{{v.AddressTitle}}{{v.UserNote}}</p>
+                        <p class="local_address">{{v.textInfo}}</p>
                     </div>
-                </li>
-            </ul>
-        </div>
+                </div>
+            </li>
+        </ul>
         <div class="address_bottom">
             <p @click="synchronize" class="set-flex set-align set-center"><i class="icon icon_synchro"></i>同步UU跑腿地址</p>
             <p @click="addAddress" class="set-flex set-align set-center"><i class="icon icon_addAddress"></i>添加新地址</p>
@@ -275,18 +273,20 @@
         position: relative;
         height: 100%;
         background: #fff;
-        .main {
-            padding: 0 0 110rpx 36rpx;
+        padding-bottom: 110rpx;
+        box-sizing: border-box;
+        .pl36 {
+            padding-left: 36rpx;
         }
         .my_address_list {
             height: 100%;
-            box-sizing: border-box;
             overflow-x: hidden;
             overflow-y: scroll;
             li {
+                box-sizing: border-box;
                 width: 100%;
                 transition: margin-left 0.6s ease;
-                padding: 20rpx 0;
+                padding: 20rpx 36rpx;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
@@ -294,7 +294,7 @@
                 &:after {
                     content: '';
                     display: block;
-                    width: 680rpx;
+                    width: 100%;
                     height: 0;
                     border-bottom: 1px solid #ebebeb;
                     transform: scaleY(0.5);
@@ -309,7 +309,6 @@
                     }
                 }
                 .edit_box {
-                    margin-right: 36rpx;
                     padding: 12rpx;
                     line-height: 1;
                 }

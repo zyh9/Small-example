@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 2,
+			"current": 15,
 			"list": [
 				{
 					"id": 1,
@@ -106,15 +106,27 @@
 				},
 				{
 					"id": 12,
-					"name": "大叔的小店",
+					"name": "测试店铺",
 					"pathName": "pages/food-store/main",
-					"query": "ShopId=1777087142298629"
+					"query": "ShopId=1861811821200391"
 				},
 				{
 					"id": -1,
 					"name": "uu支付",
 					"pathName": "pages/uu-pay/main",
 					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "登录",
+					"pathName": "pages/login/main",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "测试店铺2",
+					"pathName": "pages/food-store/main",
+					"query": "ShopId=1861953752007686"
 				}
 			]
 		}

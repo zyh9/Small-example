@@ -8,7 +8,7 @@
             <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
             <ul class="lis_bottom_btn">
                 <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)' @click="cancelOrder">取消订单</li>
-                <li @click='againOrder' v-if='orderInfo.State>=2||orderInfo.State<0' :class="{btn_other:orderInfo.State==10}">再来一单</li>
+                <li @click='againOrder' v-if='orderInfo.State==10||orderInfo.State<0' :class="{btn_other:orderInfo.State==10}">再来一单</li>
                 <li class="btn_other" v-if="orderInfo.State==4" @click="okOrder">确认收货</li>
                 <li v-if='orderInfo.State==2&&orderInfo.CancelApplyState==1' @click="cancelOrder">已申请取消</li>
                 <li class="btn_other" v-if='orderInfo.State==0' @click='OrderRePay'>继续支付</li>
@@ -52,11 +52,9 @@
             </div>
         </div>
         <div class="order_details_con">
-            <!-- <div class="shop_info_sum" @click="openShop"> -->
             <div class="shop_info_sum">
                 <img class="fade_in" :src="orderInfo.ShopLogo+'?x-oss-process=image/resize,w_100/format,jpg'" alt="">
                 <p>{{orderInfo.ShopName}}</p>
-                <!-- <i class="icon icon_right direction small"></i> -->
             </div>
             <ul class="con_order_list">
                 <li v-for="(v,i) in orderInfo.OrderGoods" :key="i" class="con_list_item">
@@ -285,38 +283,35 @@
                     })
                 }
             },
-            openShop() {
-                wx.navigateTo({
-                    url: `/pages/my-store/main?ShopId=${this.orderInfo.ShopID}&type=1`
-                })
-            },
             /* 再次生成订单信息 */
             OrderRePay() {
-                this.util.post({
-                        url: '/api/Customer/Order/OrderRePay',
-                        data: {
-                            OrderId: this.orderInfo.OrderID,
-                        }
-                    })
-                    .then(res => {
-                        if (res.State == 1) {
-                            wx.requestPayment({
-                                timeStamp: res.Body.timeStamp,
-                                nonceStr: res.Body.nonceStr,
-                                package: res.Body.package,
-                                signType: res.Body.signType,
-                                paySign: res.Body.paySign,
-                                success: payres => {
-                                    this.orderDetails()
-                                },
-                                fail: err => {
-                                    this.msg('您已取消支付')
-                                }
-                            })
-                        }
-                    }).catch(err => {
-                        this.msg(err.Msg)
-                    })
+                wx.redirectTo({
+                    url: `/pages/uu-pay/main?OrderId=${this.orderInfo.OrderID}&shopId=${this.orderInfo.ShopID}`
+                })
+                // this.util.post({
+                //     url: '/api/Customer/Order/OrderRePay',
+                //     data: {
+                //         OrderId: this.orderInfo.OrderID,
+                //     }
+                // }).then(res => {
+                //     if (res.State == 1) {
+                //         wx.requestPayment({
+                //             timeStamp: res.Body.timeStamp,
+                //             nonceStr: res.Body.nonceStr,
+                //             package: res.Body.package,
+                //             signType: res.Body.signType,
+                //             paySign: res.Body.paySign,
+                //             success: payres => {
+                //                 this.orderDetails()
+                //             },
+                //             fail: err => {
+                //                 this.msg('您已取消支付')
+                //             }
+                //         })
+                //     }
+                // }).catch(err => {
+                //     this.msg(err.Msg)
+                // })
             },
             async requireImg(ExpressType, State) {
                 this.shopMap = await this.util.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/mapicon/shop-map.png');
@@ -447,6 +442,10 @@
                     //地图所需信息 （不包含快递和商家自送）
                     if (this.orderInfo.State >= 4 && this.orderInfo.State < 10 && this.orderInfo.ExpressType != 2 && this.orderInfo.ExpressType != 4) {
                         // console.log(this.util.downImg)
+                        //开启订单轮询
+                        this.timer = setInterval(_ => {
+                            this.orderDetails();
+                        }, 7000)
                         this.requireImg(this.orderInfo.ExpressType, this.orderInfo.State).catch(err => {
                             this.msg('地图信息获取失败')
                         })
@@ -533,7 +532,7 @@
             /* 再来一单 */
             againOrder() {
                 wx.navigateTo({
-                    url: '/pages/submit-order/main?orderId=' + this.$mp.query.orderId
+                    url: `/pages/submit-order/main?orderId=${this.orderInfo.OrderID}&shopId=${this.orderInfo.ShopID}&temp=${this.orderInfo.ShopTemplateId}`
                 });
             },
             tracking() {
@@ -610,13 +609,13 @@
             }
         },
         watch: {
-            block: function(newVal, oldVal) {
-                if (newVal) {
-                    this.timer = setInterval(_ => {
-                        this.orderDetails();
-                    }, 7000)
-                }
-            },
+            // block: function(newVal, oldVal) {
+            //     if (newVal) {
+            //         this.timer = setInterval(_ => {
+            //             this.orderDetails();
+            //         }, 7000)
+            //     }
+            // },
             scrollTop: function(newVal, oldVal) {
                 newVal > this.winHeight && (this.mapBlock = false, this.winHeight = 0);
                 // console.log(newVal, this.mapBlock)

@@ -108,12 +108,6 @@
                 this.tips = false;
                 this.nomore = false;
             },
-            openShop(info) {
-                console.log(info.ShopId)
-                wx.redirectTo({
-                    url: `/pages/my-store/main?ShopId=${info.ShopId}&type=1`
-                })
-            },
             goDetails(item) {
                 // console.log(item)
                 if (item.State == 3) {

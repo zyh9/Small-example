@@ -59,7 +59,7 @@
       }];
     },
     onReady() {
-      this.vipName = '';
+      this.vipName = wx.getStorageSync('loginInfo') ? wx.getStorageSync('loginInfo').NickName : '';
       this.dateInfo = '';
       this.password = '';
       this.againPassword = '';
@@ -114,7 +114,14 @@
         }
       }
     },
-    watch: {},
+    watch: {
+      password: function(newVal, oldVal) {
+        this.authTel = newVal.replace(/[^\d]/g, '');
+      },
+      againPassword: function(newVal, oldVal) {
+        this.authVal = newVal.replace(/[^\d]/g, '');
+      },
+    },
     onUnload() {}
   }
 </script>

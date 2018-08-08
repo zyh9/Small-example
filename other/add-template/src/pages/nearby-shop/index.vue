@@ -318,11 +318,7 @@
                     transform-origin: 0 0;
                     z-index: 10;
                 }
-            } // .item_top:nth-last-child(1) {
-            //     &:after {
-            //         display: none !important;
-            //     }
-            // }
+            }
         }
         .li_mask {
             position: absolute;

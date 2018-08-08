@@ -1,5 +1,5 @@
 <template>
-    <div class="vip_recharge">
+    <div class="vip_recharge" v-if="block">
         <div class="recharge_con">
             <div class="info">
                 <i class="icon icon_price" v-if="tips"></i>

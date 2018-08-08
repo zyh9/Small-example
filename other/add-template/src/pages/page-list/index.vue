@@ -59,7 +59,7 @@
               shopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
               GoodType: this.$root.$mp.query.id,
               PageSize: 20,
-              PageIndex: 1
+              PageIndex: this.page
             }
           })
           .then(res => {
