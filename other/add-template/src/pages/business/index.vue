@@ -30,7 +30,7 @@
           <img :src="item.PictureUrl?item.PictureUrl+'?x-oss-process=image/resize,w_800/format,jpg':''" class="fade_in" alt="" />
         </div>
       </div>
-      <div class="business-recommend" v-if="GoodsTypeBlock">
+      <div class="business-recommend" v-if="GoodsTypeBlock&&pageShopList.length">
         <div class="business-recommend-title">
           <i class="icon icon_recommend"></i>
           <p>{{pageName}}</p>
@@ -51,7 +51,7 @@
       </div>
     </div>
     <div class="shop_close" v-if="openState==0">店铺已打烊</div>
-    <div class="tab_bar">
+    <div class="tab_bar fixed_bot">
       <div class="tab_bar_item">
         <img src="../../../static/tabBar/index-active.png" alt="">
         <p class="active">首页</p>
@@ -97,9 +97,11 @@
       this.getUserInfo(this.page)
     },
     onReachBottom() { //触底事件
-      if (this.quest) {
-        this.page++;
-        this.shopPageInfo()
+      if (this.IndexInfoList.TemplateData.GoodsType && this.IndexInfoList.TemplateData.GoodsType.ID) {
+        if (this.quest) {
+          this.page++;
+          this.shopPageInfo()
+        }
       }
     },
     onLoad() {
@@ -134,7 +136,7 @@
           })
           this.IndexInfoList = res.Body;
           this.openState = res.Body.OpenState;
-          if (this.IndexInfoList.TemplateData.GoodsType) {
+          if (this.IndexInfoList.TemplateData.GoodsType && this.IndexInfoList.TemplateData.GoodsType.ID) {
             this.pageName = this.IndexInfoList.TemplateData.GoodsType.Name;
             this.pageId = this.IndexInfoList.TemplateData.GoodsType.ID;
             this.shopPageInfo(pg)
@@ -143,14 +145,24 @@
           }
           wx.setStorageSync('shopInfo', this.IndexInfoList)
           this.GoodsTypeBlock = this.IndexInfoList.TemplateData.GoodsType ? true : false;
-          this.SectionFirst = this.IndexInfoList.TemplateData.SectionFirst ? this.IndexInfoList.TemplateData.SectionFirst : [];
-          if (this.IndexInfoList.TemplateData.SectionFirst && this.IndexInfoList.TemplateData.SectionFirst.length == 1) {
+          //默认banner图
+          this.SectionFirst = this.IndexInfoList.TemplateData.SectionFirst && this.IndexInfoList.TemplateData.SectionFirst.length ? this.IndexInfoList.TemplateData.SectionFirst : [{
+            LinkType: -1,
+            PictureUrl: "https://otherfiles-ali.uupt.com/Stunner/FE/M/defaultBanner.png"
+          }];
+          // console.log(this.SectionFirst)
+          if (this.SectionFirst && this.SectionFirst.length == 1) {
             this.indicatorDots = false;
           }
-          this.SectionSecond = this.IndexInfoList.TemplateData.SectionSecond ? this.IndexInfoList.TemplateData.SectionSecond : [];
-          this.SectionThird = this.IndexInfoList.TemplateData.SectionThird ? this.IndexInfoList.TemplateData.SectionThird : [];
+          this.SectionSecond = this.IndexInfoList.TemplateData.SectionSecond && this.IndexInfoList.TemplateData.SectionSecond.length ? this.IndexInfoList.TemplateData.SectionSecond : [];
+          this.SectionThird = this.IndexInfoList.TemplateData.SectionThird && this.IndexInfoList.TemplateData.SectionThird.length ? this.IndexInfoList.TemplateData.SectionThird : [];
         }).catch(err => {
           this.msg(err.Msg)
+          setTimeout(_ => {
+            wx.switchTab({
+              url: '/pages/nearby-shop/main'
+            })
+          }, 1000)
         })
       },
       shopPageInfo(pg) {
@@ -174,7 +186,7 @@
               this.pageShopList.push(...res.Body);
             }
             if (!res.Body.length && this.page == 1) {
-              this.msg('店家暂无配置')
+              // this.msg('店家暂无配置')
             } else if (!res.Body.length && this.page > 1) {
               this.quest = false;
               this.nomore = true;
@@ -236,7 +248,7 @@
           wx.navigateTo({
             url: `/pages/page-list/main?id=${item.GoodsTypeId}`
           })
-        } else {
+        } else if (item.LinkType == 4) {
           let {
             GoodsId
           } = item;
@@ -253,14 +265,11 @@
 
 <style lang="less">
   .business {
-    height: 100%;
     position: relative;
-    padding-bottom: 104rpx;
-    box-sizing: border-box;
     .business_con {
-      height: 100%;
       overflow-x: hidden;
       overflow-y: scroll;
+      padding-bottom: 104rpx;
     }
     .business_con::-webkit-scrollbar {
       display: none;
@@ -481,5 +490,9 @@
     line-height: 96rpx;
     text-align: center;
     font-size: 30rpx;
+  }
+  .fixed_bot {
+    position: fixed !important;
+    z-index: 100;
   }
 </style>

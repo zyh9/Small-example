@@ -51,6 +51,7 @@
                         data: {
                             TradersPwd: this.oldPassword,
                             VipNo: wx.getStorageSync('vipUserInfo').VipNo || '',
+                            VerifyType:1
                         }
                     }).then(res => {
                         if (res.State == 1) {

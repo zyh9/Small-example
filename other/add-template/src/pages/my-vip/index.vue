@@ -2,7 +2,7 @@
     <div class="my_vip" v-if="block">
         <div class="no_vip" v-if="!isVip">
             <div class="vip_con">
-                <img class="vip_bg fade_in" :src="info.CardImage?info.CardImage:defaultCard" alt="">
+                <img class="vip_bg fade_in" :src="info.CardImage?info.CardImage+'?x-oss-process=image/resize,w_600/format,jpg':defaultCard" alt="">
                 <div class="vip_card_info">
                     <img :src="shopLogo?shopLogo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="">
                     <p class="vip_shop_name">{{shopName}}</p>
@@ -13,7 +13,7 @@
         <div class="is_vip" v-else>
             <div class="vip_card_con">
                 <div class="vip_con">
-                    <img class="vip_bg fade_in" :src="info.CardImage?info.CardImage:defaultCard" alt="">
+                    <img class="vip_bg fade_in" :src="info.CardImage?info.CardImage+'?x-oss-process=image/resize,w_600/format,jpg':defaultCard" alt="">
                     <div class="vip_card_info">
                         <img :src="shopLogo?shopLogo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="">
                         <p class="vip_shop_name">{{info.Name}}</p>
@@ -32,7 +32,7 @@
                 </div>
                 <div class="recharge_btn">
                     <div class="recharge" @click="openRecharge">充值</div>
-                    <div class="recharge recharge_right" @click="vipCodePay">余额支付</div>
+                    <div class="recharge recharge_right" :class="{no_click:info.AccountMoney==0}" @click="vipCodePay">余额支付</div>
                 </div>
                 <div class="options" @click="vipInfo">
                     <p>会员信息</p>
@@ -128,9 +128,13 @@
                 })
             },
             vipCodePay() {
-                wx.navigateTo({
-                    url: `/pages/code-pay/main?shopName=${wx.getStorageSync('shopInfo').ShopName}&shopId=${wx.getStorageSync('shopInfo').ShopId}&temp=${wx.getStorageSync('shopInfo').ShopTemplateId}`
-                })
+                if (this.info.AccountMoney > 0) {
+                    wx.navigateTo({
+                        url: `/pages/code-pay/main?shopName=${wx.getStorageSync('shopInfo').ShopName}&shopId=${wx.getStorageSync('shopInfo').ShopId}&temp=${wx.getStorageSync('shopInfo').ShopTemplateId}`
+                    })
+                } else {
+                    this.msg('卡内余额为0，请充值')
+                }
             }
         },
         computed: {},
@@ -282,6 +286,12 @@
                 border: 1px solid #999;
                 color: #1a1a1a;
                 background-color: #fff;
+                margin-left: 28rpx;
+            }
+            .no_click {
+                border: 1px solid #f5f5f5;
+                color: #999;
+                background-color: #f5f5f5;
                 margin-left: 28rpx;
             }
             .options {

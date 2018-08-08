@@ -75,7 +75,7 @@
                                 this.userInfo = res.Body;
                                 this.userInfo.UserMobile = this.userInfo.UserMobile.substr(0, 3).padEnd(7, '*') + this.userInfo.UserMobile.substr(7);
                                 this.userInfo.NickName = this.userInfo.NickName.length > 8 ? this.userInfo.NickName.slice(0, 8) + '...' : this.userInfo.NickName;
-                                console.log(this.userInfo)
+                                // console.log(this.userInfo)
                                 wx.setStorageSync('user', this.userInfo)
                             }
                         }).catch(err => {

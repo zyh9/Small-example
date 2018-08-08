@@ -37,7 +37,7 @@
     methods: {
       getInfo(res) {
         if (res.target.userInfo) {
-          wx.setStorageSync('userInfo', JSON.stringify(res.target.userInfo))
+          // console.log(res.target.userInfo)
           //提交验证码
           this.commitSms(res.target.userInfo)
         } else {
@@ -98,19 +98,23 @@
           }).then(res => {
             if (res.State == 1) {
               this.msg(res.Msg)
-              //登录成功修改绑定手机号状态，以便于其它页面获取用户绑定手机号状态
+              //登录成功修改用户信息存储
               let loginInfo = Object.assign({}, wx.getStorageSync('loginInfo'), {
-                IsBindPhone: 1
+                IsBindPhone: 1,//手机号
+                NickName:userInfo.nickName,//微信昵称
+                Phone:this.authTel,//手机号
               })
               wx.setStorageSync('loginInfo', loginInfo)
-              this.authTel = this.authVal = '';
               //登录成功清除定时器
               this.timer = null;
               clearInterval(this.countdownTimer)
-              //返回至上一页
-              wx.navigateBack({
-                delta: 1
-              })
+              setTimeout(_ => {
+                this.authTel = this.authVal = '';
+                //返回至上一页
+                wx.navigateBack({
+                  delta: 1
+                })
+              }, 800)
             } else {
               this.msg(res.Msg)
             }

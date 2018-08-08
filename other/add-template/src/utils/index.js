@@ -6,7 +6,7 @@ const QQMap = new QQMapWX({
 })
 
 //线上地址
-// const baseUrl = 'https://stunnercustomer.uupt.com';
+const baseUrl = 'https://stunnercustomer.uupt.com';
 //光明地址
 // const baseUrl = 'http://192.168.6.180:8060'; 
 //鹏浩地址
@@ -15,12 +15,12 @@ const QQMap = new QQMapWX({
 //袁沼
 // const baseUrl = 'http://192.168.6.66:6001';
 //海涛
-const baseUrl = 'http://192.168.6.156:50654';
+// const baseUrl = 'http://192.168.6.156:50654';
 
 const commonHeader = _ => {
   //headers每次必传数据存放位置
   return {
-    v: '1.1.6',
+    v: '1.1.7',
     appid: '1',
     token: wx.getStorageSync('loginInfo').Token || '',
     qrcode: wx.setStorageSync('scene', this.scene) || ''

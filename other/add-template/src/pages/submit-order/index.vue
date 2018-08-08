@@ -80,9 +80,9 @@
       </form>
     </div>
     <!-- <div class="copy_info">
-                                                                                                                                                                                                                                                                    <p class="form_id" @click="copyInfo(formId)">{{formId}}</p>
-                                                                                                                                                                                                                                                                    <p class="pay_id" @click="copyInfo(packageId)">{{packageId}}</p>
-                                                                                                                                                                                                                                                                  </div> -->
+                                                                                                                                                                                                                                                                        <p class="form_id" @click="copyInfo(formId)">{{formId}}</p>
+                                                                                                                                                                                                                                                                        <p class="pay_id" @click="copyInfo(packageId)">{{packageId}}</p>
+                                                                                                                                                                                                                                                                      </div> -->
     <div class="mask" v-if="isActive||payMask" @click="isActive = false,payMask=false"></div>
     <div class="distribution_card" :class="{distribution_card_active:isActive}">
       <div class="distribution_card_item">
@@ -114,8 +114,8 @@
         <div class="pay_title">
           <p>支付</p>
           <!-- <div @click="payMask=false" class="title_img">
-                                  <i class="icon icon_close"></i>
-                                </div> -->
+                                      <i class="icon icon_close"></i>
+                                    </div> -->
         </div>
         <div class="pay_list">
           <div class="pay_item">
@@ -196,7 +196,8 @@
         payOnoff: true, //支付开关
         tips: '',
         payMask: false, //支付弹窗
-        again:0,//是否是再来一单
+        again: 0, //是否是再来一单
+        ShopId: '', //存储商铺id
       }
     },
     onLoad() {
@@ -205,8 +206,10 @@
         title: '加载中',
         mask: true
       })
+      this.cartListItem = [];
     },
     onShow() {
+      this.ShopId = '';
       this.again = 0;
       this.selectAddress = {};
       this.ExpressType = '配送方式+配送时长';
@@ -230,7 +233,7 @@
       this.orderMask = false;
       if (this.$mp.query.orderId) {
         this.cartListItem = wx.getStorageSync('againOrder') || [];
-        console.log('再来')
+        console.log('再来一单')
         this.again = 1;
         this.block = true;
         wx.hideLoading();
@@ -239,7 +242,8 @@
         this.again = 0;
         this.block = true;
         wx.hideLoading();
-        console.log('正常')
+        console.log('正常下单')
+        this.ShopId = wx.getStorageSync('shopInfo').ShopId;
         // 先获取缓存数据
         let cartListSum = wx.getStorageSync('cartListSum') || [];
         // console.log(cartListSum, '000')
@@ -425,8 +429,41 @@
         }).then(res => {
           // console.log(res.Body.OrderId)
           if (res.State == 1) {
+            if (this.again == 0) {
+              // console.log('no再来')
+              let cartListSum = wx.getStorageSync('cartListSum') || [];
+              let shopCartInfo = cartListSum.filter(e => e.ShopId == wx.getStorageSync('shopInfo').ShopId);
+              let cartSum = shopCartInfo[0].cartList ? shopCartInfo[0].cartList : [];
+              let filtercartSum = cartSum.filter(e => e.check == false);
+              // console.log(filtercartSum)
+              //存在false的情况
+              if (filtercartSum.length) {
+                console.log('存在未勾选商品')
+                //走设置
+                cartListSum.forEach(e => {
+                  if (e.ShopId == wx.getStorageSync('shopInfo').ShopId) {
+                    e.cartList = filtercartSum;
+                  }
+                })
+                //针对商品列表为空的店铺做清空处理
+                cartListSum = cartListSum.filter(e => e.cartList.length > 0);
+                // 再设置缓存数据
+                wx.setStorageSync('cartListSum', cartListSum);
+                //缓存length不存在，直接清除
+                !cartListSum.length && wx.removeStorageSync('cartListSum');
+              } else {
+                cartListSum = cartListSum.filter(e => e.ShopId != wx.getStorageSync('shopInfo').ShopId);
+                // console.log(cartListSum)
+                // 再设置缓存数据
+                wx.setStorageSync('cartListSum', cartListSum);
+                //缓存length不存在，直接清除
+                !cartListSum.length && wx.removeStorageSync('cartListSum');
+              }
+              wx.removeStorageSync('note');
+              wx.removeStorageSync('selectAddress');
+            }
             wx.redirectTo({
-              url: `/pages/uu-pay/main?OrderId=${res.Body.OrderId}&again=${this.again}`
+              url: `/pages/uu-pay/main?OrderId=${res.Body.OrderId}&shopId=${this.ShopId}`
             })
           } else if (res.State == -13) {
             this.orderMsg = res.Msg;
@@ -720,6 +757,7 @@
           }
         }).then(res => {
           if (res.State == 1) {
+            this.ShopId = res.Body.ShopID;
             this.cartListItem = [];
             this.shopInfo = {
               ShopId: ''
@@ -744,7 +782,7 @@
                 sumPrice: Math.round(item.OriginalPrice * 10000) * item.GoodNum / 10000
               })
             })
-            console.log(goodsDetail, '再来一单')
+            // console.log(goodsDetail, '再来一单')
             this.cartListItem = goodsDetail;
             if (wx.getStorageSync('selectAddress')) {
               this.selectAddress = wx.getStorageSync('selectAddress');
@@ -755,8 +793,6 @@
             } else {
               this.getAddressInfo(res)
             }
-          } else {
-            console.log(res.Msg)
           }
         }).catch(err => {
           this.msg(err.Msg)
@@ -819,18 +855,19 @@
       },
       backStore() {
         this.orderMask = false;
-        if (this.$mp.query.orderId) {
+        if (this.$root.$mp.query.orderId) {
           let {
             ShopTemplateId,
-            ShopId
-          } = wx.getStorageSync('shopInfo');
+            shopId
+          } = this.$root.$mp.query;
+          // console.log(this.$root.$mp.query,'再来一单参数')
           if (ShopTemplateId == 1) {
             wx.redirectTo({
-              url: `/pages/food-store/main?ShopId=${ShopId}&type=1`
+              url: `/pages/food-store/main?ShopId=${shopId}&type=1`
             })
           } else {
             wx.redirectTo({
-              url: `/pages/business/main?ShopId=${ShopId}&type=1`
+              url: `/pages/business/main?ShopId=${shopId}&type=1`
             })
           }
         } else {

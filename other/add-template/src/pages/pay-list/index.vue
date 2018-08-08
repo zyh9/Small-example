@@ -1,18 +1,17 @@
 <template>
   <div class="pay_list">
     <h3 class="title">消费余额明细</h3>
-    <div class="container">
-      <scroll-view scroll-y="true" lower-threshold="60" @scrolltolower="scrollHandler" style="height:100%;padding:0 36rpx;box-sizing:border-box;">
-        <p class="no_info" v-if="noInfo">暂无明细信息</p>
-        <div class="list-item" v-for="(v,i) in walletList" :key="i">
-          <div class="wallet-info">
-            <div class="text">{{v.SubjectName}}</div>
-            <div class="time">{{v.TradeTime}}</div>
-          </div>
-          <div class="price">{{v.TradeMoney}}</div>
+    <scroll-view scroll-y="true" lower-threshold="60" @scrolltolower="scrollHandler" :style="{height:winHeight+'px'}" class="scroll_view">
+      <p class="no_info" v-if="noInfo">暂无明细信息</p>
+      <div class="list-item" v-for="(v,i) in walletList" :key="i">
+        <div class="wallet-info">
+          <div class="text">{{v.SubjectName}}</div>
+          <div class="time">{{v.TradeTime}}</div>
         </div>
-      </scroll-view>
-    </div>
+        <div class="price">{{v.TradeMoney}}</div>
+      </div>
+      <div class="no_more" v-if="nomore">没有更多明细信息了</div>
+    </scroll-view>
   </div>
 </template>
 
@@ -23,17 +22,30 @@
         walletList: [], //钱包明细数组
         quest: true,
         page: 1,
-        PageSize: 10,
-        noInfo: false
+        PageSize: 20,
+        noInfo: false,
+        nomore: false,
+        winHeight: 0
       }
     },
     onReady() {},
     onShow() {
-      this.noInfo = false;
+      this.noInfo = this.nomore = false;
       this.walletList = [];
       this.quest = true;
       this.page = 1;
       this.getData();
+      let query = wx.createSelectorQuery();
+      query.select('.title').boundingClientRect();
+      query.exec(res => {
+        let height = res[0].height;
+        wx.getSystemInfo({
+          success: res => {
+            this.winHeight = res.windowHeight - height;
+            console.log(this.winHeight)
+          }
+        })
+      })
     },
     methods: {
       getData() {
@@ -46,17 +58,17 @@
             PageIndex: this.page,
           }
         }).then(res => {
-          console.log(res.Body)
+          // console.log(res.Body)
           // res.Body.forEach(e => {
           //   e.TradeTime = e.TradeTime.split(' ')[0]
           // });
+          this.walletList.push(...res.Body)
           if (res.Body.length < this.PageSize && this.page > 1) {
             this.quest = false;
-            this.msg('已经没有更多信息了')
+            this.nomore = true;
           } else if (!res.Body.length && this.page == 1) {
             this.noInfo = true;
           }
-          this.walletList.push(...res.Body)
         }).catch(err => {
           this.msg(err.Msg)
         })
@@ -75,24 +87,20 @@
 <style lang="less">
   .pay_list {
     background: #fff;
+    height: 100%;
+    overflow: hidden;
     .title {
-      position: absolute;
-      left: 0;
-      top: 0;
-      margin: 20rpx 36rpx;
+      padding: 20rpx 36rpx;
       font-size: 46rpx;
       font-weight: 700;
-      z-index: 5;
     }
-    .container {
-      padding-top: 104rpx;
+    .scroll_view {
       box-sizing: border-box;
-      height: 100%;
       background: #fff;
-      overflow: hidden;
+      overflow-y: scroll;
       .list-item {
         position: relative;
-        padding: 35rpx 0;
+        padding: 36rpx;
         display: flex;
         align-items: center;
         &:after {
@@ -138,6 +146,14 @@
       font-size: 28rpx;
       color: #666;
       padding-top: 100rpx;
+    }
+    .no_more {
+      height: 70rpx;
+      width: 100%;
+      line-height: 70rpx;
+      font-size: 20rpx;
+      color: #999;
+      text-align: center;
     }
   }
 </style>

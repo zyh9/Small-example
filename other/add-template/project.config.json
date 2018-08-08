@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 2,
+			"current": 14,
 			"list": [
 				{
 					"id": 1,
@@ -114,6 +114,12 @@
 					"id": -1,
 					"name": "uu支付",
 					"pathName": "pages/uu-pay/main",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "登录",
+					"pathName": "pages/login/main",
 					"query": ""
 				}
 			]

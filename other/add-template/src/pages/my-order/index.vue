@@ -35,7 +35,7 @@
                         <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li>
                         <li class="btn_other" v-if='item.State==0' @click="OrderRePay(item)">继续支付</li>
                         <!-- 再来一单  -->
-                        <li @click="againOrder(item.OrderId)" v-if='item.State>=2||item.State<0'>再来一单</li>
+                        <li @click="againOrder(item)" v-if='item.State>=2||item.State<0'>再来一单</li>
                         <li class="btn_other" v-if='item.State==4' @click="okOrder(item)">确认收货</li>
                     </ul>
                 </div>
@@ -73,6 +73,13 @@
             this.nomore = false;
             this.orderInfo()
             this.open = this.$mp.query.open == 1 ? true : false;
+        },
+        onShow() {
+            console.log(this.$store.state.mutations.newOrder ? '有新订单支付' : '正常进入列表')
+            if(this.$store.state.mutations.newOrder){
+                wx.startPullDownRefresh();
+                this.$store.dispatch('newOrder', false)
+            }
         },
         onPullDownRefresh() { //下拉刷新
             this.page = 1;
@@ -191,40 +198,43 @@
             },
             /* 再次生成订单信息 */
             OrderRePay(item) {
-                this.util.post({
-                        url: '/api/Customer/Order/OrderRePay',
-                        data: {
-                            OrderId: item.OrderId,
-                        }
-                    })
-                    .then(res => {
-                        if (res.State == 1) {
-                            wx.requestPayment({
-                                timeStamp: res.Body.timeStamp,
-                                nonceStr: res.Body.nonceStr,
-                                package: res.Body.package,
-                                signType: res.Body.signType,
-                                paySign: res.Body.paySign,
-                                success: payres => {
-                                    setTimeout(_ => {
-                                        wx.navigateTo({
-                                            url: '/pages/order-details/main?orderId=' + item.OrderId
-                                        })
-                                    }, 300)
-                                },
-                                fail: err => {
-                                    this.msg('您已取消支付')
-                                    setTimeout(_ => {
-                                        wx.navigateTo({
-                                            url: '/pages/order-details/main?orderId=' + item.OrderId
-                                        })
-                                    }, 300)
-                                }
-                            })
-                        }
-                    }).catch(err => {
-                        this.msg(err.Msg)
-                    })
+                wx.navigateTo({
+                    url: `/pages/uu-pay/main?OrderId=${item.OrderId}&shopId=${item.ShopId}`
+                })
+                // this.util.post({
+                //         url: '/api/Customer/Order/OrderRePay',
+                //         data: {
+                //             OrderId: item.OrderId,
+                //         }
+                //     })
+                //     .then(res => {
+                //         if (res.State == 1) {
+                //             wx.requestPayment({
+                //                 timeStamp: res.Body.timeStamp,
+                //                 nonceStr: res.Body.nonceStr,
+                //                 package: res.Body.package,
+                //                 signType: res.Body.signType,
+                //                 paySign: res.Body.paySign,
+                //                 success: payres => {
+                //                     setTimeout(_ => {
+                //                         wx.navigateTo({
+                //                             url: '/pages/order-details/main?orderId=' + item.OrderId
+                //                         })
+                //                     }, 300)
+                //                 },
+                //                 fail: err => {
+                //                     this.msg('您已取消支付')
+                //                     setTimeout(_ => {
+                //                         wx.navigateTo({
+                //                             url: '/pages/order-details/main?orderId=' + item.OrderId
+                //                         })
+                //                     }, 300)
+                //                 }
+                //             })
+                //         }
+                //     }).catch(err => {
+                //         this.msg(err.Msg)
+                //     })
             },
             //取消订单
             cancelOrder(item) {
@@ -268,17 +278,23 @@
                 })
             },
             /* 再来一单  */
-            againOrder(orderId) {
+            againOrder(item) {
                 wx.removeStorageSync('selectAddress');
                 wx.navigateTo({
-                    url: `/pages/submit-order/main?orderId=${orderId}`
+                    url: `/pages/submit-order/main?orderId=${item.OrderId}&shopId=${item.ShopId}&temp=${item.ShopTemplateId}`
                 });
             },
             goShop(item) {
                 if (this.open == false) return;
-                wx.navigateTo({
-                    url: `/pages/my-store/main?ShopId=${item.ShopId}&type=1`
-                });
+                if (item.ShopTemplateId == 1) {
+                    wx.navigateTo({
+                        url: `/pages/food-store/main?ShopId=${item.ShopId}&type=1`
+                    })
+                } else {
+                    wx.navigateTo({
+                        url: `/pages/business/main?ShopId=${item.ShopId}&type=1`
+                    })
+                }
             }
         },
         computed: {
