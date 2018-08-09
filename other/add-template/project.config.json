@@ -30,7 +30,11 @@
 			"list": []
 		},
 		"miniprogram": {
+<<<<<<< HEAD
 			"current": 15,
+=======
+			"current": 18,
+>>>>>>> b4c337af382c5aec80b3d66369dd59b70402cae5
 			"list": [
 				{
 					"id": 1,
@@ -127,6 +131,26 @@
 					"name": "测试店铺2",
 					"pathName": "pages/food-store/main",
 					"query": "ShopId=1861953752007686"
+<<<<<<< HEAD
+=======
+				},
+				{
+					"id": -1,
+					"name": "售后申请",
+					"pathName": "pages/after-sale/main",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "图片上传",
+					"pathName": "pages/upload-img/main",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "我的订单",
+					"pathName": "pages/my-order/main"
+>>>>>>> b4c337af382c5aec80b3d66369dd59b70402cae5
 				}
 			]
 		}

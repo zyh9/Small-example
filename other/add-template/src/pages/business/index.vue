@@ -480,7 +480,7 @@
     }
   }
   .shop_close {
-    position: absolute;
+    position: fixed;
     left: 0;
     bottom: 104rpx;
     width: 100%;

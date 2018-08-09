@@ -41,7 +41,9 @@
 		"pages/pay-password-management/main",
 		"pages/edit-pay-password/main",
 		"pages/forget-pay-password/main",
-		"pages/uu-pay/main"
+		"pages/uu-pay/main",
+		"pages/after-sale/main",
+		"pages/upload-img/main"
 	],
 	"window": {
 		"backgroundTextStyle": "light",

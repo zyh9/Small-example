@@ -16,10 +16,10 @@
                 value: ''
             }
         },
-        onLoad(){
-            this.value='';
-            if(wx.getStorageSync('note')){
-                this.value=wx.getStorageSync('note');
+        onLoad() {
+            this.value = '';
+            if (wx.getStorageSync('note')) {
+                this.value = wx.getStorageSync('note');
             }
         },
         methods: {
