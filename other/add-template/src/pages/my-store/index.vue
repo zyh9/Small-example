@@ -21,11 +21,26 @@
         onReady() { //进入页面触发，回退不触发
         },
         onShow() { //页面渲染就会触发
-            console.log('走分享')
             this.util.qqMapInfo().then(res => {
                 //分享有参数，才去解析
-                if (this.scene) {
+                if (this.scene) { //太阳码跳转
+                    console.log('太阳码跳转')
                     this.sceneInfo()
+                } else { //发送好友跳转
+                    console.log('发送好友跳转')
+                    let {
+                        ShopId,
+                        temp
+                    } = this.$root.$mp.query;
+                    if (temp == 1) {
+                        wx.redirectTo({
+                            url: `/pages/food-store/main?ShopId=${ShopId}`
+                        })
+                    } else {
+                        wx.redirectTo({
+                            url: `/pages/business/main?ShopId=${ShopId}`
+                        })
+                    }
                 }
             }).catch(err => {
                 console.log(err)
@@ -47,17 +62,13 @@
                     } = res.Body;
                     ShopId && wx.setStorageSync('ShopId', ShopId);
                     if (ShopTemplateId == 1) {
-                        setTimeout(_ => {
-                            wx.redirectTo({
-                                url: `/pages/food-store/main?ShopId=${ShopId}&share=1`
-                            })
-                        }, 600)
+                        wx.redirectTo({
+                            url: `/pages/food-store/main?ShopId=${ShopId}&share=1`
+                        })
                     } else {
-                        setTimeout(_ => {
-                            wx.redirectTo({
-                                url: `/pages/business/main?ShopId=${ShopId}&share=1`
-                            })
-                        }, 600)
+                        wx.redirectTo({
+                            url: `/pages/business/main?ShopId=${ShopId}&share=1`
+                        })
                     }
                 }).catch(err => {
                     this.msg(err.Msg)
@@ -75,8 +86,7 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        // justify-content: center;
+        align-items: center; // justify-content: center;
     }
     .loading {
         padding-top: 352rpx;

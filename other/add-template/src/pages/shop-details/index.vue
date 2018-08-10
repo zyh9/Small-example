@@ -59,11 +59,11 @@
     <div class="saveImg" v-if='shareCard'>
       <div class="main">
         <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"> 
-                                                                                  <cover-view class="shareCover" >
-                                                                                  <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                  <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                  </cover-view>
-                                                                                  </canvas>
+                                                                                      <cover-view class="shareCover" >
+                                                                                      <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
+                                                                                      <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
+                                                                                      </cover-view>
+                                                                                      </canvas>
       </div>
     </div>
   </div>
@@ -88,8 +88,8 @@
     onShareAppMessage(res) {
       return {
         title: this.shopInfoList.ShopName,
-        path: `pages/business/main?ShopId=${String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId')}`,
-        imageUrl: this.shopInfoList.Logo+'?x-oss-process=image/resize,w_400/format,jpg',
+        path: `pages/my-store/main?ShopId=${String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId')}&temp=2`,
+        imageUrl: this.shopInfoList.Logo + '?x-oss-process=image/resize,w_400/format,jpg',
         success: res => {
           this.maskActive = false;
         },

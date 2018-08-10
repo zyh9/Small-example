@@ -857,11 +857,11 @@
         this.orderMask = false;
         if (this.$root.$mp.query.orderId) {
           let {
-            ShopTemplateId,
+            temp,
             shopId
           } = this.$root.$mp.query;
           // console.log(this.$root.$mp.query,'再来一单参数')
-          if (ShopTemplateId == 1) {
+          if (temp == 1) {
             wx.redirectTo({
               url: `/pages/food-store/main?ShopId=${shopId}&type=1`
             })

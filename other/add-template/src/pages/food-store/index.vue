@@ -214,11 +214,11 @@
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
                 <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"> 
-                                                                                                                                <cover-view class="shareCover" >
-                                                                                                                                <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                                                                <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                                                                </cover-view>
-                                                                                                                                </canvas>
+                                                                                                                                                                                <cover-view class="shareCover" >
+                                                                                                                                                                                <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
+                                                                                                                                                                                <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
+                                                                                                                                                                                </cover-view>
+                                                                                                                                                                                </canvas>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -293,7 +293,7 @@
         onShareAppMessage(res) {
             return {
                 title: this.shopInfoList.ShopName,
-                path: `pages/food-store/main?ShopId=${this.ShopId}`,
+                path: `pages/my-store/main?ShopId=${this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId')}&temp=1`,
                 imageUrl: this.shopInfoList.Logo + '?x-oss-process=image/resize,w_400/format,jpg',
                 success: res => {
                     this.maskActive = false;
@@ -305,8 +305,6 @@
             }
         },
         onLoad(options) {
-            this.scene = options.scene;
-            wx.setStorageSync('scene', this.scene);
             this.ShopId = this.$root.$mp.query.ShopId;
             // console.log(this.ShopId)
             this.currentTab = 0;
@@ -375,7 +373,7 @@
                 console.log('不走分享')
                 // 获取店铺信息以及商品信息 catch用来捕获异常
                 this.shopInfoSum().catch(err => {
-                    console.log(err)
+                    // console.log(err)
                     wx.hideLoading();
                     this.msg(err.Msg)
                     setTimeout(_ => {
@@ -387,6 +385,15 @@
             }
         },
         onShow() { //页面渲染就会触发
+            let query = wx.createSelectorQuery();
+            wx.getSystemInfo({
+                success: res => {
+                    // console.log(res)
+                    this.winWidth = res.windowWidth;
+                    //减去上方的高度
+                    this.winHeight = res.windowHeight - 136;
+                }
+            })
             this.shareCard = false;
             console.log(this.$store.state.mutations.backIndex ? '存在不可结算商品' : '正常进入店铺')
             if (this.$store.state.mutations.backIndex) {
@@ -678,6 +685,19 @@
             //滑动切换
             bindChange(e) {
                 this.currentTab = e.target.current;
+                if (this.currentTab == 0) {
+                    wx.showLoading({
+                        title: '加载中',
+                        mask: true
+                    })
+                    wx.showNavigationBarLoading()
+                    this.shopInfoSum().then(res => {
+                        wx.hideNavigationBarLoading()
+                    }).catch(err => {
+                        wx.hideLoading();
+                        this.msg(err.Msg)
+                    })
+                }
             },
             //点击tab切换 
             swichNav(e) {

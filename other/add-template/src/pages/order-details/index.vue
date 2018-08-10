@@ -1,137 +1,139 @@
 <template>
-    <div class="order_details" v-if="block" :class="{hidden:isTracking}">
-        <div class="map_details" v-if="mapErr&&mapBlock&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2" :style="{height:winHeight+'px'}">
-            <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points=""></map>
-        </div>
-        <div class="order_details_top">
-            <h3 class="title" @click="tracking">{{orderInfo.stateText}}<i v-if='orderInfo.State>3||orderInfo.State<0' class="icon icon_arrowRight"></i></h3>
-            <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
-            <ul class="lis_bottom_btn">
-                <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)' @click="cancelOrder">取消订单</li>
-                <li @click='againOrder' v-if='orderInfo.State>=2||orderInfo.State<0' :class="{btn_other:orderInfo.State==10}">再来一单</li>
-                <li class="btn_other" v-if="orderInfo.State==4" @click="okOrder">确认收货</li>
-                <li v-if='orderInfo.State==2&&orderInfo.CancelApplyState==1' @click="cancelOrder">已申请取消</li>
-                <li class="btn_other" v-if='orderInfo.State==0' @click='OrderRePay'>继续支付</li>
-            </ul>
-            <!-- 跑腿配送 -->
-            <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==1&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
-                <div class="info_left">
-                    <img :src="orderInfo.PaotuiInfo.DriverPhoto?orderInfo.PaotuiInfo.DriverPhoto:'https://otherfiles-ali.uupt.com/Stunner/FE/C/man.png'" alt="" class="left_icon">
-                    <div class="info_text">
-                        <p class="company">UU跑腿</p>
-                        <p class="uu_man_name">{{orderInfo.PaotuiInfo.DriverName}}为您服务</p>
+    <div class="order_details" v-if="block">
+        <div class="order_con">
+            <div class="map_details" v-if="mapErr&&mapBlock&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2" :style="{height:winHeight+'px'}">
+                <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points=""></map>
+            </div>
+            <div class="order_details_top">
+                <h3 class="title" @click="tracking">{{orderInfo.stateText}}<i v-if='orderInfo.State>3||orderInfo.State<0' class="icon icon_arrowRight"></i></h3>
+                <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
+                <ul class="lis_bottom_btn">
+                    <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)' @click="cancelOrder">取消订单</li>
+                    <li @click='againOrder' v-if='orderInfo.State==10||orderInfo.State<0' :class="{btn_other:orderInfo.State==10}">再来一单</li>
+                    <li class="btn_other" v-if="orderInfo.State==4" @click="okOrder">确认收货</li>
+                    <li v-if='orderInfo.State==2&&orderInfo.CancelApplyState==1' @click="cancelOrder">已申请取消</li>
+                    <li class="btn_other" v-if='orderInfo.State==0' @click='OrderRePay'>继续支付</li>
+                </ul>
+                <!-- 跑腿配送 -->
+                <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==1&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
+                    <div class="info_left">
+                        <img :src="orderInfo.PaotuiInfo.DriverPhoto?orderInfo.PaotuiInfo.DriverPhoto:'https://otherfiles-ali.uupt.com/Stunner/FE/C/man.png'" alt="" class="left_icon">
+                        <div class="info_text">
+                            <p class="company">UU跑腿</p>
+                            <p class="uu_man_name">{{orderInfo.PaotuiInfo.DriverName}}为您服务</p>
+                        </div>
+                    </div>
+                    <i class="icon  icon_tel"></i>
+                </div>
+                <!-- 快递配送 -->
+                <div class="uu_man_info" v-if='orderInfo.ExpressInfo!=null&&orderInfo.ExpressType==2&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
+                    <div class="info_left">
+                        <i class="icon icon_express left_icon"></i>
+                        <div class="info_text">
+                            <p class="company">{{orderInfo.ExpressInfo.CompanyNamge}}</p>
+                            <p class="uu_man_name">{{orderInfo.ExpressInfo.OrderId}}</p>
+                        </div>
+                        <span class="copy_info" @click='copyInfo(orderInfo.ExpressInfo.OrderId)'>复制</span>
                     </div>
                 </div>
-                <i class="icon  icon_tel"></i>
-            </div>
-            <!-- 快递配送 -->
-            <div class="uu_man_info" v-if='orderInfo.ExpressInfo!=null&&orderInfo.ExpressType==2&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
-                <div class="info_left">
-                    <i class="icon icon_express left_icon"></i>
-                    <div class="info_text">
-                        <p class="company">{{orderInfo.ExpressInfo.CompanyNamge}}</p>
-                        <p class="uu_man_name">{{orderInfo.ExpressInfo.OrderId}}</p>
+                <!-- 达达配送 -->
+                <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==3&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
+                    <div class="info_left">
+                        <i class="icon icon_dada left_icon"></i>
+                        <div class="info_text">
+                            <p class="company">达达跑腿</p>
+                            <p class="uu_man_name">{{orderInfo.PaotuiInfo.DriverName}}为您服务</p>
+                        </div>
                     </div>
-                    <span class="copy_info" @click='copyInfo(orderInfo.ExpressInfo.OrderId)'>复制</span>
+                    <i class="icon  icon_tel"></i>
+                </div>
+                <div class="line_box" @click="moveMap" v-if="mapErr&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2">
+                    <i></i>
+                    <i></i>
                 </div>
             </div>
-            <!-- 达达配送 -->
-            <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==3&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
-                <div class="info_left">
-                    <i class="icon icon_dada left_icon"></i>
-                    <div class="info_text">
-                        <p class="company">达达跑腿</p>
-                        <p class="uu_man_name">{{orderInfo.PaotuiInfo.DriverName}}为您服务</p>
+            <div class="order_details_con">
+                <div class="shop_info_sum">
+                    <img class="fade_in" :src="orderInfo.ShopLogo+'?x-oss-process=image/resize,w_100/format,jpg'" alt="">
+                    <p>{{orderInfo.ShopName}}</p>
+                </div>
+                <ul class="con_order_list">
+                    <li v-for="(v,i) in orderInfo.OrderGoods" :key="i" class="con_list_item">
+                        <img class="fade_in" :src="v.GoodMasterPic+'?x-oss-process=image/resize,w_100/format,jpg'" alt="">
+                        <div class="item">
+                            <p class="name">{{v.GoodName}}</p>
+                            <p class="spec">{{v.SpecName}}</p>
+                            <p class="num">X{{v.GoodNum}}</p>
+                        </div>
+                        <div class="sum"><span>¥</span>{{v.TotalPrice}}</div>
+                    </li>
+                </ul>
+                <div class="consume">
+                    <p class="consume_l">配送费</p>
+                    <p class="consume_r"><i v-if="orderInfo.PaotuiMoneyOff">已减{{orderInfo.PaotuiMoneyOff}}元</i><span>¥</span>{{orderInfo.PaotuiMoney}}</p>
+                </div>
+                <div class="consume">
+                    <p class="consume_l">打包费</p>
+                    <p class="consume_r"><span>¥</span>{{orderInfo.PackageMoney}}</p>
+                </div>
+                <div class="consume" v-if="orderInfo.CouponAmountMoney>0">
+                    <p class="consume_l">店铺优惠券</p>
+                    <p class="consume_r color_text">-<span>¥</span>{{orderInfo.CouponAmountMoney}}</p>
+                </div>
+                <div class="consume_sum">
+                    <p class="consume_l">小计</p>
+                    <p class="consume_r"><i v-if="orderInfo.orderSumPrice>0">共节省{{orderInfo.orderSumPrice}}元</i><span>¥</span>{{orderInfo.TotalMoney}}</p>
+                </div>
+                <div class="shop_info_list">
+                    <div class="shop_tel" @click="tel(orderInfo.ShopMobile)">
+                        <i class="icon icon_shop_tel icon_info"></i>
+                        <p>商家电话</p>
+                    </div>
+                    <div class="shop_wx" @click="copyInfo(orderInfo.ShopWechat,1)">
+                        <i class="icon icon_shop_wx icon_info"></i>
+                        <p>商家微信</p>
                     </div>
                 </div>
-                <i class="icon  icon_tel"></i>
             </div>
-            <div class="line_box" @click="moveMap" v-if="mapErr&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2">
-                <i></i>
-                <i></i>
+            <div class="distribution_info">
+                <div class="distribution">
+                    <p>配送信息</p>
+                </div>
+                <div class="options">
+                    <p>支付方式</p>
+                    <p style="color:#1a1a1a;">{{orderInfo.PayType==1?'微信支付':'会员卡支付'}}</p>
+                </div>
+                <div class="options other">
+                    <p>备注</p>
+                    <p>{{orderInfo.Remark?orderInfo.Remark:'无'}}</p>
+                </div>
+                <div class="options">
+                    <p>配送方式</p>
+                    <p>{{orderInfo.ExpressType== 2 ? '快递配送' : orderInfo.ExpressType== 4?'商家自送':'跑腿配送'}}</p>
+                </div>
+                <div class="options other">
+                    <p>收货地址</p>
+                    <p>{{orderAdress}}</p>
+                </div>
             </div>
-        </div>
-        <div class="order_details_con">
-            <div class="shop_info_sum">
-                <img class="fade_in" :src="orderInfo.ShopLogo+'?x-oss-process=image/resize,w_100/format,jpg'" alt="">
-                <p>{{orderInfo.ShopName}}</p>
-            </div>
-            <ul class="con_order_list">
-                <li v-for="(v,i) in orderInfo.OrderGoods" :key="i" class="con_list_item">
-                    <img class="fade_in" :src="v.GoodMasterPic+'?x-oss-process=image/resize,w_100/format,jpg'" alt="">
-                    <div class="item">
-                        <p class="name">{{v.GoodName}}</p>
-                        <p class="spec">{{v.SpecName}}</p>
-                        <p class="num">X{{v.GoodNum}}</p>
+            <div class="order_list_info">
+                <div class="order_info">
+                    <p>订单信息</p>
+                </div>
+                <div class="options">
+                    <p>订单号</p>
+                    <div class="options_r">
+                        <p>{{orderInfo.OrderID}}</p>
+                        <span @click='copyInfo(orderInfo.OrderID)'>复制</span>
                     </div>
-                    <div class="sum"><span>¥</span>{{v.TotalPrice}}</div>
-                </li>
-            </ul>
-            <div class="consume">
-                <p class="consume_l">配送费</p>
-                <p class="consume_r"><i v-if="orderInfo.PaotuiMoneyOff">已减{{orderInfo.PaotuiMoneyOff}}元</i><span>¥</span>{{orderInfo.PaotuiMoney}}</p>
-            </div>
-            <div class="consume">
-                <p class="consume_l">打包费</p>
-                <p class="consume_r"><span>¥</span>{{orderInfo.PackageMoney}}</p>
-            </div>
-            <div class="consume" v-if="orderInfo.CouponAmountMoney>0">
-                <p class="consume_l">店铺优惠券</p>
-                <p class="consume_r color_text">-<span>¥</span>{{orderInfo.CouponAmountMoney}}</p>
-            </div>
-            <div class="consume_sum">
-                <p class="consume_l">小计</p>
-                <p class="consume_r"><i v-if="orderInfo.orderSumPrice>0">共节省{{orderInfo.orderSumPrice}}元</i><span>¥</span>{{orderInfo.TotalMoney}}</p>
-            </div>
-            <div class="shop_info_list">
-                <div class="shop_tel" @click="tel(orderInfo.ShopMobile)">
-                    <i class="icon icon_shop_tel icon_info"></i>
-                    <p>商家电话</p>
                 </div>
-                <div class="shop_wx" @click="copyInfo(orderInfo.ShopWechat,1)">
-                    <i class="icon icon_shop_wx icon_info"></i>
-                    <p>商家微信</p>
+                <div class="options">
+                    <p>订单时间</p>
+                    <p>{{orderInfo.OrderCreateTime}}</p>
                 </div>
             </div>
         </div>
-        <div class="distribution_info">
-            <div class="distribution">
-                <p>配送信息</p>
-            </div>
-            <div class="options">
-                <p>支付方式</p>
-                <p style="color:#1a1a1a;">{{orderInfo.PayType==1?'微信支付':'会员卡支付'}}</p>
-            </div>
-            <div class="options other">
-                <p>备注</p>
-                <p>{{orderInfo.Remark?orderInfo.Remark:'无'}}</p>
-            </div>
-            <div class="options">
-                <p>配送方式</p>
-                <p>{{orderInfo.ExpressType== 2 ? '快递配送' : orderInfo.ExpressType== 4?'商家自送':'跑腿配送'}}</p>
-            </div>
-            <div class="options other">
-                <p>收货地址</p>
-                <p>{{orderAdress}}</p>
-            </div>
-        </div>
-        <div class="order_list_info">
-            <div class="order_info">
-                <p>订单信息</p>
-            </div>
-            <div class="options">
-                <p>订单号</p>
-                <div class="options_r">
-                    <p>{{orderInfo.OrderID}}</p>
-                    <span @click='copyInfo(orderInfo.OrderID)'>复制</span>
-                </div>
-            </div>
-            <div class="options">
-                <p>订单时间</p>
-                <p>{{orderInfo.OrderCreateTime}}</p>
-            </div>
-        </div>
-        <div class="mask" v-if='isTracking' @click='closeMask'></div>
+        <div class="mask" v-if='isTracking||saleMask' @click='isTracking=false,saleMask=false'></div>
         <div class="orderTracking" v-if='isTracking'>
             <h2 class="title">订单状态跟踪</h2>
             <div class="main">
@@ -142,9 +144,40 @@
                     </li>
                 </ul>
             </div>
-            <div class="close" @click='closeMask'>关闭</div>
+            <div class="close" @click='isTracking=false,saleMask=false'>关闭</div>
         </div>
-        <!-- <span class="go_index" @click="goIndex">回到首页</span> -->
+        <div class="after_sale" :class="{after_sale_active:saleMask}" v-if="saleMask">
+            <div class="after_sale_item">
+                <div class="after_sale_title">
+                    <p>售后申请</p>
+                </div>
+                <ul class="after_sale_list">
+                    <li class="after_sale_lis" v-for="(v,i) in saleList" :key="i">{{v.text}}</li>
+                </ul>
+            </div>
+            <div class="after_sale_ok" @click="saleMask=false">确定</div>
+        </div>
+        <div class="cancel_mask" v-if="false">
+            <div class="cancel_con">
+                <h3>售后申请提示</h3>
+                <p>建议您先跟商家沟通后再申请售后，商家处理会更加高效</p>
+                <div class="btn_sum">
+                    <div class="btn btn_left">继续申请</div>
+                    <div class="btn btn_right">立即联系</div>
+                </div>
+            </div>
+        </div>
+        <div class="cancel_mask" v-if="false">
+            <div class="cancel_con">
+                <h3>取消确认</h3>
+                <p>跑男已接单，此时取消将扣除跑男上门 费，剩余费用将退回</p>
+                <span class="deduct">本次将扣取上门费：15元</span>
+                <div class="btn_sum">
+                    <div class="btn btn_left">确认取消</div>
+                    <div class="btn btn_right">再想想</div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -170,6 +203,14 @@
                 manMap: '',
                 tips: '',
                 mapErr: true,
+                saleMask: false, //售后弹窗
+                saleList: [{
+                    text: '仅退款'
+                }, {
+                    text: '我要换货'
+                }, {
+                    text: '我要退货'
+                }]
             }
         },
         onLoad() {
@@ -187,6 +228,7 @@
             this.mapBlock = true;
             this.mapErr = true;
             this.isTracking = false;
+            this.saleMask = false;
             this.tips = '';
             this.orderDetails()
         },
@@ -542,15 +584,6 @@
                     this.isTracking = true;
                 }
             },
-            closeMask() {
-                this.isTracking = false;
-                // if (this.orderInfo.State >= 4 && this.orderInfo.State < 10 && this.orderInfo.ExpressType != 2) {
-                //     console.log('关闭')
-                //     this.mapBlock = true;
-                //     this.winHeight = this.mapBlockHeight;
-                //     console.log(this.mapBlock, this.winHeight)
-                // }
-            },
             moveMap() {
                 if (this.mapBlock && this.winHeight > 0) {
                     this.winHeight = 0;
@@ -647,6 +680,13 @@
     .order_details {
         background: #ebebeb;
         position: relative;
+        height: 100%;
+        overflow: hidden;
+        .order_con {
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
         .map_details {
             height: 820rpx;
             transition: all 0.2s ease;
@@ -759,6 +799,7 @@
                     }
                 }
             }
+            //地图线条
             .line_box {
                 position: absolute;
                 left: 50%;
@@ -1044,13 +1085,13 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, .7);
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             z-index: 10;
         }
         .orderTracking {
-            position: fixed;
+            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
@@ -1144,20 +1185,149 @@
                 border-top: 1rpx solid #ebebeb;
             }
         }
-    }
-    .go_index {
-        font-size: 26rpx;
-        color: #fff;
-        position: fixed;
-        right: 30rpx;
-        bottom: 30rpx;
-        z-index: 10;
-        background: #ff4d3a;
-        padding: 10rpx 16rpx;
-        border-radius: 4rpx;
-    }
-    .hidden {
-        overflow: hidden !important;
-        height: 100%;
+        .after_sale {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            background: #fff;
+            z-index: 20;
+            width: 100%;
+            background: #fff;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+            z-index: 20;
+            box-sizing: border-box;
+            .after_sale_item {
+                .after_sale_title {
+                    position: relative;
+                    padding: 30rpx 0;
+                    &:after {
+                        content: '';
+                        display: block;
+                        width: 100%;
+                        height: 0;
+                        border-bottom: 1px solid #ebebeb;
+                        position: absolute;
+                        left: 0;
+                        bottom: 0;
+                        transform: scaleY(0.5);
+                        transform-origin: 0 0;
+                    }
+                    p {
+                        text-align: center;
+                        color: #1d1d1d;
+                        font-size: 30rpx;
+                        font-weight: 700;
+                    }
+                }
+                .after_sale_list {
+                    padding: 0 36rpx 80rpx;
+                }
+                .after_sale_lis {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 36rpx 0;
+                    position: relative;
+                    color: #1d1d1d;
+                    font-size: 28rpx;
+                    &:after {
+                        content: '';
+                        display: block;
+                        width: 100%;
+                        height: 0;
+                        border-bottom: 1px solid #ebebeb;
+                        position: absolute;
+                        left: 0;
+                        bottom: 0;
+                        transform: scaleY(0.5);
+                        transform-origin: 0 0;
+                    }
+                }
+            }
+            .after_sale_ok {
+                height: 88rpx;
+                line-height: 88rpx;
+                text-align: center;
+                background-color: #333333;
+                border-radius: 8rpx;
+                color: #fff;
+                font-size: 30rpx;
+                margin: 0 36rpx 36rpx;
+            }
+        }
+        .after_sale_active {
+            transform: translateY(0);
+        }
+        .cancel_mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10;
+            transition: all 0.1s ease;
+        }
+        .cancel_mask {
+            display: flex;
+            .cancel_con {
+                width: 500rpx;
+                margin: auto;
+                background: #fff;
+                padding: 46rpx 36rpx 36rpx;
+                border-radius: 8rpx;
+                h3 {
+                    font-size: 36rpx;
+                    color: #1a1a1a;
+                    font-weight: 700;
+                    text-align: center;
+                }
+                p {
+                    margin-top: 42rpx;
+                    color: #444;
+                    font-size: 28rpx;
+                    line-height: 48rpx;
+                }
+                .deduct {
+                    margin-top: 16rpx;
+                    font-size: 28rpx;
+                    color: #ff4d3a;
+                    line-height: 46rpx;
+                    display: block;
+                }
+                .btn_sum {
+                    margin-top: 46rpx;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .btn {
+                    height: 72rpx;
+                    border: 30rpx;
+                    border-radius: 8rpx;
+                    text-align: center;
+                    line-height: 72rpx;
+                    font-size: 26rpx;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+                .btn_left {
+                    border-radius: 6rpx;
+                    border: 1px solid #999;
+                    color: #1a1a1a;
+                    background-color: #fff;
+                    margin-right: 24rpx;
+                }
+                .btn_right {
+                    border-radius: 6rpx;
+                    border: 1px solid #ff4d3a;
+                    color: #fff;
+                    background-color: #ff4d3a;
+                }
+            }
+        }
     }
 </style>

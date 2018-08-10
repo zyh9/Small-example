@@ -31,11 +31,11 @@
                 <div class="lis_bottom">
                     <ul class="lis_bottom_btn">
                         <!-- 取消订单：商家未接单，商家已接单未发货 -->
-                        <li v-if='item.State==0||item.State==1||(item.State==2&&item.CancelApplyState ==0)' @click="cancelOrder(item)">取消订单</li>
-                        <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li>
+                        <!-- <li v-if='item.State==0||item.State==1||(item.State==2&&item.CancelApplyState ==0)' @click="cancelOrder(item)">取消订单</li>
+                                <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li> -->
                         <li class="btn_other" v-if='item.State==0' @click="OrderRePay(item)">继续支付</li>
                         <!-- 再来一单  -->
-                        <li @click="againOrder(item)" v-if='item.State>=2||item.State<0'>再来一单</li>
+                        <li @click="againOrder(item)" v-if='item.State==10||item.State<0'>再来一单</li>
                         <li class="btn_other" v-if='item.State==4' @click="okOrder(item)">确认收货</li>
                     </ul>
                 </div>
@@ -76,7 +76,7 @@
         },
         onShow() {
             console.log(this.$store.state.mutations.newOrder ? '有新订单支付' : '正常进入列表')
-            if(this.$store.state.mutations.newOrder){
+            if (this.$store.state.mutations.newOrder) {
                 wx.startPullDownRefresh();
                 this.$store.dispatch('newOrder', false)
             }

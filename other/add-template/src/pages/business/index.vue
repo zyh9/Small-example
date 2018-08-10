@@ -172,7 +172,7 @@
               shopId: this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
               GoodType: this.pageId,
               PageSize: 20,
-              PageIndex: 1
+              PageIndex: this.page
             }
           })
           .then(res => {
@@ -480,7 +480,7 @@
     }
   }
   .shop_close {
-    position: absolute;
+    position: fixed;
     left: 0;
     bottom: 104rpx;
     width: 100%;
