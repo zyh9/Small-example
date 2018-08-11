@@ -1,27 +1,4 @@
 <template>
-<<<<<<< HEAD
-    <div class="order_details" v-if="block" :class="{hidden:isTracking}">
-        <div class="map_details" v-if="mapErr&&mapBlock&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2" :style="{height:winHeight+'px'}">
-            <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points=""></map>
-        </div>
-        <div class="order_details_top">
-            <h3 class="title" @click="tracking">{{orderInfo.stateText}}<i v-if='orderInfo.State>3||orderInfo.State<0' class="icon icon_arrowRight"></i></h3>
-            <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
-            <ul class="lis_bottom_btn">
-                <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)' @click="cancelOrder">取消订单</li>
-                <li @click='againOrder' v-if='orderInfo.State==10||orderInfo.State<0' :class="{btn_other:orderInfo.State==10}">再来一单</li>
-                <li class="btn_other" v-if="orderInfo.State==4" @click="okOrder">确认收货</li>
-                <li v-if='orderInfo.State==2&&orderInfo.CancelApplyState==1' @click="cancelOrder">已申请取消</li>
-                <li class="btn_other" v-if='orderInfo.State==0' @click='OrderRePay'>继续支付</li>
-            </ul>
-            <!-- 跑腿配送 -->
-            <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==1&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
-                <div class="info_left">
-                    <img :src="orderInfo.PaotuiInfo.DriverPhoto?orderInfo.PaotuiInfo.DriverPhoto:'https://otherfiles-ali.uupt.com/Stunner/FE/C/man.png'" alt="" class="left_icon">
-                    <div class="info_text">
-                        <p class="company">UU跑腿</p>
-                        <p class="uu_man_name">{{orderInfo.PaotuiInfo.DriverName}}为您服务</p>
-=======
     <div class="order_details" v-if="block">
         <div class="order_con">
             <div class="map_details" v-if="mapErr&&mapBlock&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2" :style="{height:winHeight+'px'}">
@@ -45,7 +22,6 @@
                             <p class="company">UU跑腿</p>
                             <p class="uu_man_name">{{orderInfo.PaotuiInfo.DriverName}}为您服务</p>
                         </div>
->>>>>>> b4c337af382c5aec80b3d66369dd59b70402cae5
                     </div>
                     <i class="icon  icon_tel"></i>
                 </div>
@@ -75,20 +51,6 @@
                     <i></i>
                     <i></i>
                 </div>
-<<<<<<< HEAD
-                <i class="icon  icon_tel"></i>
-            </div>
-            <div class="line_box" @click="moveMap" v-if="mapErr&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2">
-                <i></i>
-                <i></i>
-            </div>
-        </div>
-        <div class="order_details_con">
-            <div class="shop_info_sum">
-                <img class="fade_in" :src="orderInfo.ShopLogo+'?x-oss-process=image/resize,w_100/format,jpg'" alt="">
-                <p>{{orderInfo.ShopName}}</p>
-=======
->>>>>>> b4c337af382c5aec80b3d66369dd59b70402cae5
             </div>
             <div class="order_details_con">
                 <div class="shop_info_sum">

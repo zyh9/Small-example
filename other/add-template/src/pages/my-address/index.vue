@@ -2,7 +2,7 @@
     <div class="my_address set-flex set-ver" v-if="block">
         <div class="pageTitle pl36">我的地址</div>
         <p class="no_address" v-if="noAddress">您还没有地址，可点击底部按钮进行添加</p>
-        <ul class="my_address_list set-grow" v-if="addressList.length">
+        <ul class="my_address_list" v-if="addressList.length">
             <li v-for="(v,i) in addressList" :key="i" :data-index="i" @touchstart="touchS" @touchmove="touchM" @touchend="touchE" :style="{marginLeft:v.leftVal}">
                 <div class="address_item_left set-align" @click="setAddress(v)">
                     <i class="icon " v-if='type==1' :class="checkId==v.Id?'icon_checked':'icon_check'"></i>
@@ -16,7 +16,7 @@
                 <div class="list_item_del" @click='delAddress(v)' :style="{right:-delBtnWidth+'px',width:delBtnWidth+'px'}" :data-item="v">删除</div>
             </li>
         </ul>
-        <ul class="my_address_list set-grow" v-if="uuptList.length">
+        <ul class="my_address_list" v-if="uuptList.length">
             <li v-for="(v,i) in uuptList" :key="i" :data-index="i">
                 <div class="address_item_left set-align" @click="setAddress(v)">
                     <i class="icon " v-if='type==1' :class="checkId==v.Id?'icon_checked':'icon_check'"></i>
@@ -275,13 +275,12 @@
         background: #fff;
         padding-bottom: 110rpx;
         box-sizing: border-box;
+        overflow-y: scroll;
+        overflow-x: hidden;
         .pl36 {
             padding-left: 36rpx;
         }
         .my_address_list {
-            height: 100%;
-            overflow-x: hidden;
-            overflow-y: scroll;
             li {
                 box-sizing: border-box;
                 width: 100%;
@@ -303,11 +302,11 @@
                     bottom: 0;
                     left: 0;
                 }
-                &:last-child {
-                    &::after {
-                        display: none;
-                    }
-                }
+                // &:last-child {
+                //     &::after {
+                //         display: none;
+                //     }
+                // }
                 .edit_box {
                     padding: 12rpx;
                     line-height: 1;

@@ -38,10 +38,6 @@
 
 <script>
     import gcoord from 'gcoord';
-    import QQMapWX from '../../utils/qqmap-wx-jssdk.js';
-    const QQMap = new QQMapWX({
-        key: 'BZMBZ-OKXRU-DINVZ-2SRN5-4KWJ7-S6B6O'
-    })
     export default {
         data() {
             return {

@@ -106,7 +106,6 @@
       },
       addAddress() {
         if (this.authName(this.address.LinkMan) && this.phone(this.address.LinkManMobile) && this.authTitle(this.addressTitle) && this.authDetails(this.addressNote)) {
-          
           if (this.saveOnoff) {
             this.saveOnoff = false;
             this.util.post({
@@ -149,6 +148,8 @@
                   wx.navigateBack({
                     delta: 1
                   })
+                } else {
+                  this.msg(res.Msg)
                 }
               }).catch(err => {
                 this.saveOnoff = true;

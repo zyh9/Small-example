@@ -47,12 +47,7 @@
 </template>
 
 <script>
-    import gcoord from 'gcoord'
-    // 引入SDK核心类
-    import QQMapWX from '../../utils/qqmap-wx-jssdk.js';
-    const QQMap = new QQMapWX({
-        key: 'BZMBZ-OKXRU-DINVZ-2SRN5-4KWJ7-S6B6O'
-    })
+    import gcoord from 'gcoord';
     export default {
         data() {
             return {
@@ -104,7 +99,7 @@
             //坐标转地址
             QQcityInfo(result) {
                 // 调用接口
-                QQMap.reverseGeocoder({
+                this.util.QQMap.reverseGeocoder({
                     location: {
                         latitude: result[1],
                         longitude: result[0]
@@ -138,7 +133,7 @@
                 return s;
             },
             siteInfo() {
-                QQMap.getSuggestion({
+                this.util.QQMap.getSuggestion({
                     keyword: this.val,
                     region: this.city,
                     success: res => {
