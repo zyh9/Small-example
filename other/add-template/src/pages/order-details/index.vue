@@ -593,11 +593,6 @@
                     this.winHeight = this.mapBlockHeight;
                 }
             },
-            goIndex() {
-                wx.switchTab({
-                    url: '/pages/nearby-shop/main'
-                })
-            },
             trans(pos) {
                 // console.log(pos)
                 let {

@@ -2,7 +2,7 @@
     <div class="store" v-if="block">
         <div class="store_top_info" v-show="shopInfoList.Logo">
             <div class="store_banner">
-                <img :src="shopInfoList.Logo?shopInfoList.Logo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="" class="shop_img fade_in">
+                <img :src="shopInfoList.Logo?shopInfoList.Logo+'?x-oss-process=image/resize,w_100/format,jpg':''" alt="" class="shop_img fade_in">
                 <div class="shop_right_details">
                     <p>简介：{{shopInfoList.ShopSummary?shopInfoList.ShopSummary:'欢迎光临本店，我们不定期会推出活动和优惠！'}}</p>
                     <p>{{time}}</p>
@@ -37,11 +37,11 @@
                             </div>
                         </scroll-view>
                         <div class="right_con">
-                            <scroll-view v-for="(item,index) in allShopInfoList" :key="index" v-if="selected==index" scroll-y="true" style="height: 100%" class="scroll_right">
+                            <scroll-view v-for="(item,index) in shopPageListSum" :key="index" v-if="selected==index" scroll-y="true" style="height: 100%" lower-threshold="20" @scrolltolower="scrollHandler(selected)" class="scroll_right">
                                 <!-- <p class="no_shop" v-if="!item.length">此分类暂无商品信息哦</p> -->
-                                <div class="list_item_r" v-if="item.GoodsInfo.length" v-for="(v,i) in item.GoodsInfo" :key="i">
+                                <div class="list_item_r" v-if="item.length" v-for="(v,i) in item" :key="i">
                                     <div class="lis_item_left" @click="goGoodsDetail(v)">
-                                        <img :src="v.GoodsMasterPic?v.GoodsMasterPic+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="" class="shop_lis_img fade_in" lazy-load="true">
+                                        <img :src="v.GoodsMasterPic" alt="" class="shop_lis_img fade_in" lazy-load="true">
                                         <div class="shop_lis_mask" v-if="v.State==3||(v.MultiSpec==0&&v.RealStock<=0)||(v.MultiSpec==1&&!v.List.length)">已售罄</div>
                                         <div class="li_info">
                                             <p class="shop_name">{{v.GoodName}}<span v-if="v.GoodsType==-1">{{v.SpecName}}</span></p>
@@ -121,10 +121,6 @@
                     <div class="options" @click="goCoupon">
                         <i class="icon icon_offer"></i>
                         <p>我的优惠券</p>
-                    </div>
-                    <div class="options" @click="goVip">
-                        <i class="icon icon_vip"></i>
-                        <p>我的会员卡</p>
                     </div>
                 </div>
             </swiper-item>
@@ -214,11 +210,11 @@
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
                 <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"> 
-                                                                                                                                                                                    <cover-view class="shareCover" >
-                                                                                                                                                                                    <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                                                                                                                    <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                                                                                                                    </cover-view>
-                                                                                                                                                                                    </canvas>
+                    <cover-view class="shareCover" >
+                    <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
+                    <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
+                    </cover-view>
+                    </canvas>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -235,7 +231,7 @@
                 </div>
                 <div class="format_bot">
                     <p class="format_price"><span>¥</span>{{formatList.GoodsSpec[formatLi].OriginalPrice}}<i v-if="formatList.GoodsSpec[formatLi].RealStock>0&&formatList.GoodsSpec[formatLi].RealStock<=10">仅剩{{formatList.GoodsSpec[formatLi].RealStock}}份</i></p>
-                    <div class="add_cart" @click="addCart"><span>+</span> 加入购物车</div>
+                    <div class="add_cart" @click="addCart(shopPageListSum[selected])"><span>+</span> 加入购物车</div>
                 </div>
             </div>
         </div>
@@ -270,6 +266,7 @@
                 formatMask: false, //选择规格mask
                 formatList: [], //规格列表
                 formatLi: 0, //默认选择第一个规格
+                isBindPhone: true, //是否绑定手机号
                 code: '', //微信code
                 time: '', //营业时间
                 timeInfo: '',
@@ -293,8 +290,8 @@
         onShareAppMessage(res) {
             return {
                 title: this.shopInfoList.ShopName,
-                path: `pages/my-store/main?ShopId=${this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId')}&temp=1`,
-                imageUrl: this.shopInfoList.Logo + '?x-oss-process=image/resize,w_400/format,jpg',
+                path: `pages/my-store/main?ShopId=${this.ShopId}`,
+                imageUrl: this.shopInfoList.Logo,
                 success: res => {
                     this.maskActive = false;
                 },
@@ -305,6 +302,8 @@
             }
         },
         onLoad(options) {
+            this.scene = options.scene;
+            wx.setStorageSync('scene', this.scene);
             this.ShopId = this.$root.$mp.query.ShopId;
             // console.log(this.ShopId)
             this.currentTab = 0;
@@ -333,17 +332,11 @@
             this.minShopLogo = '';
             //优惠券列表
             this.couponList = [];
-            if (this.$root.$mp.query.share == 1) {
-                console.log('走分享')
-                this.shopInfoSum().catch(err => {
-                    wx.hideLoading();
-                    this.msg(err.Msg)
-                })
-            } else {
+            if (this.$root.$mp.query.type == 1 || this.$root.$mp.query.back == 1) {
                 console.log('不走分享')
                 // 获取店铺信息以及商品信息 catch用来捕获异常
                 this.shopInfoSum().catch(err => {
-                    // console.log(err)
+                    console.log(err)
                     wx.hideLoading();
                     this.msg(err.Msg)
                     setTimeout(_ => {
@@ -352,18 +345,24 @@
                         })
                     }, 1000)
                 })
+            } else {
+                console.log('走分享')
+                this.util.qqMapInfo().then(res => {
+                    //分享有参数，才去解析
+                    if (this.scene) {
+                        this.sceneInfo()
+                    } else {
+                        this.shopInfoSum().catch(err => {
+                            wx.hideLoading();
+                            this.msg(err.Msg)
+                        })
+                    }
+                }).catch(err => {
+                    console.log(err)
+                })
             }
         },
         onShow() { //页面渲染就会触发
-            let query = wx.createSelectorQuery();
-            wx.getSystemInfo({
-                success: res => {
-                    // console.log(res)
-                    this.winWidth = res.windowWidth;
-                    //减去上方的高度
-                    this.winHeight = res.windowHeight - 136;
-                }
-            })
             this.shareCard = false;
             console.log(this.$store.state.mutations.backIndex ? '存在不可结算商品' : '正常进入店铺')
             if (this.$store.state.mutations.backIndex) {
@@ -392,6 +391,7 @@
             }
             this.couponActive = false;
             this.cartActive = false;
+            this.isBindPhone = wx.getStorageSync('loginInfo').IsBindPhone == 1 ? false : true;
             // 先获取缓存数据
             let cartListSum = wx.getStorageSync('cartListSum') || [];
             //再找到对应店铺
@@ -411,17 +411,17 @@
                         item.sumPrice = 0;
                     }
                 })
-                // this.shopPageListSum.forEach(item => {
-                //     item.forEach(e => {
-                //         if (e.MultiSpec == 1) {
-                //             e.GoodsSpec.forEach(ele => {
-                //                 ele.num = 0;
-                //             })
-                //         } else {
-                //             e.num = 0;
-                //         }
-                //     })
-                // })
+                this.shopPageListSum.forEach(item => {
+                    item.forEach(e => {
+                        if (e.MultiSpec == 1) {
+                            e.GoodsSpec.forEach(ele => {
+                                ele.num = 0;
+                            })
+                        } else {
+                            e.num = 0;
+                        }
+                    })
+                })
                 //清空列表数量
                 this.allShopInfoList.forEach(e => {
                     e.sum = 0;
@@ -445,6 +445,7 @@
                 }).then(res => {
                     this.GoodId = res.Body.GoodId;
                     this.ShopId = res.Body.ShopId;
+                    this.$store.dispatch('code', this.scene)
                     //获取店铺信息以及商品信息 catch用来捕获异常
                     this.shopInfoSum().catch(err => {
                         wx.hideLoading();
@@ -484,8 +485,8 @@
                 let allShopInfo = await this.allShopInfo()
                 //所有商品汇集  针对左侧列表返回商品为空的作清空处理
                 this.allShopInfoList = allShopInfo.Body.filter(e => e.GoodsInfo.length);
-                // console.log(this.allShopInfoList)
                 if (!this.allShopInfoList.length) this.noShop = true;
+                // console.log(this.allShopInfoList)
                 this.allShopInfoList.forEach(e => {
                     e.GoodsInfo.forEach(item => {
                         if (item.MultiSpec == 1) {
@@ -496,47 +497,29 @@
                                 ele.GoodsMasterPic = item.GoodsMasterPic;
                                 ele.State = item.State;
                                 ele.sumPrice = 0;
-                                ele.MultiSpec = 1;
-                                ele.check = true;
                             })
                             //多规格判断是否已售罄
                             item.List = item.GoodsSpec.filter(e => e.RealStock > 0);
                         } else {
                             item.num = 0;
                             item.sumPrice = 0;
-                            item.SpecName = item.GoodsSpec[0].SpecName == '默认' ? '' : item.GoodsSpec[0].SpecName == "" ? '' : ` - ${item.GoodsSpec[0].SpecName}`;
+                            item.SpecName = item.GoodsSpec[0].SpecName == '默认' ? '' : ` - ${item.GoodsSpec[0].SpecName}`;
                             //规格编号  抓过来的数据单个规格数据没有
                             item.Id = item.GoodsSpec[0].Id;
                             item.RealStock = item.GoodsSpec[0].RealStock;
-                            item.check = true;
                         }
                         this.sumList.push(item)
                     })
                     //单项分类设置页面索引以及终止状态
-                    // this.shopPageIndex.push({
-                    //     page: 1,
-                    //     quest: true
-                    // })
-                    // this.shopPageListSum.push([])
+                    this.shopPageIndex.push({
+                        page: 1,
+                        quest: true
+                    })
+                    this.shopPageListSum.push([])
                 })
                 wx.hideLoading()
                 this.block = true;
                 this.$store.dispatch('backIndex', false)
-                if (this.shopInfoList.OpenState == 1) { //店铺营业走缓存
-                    // 先获取缓存数据
-                    let cartListSum = wx.getStorageSync('cartListSum') || [];
-                    //再找到对应店铺
-                    let cartItem = cartListSum.filter(e => e.ShopId == wx.getStorageSync('shopInfo').ShopId);
-                    this.cartListItem = cartItem.length ? cartItem[0].cartList : [];
-                    this.cartListItem = this.cartListItem.filter(e => e.num != 0);
-                    //当前店铺购物车的列表不为空走缓存，反之过滤设置缓存（主要针对购物车无商品且缓存中仍存在商品数量为零的情况）
-                    this.cartListItem.length ? this.cache() : (cartListSum = cartListSum.filter(e => e.ShopId != wx.getStorageSync('shopInfo').ShopId))
-                    // 再设置缓存数据
-                    wx.setStorageSync('cartListSum', cartListSum);
-                    //缓存length不存在，直接清除
-                    !cartListSum.length && wx.removeStorageSync('cartListSum');
-                }
-                return;
                 // console.log(this.shopPageIndex)
                 //获取分类以及分页
                 this.allShopInfoList.length && this.shopPageInfo(this.allShopInfoList[0].ID);
@@ -547,7 +530,7 @@
                     url: '/api/Customer/Browse/GetShopInfo',
                     data: {
                         //分享二维码获取  商品详情获取 this.ShopId || wx.getStorageSync('ShopId')
-                        shopId: this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+                        ShopId: this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
                     }
                 })
             },
@@ -556,29 +539,29 @@
                 return this.util.post({
                     url: '/api/Customer/Browse/GetShopAllGoods',
                     data: {
-                        shopId: this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+                        ShopId: this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
                     }
                 })
             },
-            // scrollHandler(select) {
-            //     if (this.shopPageIndex[select].quest) {
-            //         //单项的page++
-            //         this.shopPageIndex[select].page++;
-            //         console.log('加载至' + this.shopPageIndex[select].page)
-            //         this.shopPageInfo(this.itemId, select, this.shopPageIndex[select])
-            //     } else {
-            //         // this.msg('已经没有更多商品了')
-            //     }
-            // },
+            scrollHandler(select) {
+                if (this.shopPageIndex[select].quest) {
+                    //单项的page++
+                    this.shopPageIndex[select].page++;
+                    console.log('加载至' + this.shopPageIndex[select].page)
+                    this.shopPageInfo(this.itemId, select, this.shopPageIndex[select])
+                } else {
+                    // this.msg('已经没有更多商品了')
+                }
+            },
             //切换左侧类别
             checked(item, index) {
                 if (this.selected == index) return;
-                // this.itemId = item.ID;
-                // //没有请求数据列表的才会请求
-                // // if (typeof(this.shopPageListSum[index]) == 'undefined') {
-                // if (!this.shopPageListSum[index].length) {
-                //     this.shopPageInfo(this.itemId, index)
-                // }
+                this.itemId = item.ID;
+                //没有请求数据列表的才会请求
+                // if (typeof(this.shopPageListSum[index]) == 'undefined') {
+                if (!this.shopPageListSum[index].length) {
+                    this.shopPageInfo(this.itemId, index)
+                }
                 this.selected = index;
             },
             //单项分类商品信息获取  index默认为0  select={}
@@ -589,7 +572,7 @@
                 return this.util.post({
                         url: '/api/Customer/Browse/GetShopGoods',
                         data: {
-                            shopId: this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
+                            ShopId: this.ShopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
                             GoodType: id,
                             PageSize: 10,
                             PageIndex: select.page
@@ -606,11 +589,17 @@
                                     item.State = e.State;
                                     item.sumPrice = 0;
                                 })
+                                //多规格判断是否已售罄
+                                e.List = e.GoodsSpec.filter(e => e.RealStock > 0);
                             } else {
                                 e.num = 0;
                                 e.sumPrice = 0;
                                 e.SpecName = e.GoodsSpec[0].SpecName == '默认' ? '' : ` - ${e.GoodsSpec[0].SpecName}`;
+                                //规格编号  抓过来的数据单个规格数据没有
+                                e.Id = e.GoodsSpec[0].Id;
+                                e.RealStock = e.GoodsSpec[0].RealStock;
                             }
+                            e.GoodsMasterPic = e.GoodsMasterPic + '?x-oss-process=image/resize,w_100/format,jpg';
                         })
                         if (res.Body.length < 10) {
                             if (select.page > 1) { //页面大于1
@@ -647,7 +636,6 @@
                 let {
                     info
                 } = e.target.dataset;
-                info.GoodsSpec = info.GoodsSpec.filter(e => e.RealStock > 0);
                 // console.log(info)
                 this.formatList = info;
                 this.formatMask = true;
@@ -655,19 +643,6 @@
             //滑动切换
             bindChange(e) {
                 this.currentTab = e.target.current;
-                if (this.currentTab == 0) {
-                    wx.showLoading({
-                        title: '加载中',
-                        mask: true
-                    })
-                    wx.showNavigationBarLoading()
-                    this.shopInfoSum().then(res => {
-                        wx.hideNavigationBarLoading()
-                    }).catch(err => {
-                        wx.hideLoading();
-                        this.msg(err.Msg)
-                    })
-                }
             },
             //点击tab切换 
             swichNav(e) {
@@ -678,7 +653,7 @@
                 this.maskActive = true;
             },
             shareQR() {
-                if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
+                if (this.isBindPhone) {
                     this.msg('您还没有登录哦')
                     wx.redirectTo({
                         url: `/pages/login/main`
@@ -858,14 +833,14 @@
                             console.log('每单限一份')
                         }
                     }
-                    // this.shopPageListSum.forEach(item => {
-                    //     item.forEach(ele => {
-                    //         if (ele.GoodId == info.GoodId) {
-                    //             ele.num = info.num;
-                    //             ele.num--;
-                    //         }
-                    //     })
-                    // })
+                    this.shopPageListSum.forEach(item => {
+                        item.forEach(ele => {
+                            if (ele.GoodId == info.GoodId) {
+                                ele.num = info.num;
+                                ele.num--;
+                            }
+                        })
+                    })
                     this.sumList.forEach(ele => {
                         if (ele.GoodId == info.GoodId) {
                             ele.num = info.num;
@@ -874,16 +849,16 @@
                         }
                     })
                 } else {
-                    // this.shopPageListSum.forEach(item => {
-                    //     item.forEach(ele => {
-                    //         if (ele.MultiSpec == 1) {
-                    //             ele.GoodsSpec.forEach(e => {
-                    //                 e.num = info.num;
-                    //                 e.num--;
-                    //             })
-                    //         }
-                    //     })
-                    // })
+                    this.shopPageListSum.forEach(item => {
+                        item.forEach(ele => {
+                            if (ele.MultiSpec == 1) {
+                                ele.GoodsSpec.forEach(e => {
+                                    e.num = info.num;
+                                    e.num--;
+                                })
+                            }
+                        })
+                    })
                     this.sumList.forEach(ele => {
                         if (ele.MultiSpec == 1) {
                             ele.GoodsSpec.forEach(e => {
@@ -901,66 +876,62 @@
                 let {
                     info
                 } = e.target.dataset;
-                // console.log(info)
-                if (info.RealStock > info.num) {
-                    if (info.MultiSpec == 0) {
-                        if (info.GoodsType == -1) { //折扣商品
-                            if (info.PriceOffRule.DiscountRule == 1) { //购买规格  每人限一份
-                                if (info.IsBuyed == 0) { //未购买
-                                    if (info.num == 1) {
-                                        this.msg('每人限1份的商品仅能购买一次')
-                                        return;
-                                    }
-                                    this.addFun(info)
-                                } else { //已购买
-                                    this.msg('每人限1份的商品仅能购买一次')
-                                }
-                            } else { //每单限一份
+                console.log(info)
+                if (info.MultiSpec == 0) {
+                    if (info.GoodsType == -1) { //折扣商品
+                        if (info.PriceOffRule.DiscountRule == 1) { //购买规格  每人限一份
+                            if (info.IsBuyed == 0) { //未购买
                                 if (info.num == 1) {
-                                    this.msg('每单仅享1份优惠价')
+                                    this.msg('每人限1份的商品仅能购买一次')
+                                    return;
                                 }
                                 this.addFun(info)
+                            } else { //已购买
+                                this.msg('每人限1份的商品仅能购买一次')
                             }
-                        } else {
-                            console.log('非折扣')
+                        } else { //每单限一份
+                            if (info.num == 1) {
+                                this.msg('每单仅享1份优惠价')
+                            }
                             this.addFun(info)
                         }
-                    } else { //多规格增加
-                        // this.shopPageListSum.forEach(item => {
-                        //     item.forEach(ele => {
-                        //         if (ele.MultiSpec == 1) {
-                        //             ele.GoodsSpec.forEach(e => {
-                        //                 e.num = info.num;
-                        //                 e.num++;
-                        //             })
-                        //         }
-                        //     })
-                        // })
-                        this.sumList.forEach(ele => {
+                    } else {
+                        console.log('非折扣')
+                        this.addFun(info)
+                    }
+                } else { //多规格增加
+                    this.shopPageListSum.forEach(item => {
+                        item.forEach(ele => {
                             if (ele.MultiSpec == 1) {
                                 ele.GoodsSpec.forEach(e => {
-                                    if (e.Id == info.Id) {
-                                        e.num = info.num;
-                                        e.num++;
-                                        this.saveData(e, wx.getStorageSync('shopInfo').ShopId)
-                                    }
+                                    e.num = info.num;
+                                    e.num++;
                                 })
                             }
                         })
-                    }
-                } else {
-                    this.msg('购买数量不能超过库存哦');
+                    })
+                    this.sumList.forEach(ele => {
+                        if (ele.MultiSpec == 1) {
+                            ele.GoodsSpec.forEach(e => {
+                                if (e.Id == info.Id) {
+                                    e.num = info.num;
+                                    e.num++;
+                                    this.saveData(e, wx.getStorageSync('shopInfo').ShopId)
+                                }
+                            })
+                        }
+                    })
                 }
             },
             addFun(info) {
-                // this.shopPageListSum.forEach(item => {
-                //     item.forEach(ele => {
-                //         if (ele.GoodId == info.GoodId) {
-                //             ele.num = info.num;
-                //             ele.num++;
-                //         }
-                //     })
-                // })
+                this.shopPageListSum.forEach(item => {
+                    item.forEach(ele => {
+                        if (ele.GoodId == info.GoodId) {
+                            ele.num = info.num;
+                            ele.num++;
+                        }
+                    })
+                })
                 this.sumList.forEach(ele => {
                     if (ele.GoodId == info.GoodId) {
                         ele.num = info.num;
@@ -990,7 +961,6 @@
                                 cartItem[0].cartList.forEach(e => {
                                     if (e.GoodId == info.GoodId) {
                                         e.num = info.num;
-                                        e.RealStock = info.RealStock;
                                     }
                                 })
                             } else {
@@ -1007,7 +977,6 @@
                                 cartItem[0].cartList.forEach(e => {
                                     if (e.Id == info.Id) {
                                         e.num = info.num;
-                                        e.RealStock = info.RealStock;
                                     }
                                 })
                             } else {
@@ -1073,27 +1042,27 @@
             cache() {
                 console.log('走缓存了');
                 // console.log(this.cartListItem)
-                // if (!this.shopPageListSum.length) return;
-                // let listItem = this.shopPageListSum[this.selected];
-                // listItem.forEach(item => {
-                //     if (item.MultiSpec == 0) { //无规格
-                //         item.num = 0;
-                //         this.cartListItem.forEach(ele => {
-                //             if (item.GoodId == ele.GoodId) {
-                //                 item.num = ele.num;
-                //             }
-                //         })
-                //     } else { //有规格
-                //         item.GoodsSpec.forEach(ele => {
-                //             ele.num = 0;
-                //             this.cartListItem.forEach($item => {
-                //                 if (ele.Id == $item.Id) {
-                //                     ele.num = $item.num;
-                //                 }
-                //             })
-                //         })
-                //     }
-                // })
+                if (!this.shopPageListSum.length) return;
+                let listItem = this.shopPageListSum[this.selected];
+                listItem.forEach(item => {
+                    if (item.MultiSpec == 0) { //无规格
+                        item.num = 0;
+                        this.cartListItem.forEach(ele => {
+                            if (item.GoodId == ele.GoodId) {
+                                item.num = ele.num;
+                            }
+                        })
+                    } else { //有规格
+                        item.GoodsSpec.forEach(ele => {
+                            ele.num = 0;
+                            this.cartListItem.forEach($item => {
+                                if (ele.Id == $item.Id) {
+                                    ele.num = $item.num;
+                                }
+                            })
+                        })
+                    }
+                })
                 //针对全部商品的缓存赋值
                 this.sumList.forEach(item => {
                     if (item.MultiSpec == 0) { //无规格
@@ -1143,17 +1112,17 @@
             clearCart() {
                 this.cartActive = false;
                 this.cartListItem = [];
-                // this.shopPageListSum.forEach(e => {
-                //     e.forEach(item => {
-                //         if (item.MultiSpec == 1) {
-                //             item.GoodsSpec.forEach(ele => {
-                //                 ele.num = 0;
-                //             })
-                //         } else {
-                //             item.num = 0;
-                //         }
-                //     })
-                // })
+                this.shopPageListSum.forEach(e => {
+                    e.forEach(item => {
+                        if (item.MultiSpec == 1) {
+                            item.GoodsSpec.forEach(ele => {
+                                ele.num = 0;
+                            })
+                        } else {
+                            item.num = 0;
+                        }
+                    })
+                })
                 this.sumList.forEach(e => {
                     if (e.MultiSpec == 1) {
                         e.GoodsSpec.forEach(ele => {
@@ -1178,7 +1147,8 @@
             settlement() {
                 if (this.cartListItem.length) {
                     //判断手机号绑定状态
-                    if (wx.getStorageSync('loginInfo').IsBindPhone == 1) {
+                    this.isBindPhone = wx.getStorageSync('loginInfo').IsBindPhone == 1 ? false : true;
+                    if (!this.isBindPhone) {
                         let ShopId = String(wx.getStorageSync('shopInfo').ShopId) || '';
                         wx.navigateTo({
                             url: `/pages/submit-order/main?ShopId=${ShopId}`
@@ -1193,16 +1163,17 @@
                 }
             },
             goGoodsDetail(item) {
-                if (item.State == 3 || (item.MultiSpec == 0 && item.RealStock <= 0) || (item.MultiSpec == 1 && !item.List.length)) {
+                if (item.State==3||(item.MultiSpec==0&&item.RealStock<=0)||(item.MultiSpec==1&&!item.List.length)) {
                     this.msg('商品已售罄')
                     return;
                 }
+                let num = item.hasOwnProperty('num') ? item.num : 'spec';
                 let {
                     GoodId
                 } = item;
                 let ShopId = String(wx.getStorageSync('shopInfo').ShopId) || '';
                 wx.navigateTo({
-                    url: `/pages/product-details/main?ShopId=${ShopId}&GoodId=${GoodId}&type=1&temp=1`
+                    url: `/pages/product-details/main?ShopId=${ShopId}&GoodId=${GoodId}&num=${num}&type=1`
                 })
             },
             shopOpenState() {
@@ -1213,47 +1184,41 @@
                 this.formatLi = i;
             },
             //规格加入购物车
-            addCart() {
+            addCart(list) {
                 //获取点击的规格和价格
                 let info = this.formatList.GoodsSpec[this.formatLi];
-                // console.log(list)
-                // list.forEach(item => {
-                //     if (item.MultiSpec == 1) {
-                //         item.GoodsSpec.forEach(e => {
-                //             if (e.Id == info.Id) {
-                //                 info.num++;
-                //                 e.num = info.num;
-                //             }
-                //         })
-                //     }
-                // })
-                this.sumList.forEach(item => {
-                    if (item.MultiSpec == 1) { //有规格
-                        item.GoodsSpec.forEach(ele => {
-                            if (ele.Id == info.Id) {
-                                if (ele.RealStock > info.num) {
-                                    info.num++;
-                                    ele.num = info.num;
-                                    wx.showToast({
-                                        title: '添加购物车成功',
-                                        icon: 'success',
-                                        duration: 600
-                                    })
-                                } else {
-                                    this.msg('购买数量不能超过库存哦');
-                                }
+                list.forEach(item => {
+                    if (item.MultiSpec == 1) {
+                        item.GoodsSpec.forEach(e => {
+                            if (e.Id == info.Id) {
+                                info.num++;
+                                e.num = info.num;
                             }
                         })
                     }
                 })
-                // console.log('多规格的数量', info)
+                this.sumList.forEach(item => {
+                    if (item.MultiSpec == 1) { //有规格
+                        item.GoodsSpec.forEach(ele => {
+                            if (ele.Id == info.Id) {
+                                ele.num = info.num;
+                            }
+                        })
+                    }
+                })
+                // console.log('多规格的数量', info.num)
                 this.saveData(info, wx.getStorageSync('shopInfo').ShopId)
                 //索引归0  遮罩隐藏
                 this.formatLi = 0;
                 this.formatMask = false;
+                wx.showToast({
+                    title: '添加购物车成功',
+                    icon: 'success',
+                    duration: 600
+                })
             },
             address() {
-                if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
+                if (this.isBindPhone) {
                     this.msg('您还没有登录哦')
                     setTimeout(_ => {
                         wx.navigateTo({
@@ -1267,7 +1232,7 @@
                 }
             },
             order() {
-                if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
+                if (this.isBindPhone) {
                     this.msg('您还没有登录哦')
                     setTimeout(_ => {
                         wx.navigateTo({
@@ -1276,12 +1241,12 @@
                     }, 1000)
                 } else {
                     wx.navigateTo({
-                        url: '/pages/my-order/main?open=0'
+                        url: '/pages/my-order/main'
                     })
                 }
             },
             goCoupon() {
-                if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
+                if (this.isBindPhone) {
                     this.msg('您还没有登录哦')
                     setTimeout(_ => {
                         wx.navigateTo({
@@ -1306,7 +1271,7 @@
             },
             /* 领取优惠券 */
             receiveCoupon(v) {
-                if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
+                if (this.isBindPhone) {
                     this.msg('您还没有登录哦')
                     setTimeout(_ => {
                         wx.navigateTo({
@@ -1341,26 +1306,7 @@
                         this.msg('您已经领取过了哦')
                     }
                 }
-            },
-            goVip() {
-                if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
-                    this.msg('您还没有登录哦')
-                    setTimeout(_ => {
-                        wx.navigateTo({
-                            url: '/pages/login/main'
-                        })
-                    }, 800)
-                } else {
-                    if (wx.getStorageSync('shopInfo').IsShowVipMenu == 0) {
-                        this.msg('店铺暂未开启会员服务，敬请期待')
-                        return;
-                    } else {
-                        wx.navigateTo({
-                            url: `/pages/my-vip/main`
-                        })
-                    }
-                }
-            },
+            }
         },
         computed: {
             //购物车商品总价
@@ -1641,7 +1587,7 @@
                                 top: 48rpx;
                                 font-size: 22rpx;
                                 color: #999;
-                                .price_tips {
+                                .price_tips{
                                     margin-right: 24rpx;
                                 }
                             }
@@ -1796,7 +1742,7 @@
                 }
                 .swiper_item {
                     height: 46rpx !important;
-                    i {
+                    i{
                         margin-left: 8rpx;
                     }
                 }

@@ -16,7 +16,7 @@
     "we-cropper": "^1.2.0"
   },
   "devDependencies": {
-    "autoprefixer": "^9.1.0",
+    "autoprefixer": "^9.1.1",
     "keymirror": "^0.1.1",
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
