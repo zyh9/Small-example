@@ -265,13 +265,13 @@ input::-webkit-input-placeholder {
   background-image: url('../../static/icon-vip.png');
 }
 .icon_lower {
-  width: 58rpx;
-  height: 58rpx;
+  width: 42rpx;
+  height: 42rpx;
   background-image: url('../../static/lower.png');
 }
 .icon_add {
-  width: 58rpx;
-  height: 58rpx;
+  width: 42rpx;
+  height: 42rpx;
   background-image: url('../../static/add.png');
 }
 .icon_lower_bus {
@@ -324,10 +324,10 @@ input::-webkit-input-placeholder {
   background-image: url('https://otherfiles-ali.uupt.com/Stunner/FE/C/share.png');
 }
 .icon_shop_tel {
-  background-image: url('https://otherfiles-ali.uupt.com/Stunner/FE/C/shop-tel.png');
+  background-image: url('../../static/shop-tel.png');
 }
 .icon_shop_wx {
-  background-image: url('https://otherfiles-ali.uupt.com/Stunner/FE/C/shop-wx.png');
+  background-image: url('../../static/shop-wx.png');
 }
 .icon_cart {
   background-image: url('../../static/cart.png');
@@ -509,6 +509,16 @@ input::-webkit-input-placeholder {
   width: 180rpx ;
   height: 180rpx;
   background-image: url('../../static/discont-shop.png');
+}
+.icon_red_tel {
+  width: 40rpx ;
+  height: 40rpx;
+  background-image: url('../../static/red-tel.png');
+}
+.icon_refund {
+  width: 40rpx ;
+  height: 40rpx;
+  background-image: url('../../static/refund.png');
 }
 @keyframes fadeIn {
   0% {

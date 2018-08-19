@@ -20,7 +20,7 @@ const baseUrl = 'http://192.168.6.156:50654';
 const commonHeader = _ => {
   //headers每次必传数据存放位置
   return {
-    // v: '1.1.7.1',
+    v: '1.1.7.2',
     appid: '1',
     token: wx.getStorageSync('loginInfo').Token || '',
     qrcode: wx.setStorageSync('scene', this.scene) || ''

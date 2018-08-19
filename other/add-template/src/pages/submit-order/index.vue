@@ -9,7 +9,7 @@
             <p v-if="addressInfo">{{addressInfo}}</p>
             <i class="icon icon_right options_img"></i>
           </div>
-          <span class="linkUser" v-if="addressInfo">{{selectAddress.LinkMan}}{{selectAddress.LinkManMobile}}</span>
+          <span class="linkUser" v-if="addressInfo">{{selectAddress.LinkMan}} {{selectAddress.LinkManMobile}}</span>
         </div>
         <div class="options fade_in">
           <p>{{ExpressType}}</p>
@@ -17,7 +17,7 @@
       </div>
       <div class="con_order_info">
         <div class="options">
-          <img class="fade_in" :src="shopInfo.Logo" alt="">
+          <!-- <img class="fade_in" :src="shopInfo.Logo" alt=""> -->
           <p>{{shopInfo.ShopName}}</p>
         </div>
         <ul class="con_order_list">
@@ -36,7 +36,7 @@
             </div>
           </li>
         </ul>
-        <div class="consume">
+        <div class="consume bor_t">
           <p class="consume_l">打包费</p>
           <p class="consume_r"><span v-if="goodsInfo.PackageMoney!==''">¥</span>{{goodsInfo.PackageMoney===''?'-':goodsInfo.PackageMoney}}</p>
         </div>
@@ -44,8 +44,8 @@
           <p class="consume_l">配送费</p>
           <p class="consume_r"><i v-if="ExpressPriceOff">已减{{ExpressPriceOff}}元</i><span v-if="GoodPriceToken!=''">¥</span>{{GoodPriceToken==''?'-':ExpressPrice}}</p>
         </div>
-        <div class="consume other" @click="chooseCoupon">
-          <p class="consume_l">店铺优惠券</p>
+        <div class="consume other bor_t" @click="chooseCoupon">
+          <p class="consume_l"><i class="icon icon_coupon"></i>店铺优惠券</p>
           <!-- goodsInfo.CouponID:没有匹配的优惠券、不使用优惠券都返回 0 ；nonuseCoupon默认0，匹配到优惠券也为0，选择不使用优惠券：变为-1-->
           <p class="consume_r">
             <span class="circle" v-if='goodsInfo.CouponID==0&&nonuseCoupon==0'>暂无可用优惠券</span>
@@ -80,9 +80,9 @@
       </form>
     </div>
     <!-- <div class="copy_info">
-                                                                                                                                                                                                                                                                        <p class="form_id" @click="copyInfo(formId)">{{formId}}</p>
-                                                                                                                                                                                                                                                                        <p class="pay_id" @click="copyInfo(packageId)">{{packageId}}</p>
-                                                                                                                                                                                                                                                                      </div> -->
+                                                                                                                                                                                                                                                                                  <p class="form_id" @click="copyInfo(formId)">{{formId}}</p>
+                                                                                                                                                                                                                                                                                  <p class="pay_id" @click="copyInfo(packageId)">{{packageId}}</p>
+                                                                                                                                                                                                                                                                                </div> -->
     <div class="mask" v-if="isActive||payMask" @click="isActive = false,payMask=false"></div>
     <div class="distribution_card" :class="{distribution_card_active:isActive}">
       <div class="distribution_card_item">
@@ -114,8 +114,8 @@
         <div class="pay_title">
           <p>支付</p>
           <!-- <div @click="payMask=false" class="title_img">
-                                      <i class="icon icon_close"></i>
-                                    </div> -->
+                                                <i class="icon icon_close"></i>
+                                              </div> -->
         </div>
         <div class="pay_list">
           <div class="pay_item">
@@ -918,6 +918,21 @@
 </script>
 
 <style lang="less">
+  .bor_t {
+    position: relative;
+    &:after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 0;
+      border-bottom: 1px solid #ebebeb;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: scaleY(0.5);
+      transform-origin: 0 0;
+    }
+  }
   .submit_order {
     height: 100%;
     background: #f3f3f3;
@@ -949,12 +964,13 @@
             transform-origin: 0 0;
           }
           .options_top {
-            font-size: 32rpx;
+            font-size: 28rpx;
             color: #999;
+            padding: 10rpx 0;
           }
           .linkUser {
             font-size: 28rpx;
-            color: #999999;
+            color: #444;
           }
           .options_bot {
             display: flex;
@@ -1035,9 +1051,10 @@
             border-radius: 10rpx;
           }
           p {
-            font-size: 26rpx;
+            font-size: 32rpx;
             white-space: nowrap;
             color: #383838;
+            font-weight: 700;
           }
         }
         .con_order_list {
@@ -1083,10 +1100,12 @@
               flex-direction: column;
               align-items: flex-end;
               .price {
-                font-size: 28rpx;
+                font-size: 30rpx;
                 color: #1a1a1a;
                 span {
-                  font-size: 24rpx;
+                  font-size: 22rpx;
+                  margin-right: 6rpx;
+                  transform: translateY(-1rpx);
                 }
               }
               .original_price {
@@ -1117,30 +1136,25 @@
           padding: 26rpx 0;
           margin: 0 35rpx;
           position: relative;
-          &:after {
-            content: '';
-            display: block;
-            width: 100%;
-            height: 0;
-            border-top: 1px solid #ebebeb;
-            position: absolute;
-            left: 0;
-            top: 0;
-            transform: scaleY(0.5);
-            transform-origin: 0 0;
-          }
           .consume_l {
             font-size: 28rpx;
             white-space: nowrap;
-            color: #1d1d1d;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            i {
+              margin-right: 8rpx;
+            }
           }
           .consume_r {
-            font-size: 28rpx;
+            font-size: 30rpx;
             white-space: nowrap;
-            color: #999;
+            color: #1d1d1d;
             span {
               display: inline-block;
-              font-size: 24rpx;
+              font-size: 22rpx;
+              margin-right: 6rpx;
+              transform: translateY(-1rpx);
             }
             i {
               display: inline-block;
@@ -1168,8 +1182,8 @@
               }
               .circle {
                 margin-right: 0;
-                font-size: 24rpx;
-                color: #b2b2b2;
+                font-size: 28rpx;
+                color: #ccc;
                 padding: 0 6rpx;
               }
             }
@@ -1202,14 +1216,16 @@
           .consume_r {
             font-size: 34rpx;
             white-space: nowrap;
-            color: #1d1d1d;
+            color: #ff4d3a;
             span {
               display: inline-block;
               font-size: 26rpx;
+              margin-right: 6rpx;
+              transform: translateY(-1rpx);
             }
             i {
               font-size: 24rpx;
-              color: #b2b2b2;
+              color: #666;
               display: inline-block;
               margin-right: 16rpx;
             }
@@ -1269,7 +1285,7 @@
           }
           .note_text {
             font-size: 28rpx;
-            color: #999;
+            color: #ccc;
             flex: 1;
             text-align: right;
             overflow: hidden;
@@ -1281,7 +1297,7 @@
     }
     .submit_bottom {
       height: 100rpx;
-      background-color: #fff;
+      background-color: #444;
       display: flex;
       align-items: center;
       position: absolute;
@@ -1290,42 +1306,42 @@
       left: 0;
       z-index: 5;
       padding: 0 35rpx;
-      box-sizing: border-box;
-      &:after {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 0;
-        border-top: 1px solid #ebebeb;
-        position: absolute;
-        left: 0;
-        top: 0;
-        transform: scaleY(0.5);
-        transform-origin: 0 0;
-      }
+      box-sizing: border-box; // &:after {
+      //   content: '';
+      //   display: block;
+      //   width: 100%;
+      //   height: 0;
+      //   border-top: 1px solid #ebebeb;
+      //   position: absolute;
+      //   left: 0;
+      //   top: 0;
+      //   transform: scaleY(0.5);
+      //   transform-origin: 0 0;
+      // }
       p {
-        font-size: 34rpx;
-        color: #1a1a1a;
+        font-size: 46rpx;
+        color: #fff;
         height: 100%;
         flex: 1;
         line-height: 100rpx;
         span {
-          font-size: 26rpx;
+          font-size: 38rpx;
+          margin-right: 6rpx;
         }
       }
       .pay {
-        width: 184rpx;
-        height: 64rpx;
+        width: 230rpx;
+        height: 100rpx;
         background-color: #999;
-        border-radius: 8rpx;
-        font-size: 24rpx;
+        font-size: 32rpx;
         color: #fff;
-        line-height: 64rpx;
+        line-height: 100rpx;
         text-align: center;
         border: 0;
+        transform: translateX(35rpx);
       }
       .pay_ok {
-        background-color: #000;
+        background-color: #ff4d3a;
       }
     }
     .mask,

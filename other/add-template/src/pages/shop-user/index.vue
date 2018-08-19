@@ -82,6 +82,11 @@
       address() {
         if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
           this.msg('您还没有登录哦')
+          setTimeout(_ => {
+            wx.navigateTo({
+              url: '/pages/login/main'
+            })
+          }, 800)
           return;
         }
         wx.navigateTo({
@@ -91,6 +96,11 @@
       order() {
         if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
           this.msg('您还没有登录哦')
+          setTimeout(_ => {
+            wx.navigateTo({
+              url: '/pages/login/main'
+            })
+          }, 800)
           return;
         }
         wx.navigateTo({
@@ -125,6 +135,11 @@
         let ShopId = wx.getStorageSync('shopInfo').ShopId;
         if (wx.getStorageSync('loginInfo').IsBindPhone == 0) {
           this.msg('您还没有登录哦')
+          setTimeout(_ => {
+            wx.navigateTo({
+              url: '/pages/login/main'
+            })
+          }, 800)
           return;
         }
         wx.navigateTo({

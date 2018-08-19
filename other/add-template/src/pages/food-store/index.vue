@@ -137,7 +137,7 @@
                     <i class="icon icon_active cart_img" v-if="number>0||number=='99+'"></i>
                     <i v-if="cartListItem.length" class="number">{{number}}</i>
                 </div>
-                <p class="money" v-if="OpenState">¥ {{count}}</p>
+                <p class="money" v-if="OpenState"><span>¥</span>{{count}}</p>
             </div>
             <div class="cart_right">
                 <span class="no_num" v-if="OpenState&&!cartListItem.length">快去挑选商品吧</span>
@@ -1490,7 +1490,7 @@
                     align-items: center;
                     justify-content: center;
                     background-color: #f5f5f5;
-                    padding: 20rpx 0;
+                    height: 84rpx;
                     border-radius: 8rpx;
                     .icon_info {
                         width: 30rpx;
@@ -1498,8 +1498,8 @@
                         margin-right: 8rpx;
                     }
                     p {
-                        font-size: 24rpx;
-                        color: #666;
+                        font-size: 28rpx;
+                        color: #444;
                     }
                 }
                 .shop_tel {
@@ -1541,10 +1541,12 @@
                 }
             }
             .scroll_left {
-                width: 180rpx;
+                width: 156rpx;
+                background: #f5f5f5;
                 .list_item_l {
-                    padding: 35rpx 28rpx;
-                    color: #444;
+                    transition: all 0.3s ease;
+                    padding: 35rpx 20rpx;
+                    color: #666;
                     font-size: 26rpx;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -1574,6 +1576,7 @@
                 .left_select {
                     color: #1d1d1d;
                     font-weight: 700;
+                    background: #fff;
                 }
             }
             .right_con {
@@ -1591,10 +1594,11 @@
                 }
                 .list_item_r {
                     position: relative;
-                    padding: 20rpx 0;
+                    padding: 20rpx 0 20rpx 20rpx;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
+                    box-sizing: border-box;
                     .lis_item_left {
                         flex: 1;
                         display: flex;
@@ -1602,8 +1606,8 @@
                         overflow: hidden;
                         position: relative;
                         .shop_lis_img {
-                            width: 136rpx;
-                            height: 136rpx;
+                            width: 156rpx;
+                            height: 156rpx;
                             margin-right: 20rpx;
                             border-radius: 10rpx;
                         }
@@ -1624,11 +1628,11 @@
                         .li_info {
                             flex: 1; // overflow: hidden;
                             position: relative;
+                            height: 156rpx;
                             .shop_name {
                                 color: #1d1d1d;
-                                font-size: 28rpx;
-                                line-height: 60rpx;
-                                transform: translateY(-18%);
+                                font-size: 30rpx;
+                                line-height: 42rpx;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
                                 white-space: nowrap;
@@ -1649,21 +1653,20 @@
                                 color: #ff4d3a;
                                 line-height: 60rpx;
                                 font-size: 36rpx;
-                                transform: translateY(20rpx);
+                                transform: translateY(64rpx);
                                 font-weight: 700;
                                 span {
                                     font-size: 24rpx;
                                 }
                             }
                             .discount_shop {
+                                margin-top: 74rpx;
                                 display: flex;
                                 align-items: center;
-                                transform: translateY(10rpx);
                                 .price {
                                     color: #ff4d3a;
-                                    line-height: 60rpx;
+                                    line-height: 42rpx;
                                     font-size: 36rpx;
-                                    transform: translateY(18%);
                                     font-weight: 700;
                                     span {
                                         font-size: 24rpx;
@@ -1672,7 +1675,6 @@
                                 .original_price {
                                     font-size: 22rpx;
                                     color: #ccc;
-                                    transform: translateY(14rpx);
                                     margin-left: 12rpx;
                                     position: relative;
                                     &:after {
@@ -1694,7 +1696,7 @@
                     .count {
                         position: absolute;
                         right: 27rpx;
-                        bottom: 16rpx;
+                        bottom: 24rpx;
                         display: flex;
                         align-items: center;
                         width: 170rpx;
@@ -1713,7 +1715,7 @@
                     .select_rule {
                         position: absolute;
                         right: 27rpx;
-                        bottom: 16rpx;
+                        bottom: 24rpx;
                         font-size: 24rpx;
                         color: #fff;
                         height: 42rpx;
@@ -1947,7 +1949,7 @@
                 .cart_img {
                     width: 112rpx;
                     height: 112rpx;
-                    transform: translateY(-8%);
+                    transform: translateY(-12%);
                 }
                 .number {
                     position: absolute;
@@ -1968,12 +1970,16 @@
             }
             .money {
                 color: #fff;
-                font-size: 36rpx;
+                font-size: 46rpx;
                 margin-left: 20rpx;
+                span{
+                    margin-right: 6rpx;
+                    font-size: 38rpx;
+                }
             }
         }
         .cart_right {
-            height: 100%;
+            height: 100rpx;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1988,14 +1994,14 @@
                 white-space: nowrap;
             }
             .settlement {
-                width: 184rpx;
-                height: 64rpx;
+                width: 230rpx;
+                height: 100rpx;
                 background-color: #ff4d3a;
-                border-radius: 8rpx;
-                font-size: 24rpx;
+                font-size: 32rpx;
                 color: #fff;
-                line-height: 64rpx;
+                line-height: 100rpx;
                 text-align: center;
+                transform: translateX(20rpx);
             }
         }
     }

@@ -435,7 +435,7 @@
           align-items: center;
           justify-content: center;
           background-color: #f5f5f5;
-          padding: 20rpx 0;
+          height: 84rpx;
           border-radius: 8rpx;
           .icon_info {
             width: 30rpx;
@@ -443,8 +443,8 @@
             margin-right: 8rpx;
           }
           p {
-            font-size: 24rpx;
-            color: #666;
+            font-size: 28rpx;
+            color: #444;
           }
         }
         .shop_tel {
