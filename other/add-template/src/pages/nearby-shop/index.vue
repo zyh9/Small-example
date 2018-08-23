@@ -81,7 +81,7 @@
                 // console.log('下拉')
                 this.nearbyShop(this.page)
             }).catch(err => {
-                this.msg('位置信息获取错误，请稍后重试')
+                // this.msg('位置信息获取错误，请稍后重试')
             })
         },
         onReachBottom() { //触底事件

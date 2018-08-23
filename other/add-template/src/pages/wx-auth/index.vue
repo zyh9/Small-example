@@ -20,7 +20,7 @@
         onShow() {},
         methods: {
             setting(e) {
-                console.log(e.mp.detail.authSetting)
+                // console.log(e.mp.detail.authSetting)
                 if (e.mp.detail.authSetting['scope.userLocation'] && (wx.getStorageSync('auth') || null) == 1) {
                     this.tips = '';
                     this.msg('授权成功')

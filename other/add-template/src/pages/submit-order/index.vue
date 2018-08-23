@@ -366,6 +366,7 @@
               !cartListSum.length && wx.removeStorageSync('cartListSum');
             }
           }).catch(err => {
+            this.tips = err.Msg;
             this.msg(err.Msg)
           })
       },
@@ -1305,19 +1306,8 @@
       right: 0;
       left: 0;
       z-index: 5;
-      padding: 0 35rpx;
-      box-sizing: border-box; // &:after {
-      //   content: '';
-      //   display: block;
-      //   width: 100%;
-      //   height: 0;
-      //   border-top: 1px solid #ebebeb;
-      //   position: absolute;
-      //   left: 0;
-      //   top: 0;
-      //   transform: scaleY(0.5);
-      //   transform-origin: 0 0;
-      // }
+      padding-left: 36rpx;
+      box-sizing: border-box;
       p {
         font-size: 46rpx;
         color: #fff;
@@ -1338,7 +1328,6 @@
         line-height: 100rpx;
         text-align: center;
         border: 0;
-        transform: translateX(35rpx);
       }
       .pay_ok {
         background-color: #ff4d3a;

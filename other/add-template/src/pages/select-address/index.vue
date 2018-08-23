@@ -4,7 +4,6 @@
             <div class="pageTitle">选择收货地址</div>
             <div class="address_top set-between">
                 <p class="city">
-                    <!-- {{city}} -->
                     <picker mode="region" @change="bindRegionChange" :value="region" class="citySelect">
                         <view class="picker">
                             {{region[1]}}
@@ -51,20 +50,17 @@
     export default {
         data() {
             return {
-                city: '定位中...',
                 val: '',
                 addressList: [],
                 winWidth: '',
                 winHeight: '',
-                region: [],
-                customItem: '请选择',
+                region: ['-', '请选择', '-'],
                 poiList: [],
             }
         },
         onShow() {
+            this.region = ['-', '请选择', '-'];
             this.val = '';
-        },
-        mounted() {
             let query = wx.createSelectorQuery();
             query.select('.top').boundingClientRect()
             query.exec(res => {
@@ -77,23 +73,21 @@
                     }
                 })
             })
-            // 实例化API核心类
-            wx.getLocation({
-                type: 'wgs84',
-                success: res => {
-                    let result = gcoord.transform(
-                        [res.longitude, res.latitude], // 经纬度坐标
-                        gcoord.WGS84, // 当前坐标系
-                        gcoord.GCJ02, // 目标坐标系
-                    );
-                    this.QQcityInfo(result)
-                },
-                fail: err => {}
-            })
+            if (wx.getStorageSync('QQmap').mapGet) {
+                let {
+                    longitude,
+                    latitude
+                } = wx.getStorageSync('QQmap');
+                let result = gcoord.transform(
+                    [longitude, latitude], // 经纬度坐标
+                    gcoord.WGS84, // 当前坐标系
+                    gcoord.GCJ02, // 目标坐标系
+                );
+                this.QQcityInfo(result)
+            }
         },
         methods: {
             bindRegionChange: function(e) {
-                this.city = e.target.value[1];
                 this.region = ['', e.target.value[1] == '县' ? e.target.value[0] : e.target.value[1]];
             },
             //坐标转地址
@@ -114,7 +108,6 @@
                         res.result.pois.sort((a, b) => a.distance - b.distance)
                         this.poiList = res.result.pois;
                         // console.log(this.poiList)
-                        this.city = res.result.address_component.city;
                         this.region = [res.result.address_component.province, res.result.address_component.city, '']
                     },
                     fail: err => {
@@ -135,9 +128,8 @@
             siteInfo() {
                 this.util.QQMap.getSuggestion({
                     keyword: this.val,
-                    region: this.city,
+                    region: this.region[1],
                     success: res => {
-                        console.log(res, '新检索')
                         this.addressList = res.data;
                     },
                     fail: err => {
@@ -180,7 +172,8 @@
         },
         computed: {
             pos: function() {
-                if (this.region[1] != wx.getStorageSync('QQmap').city) {
+                let city = wx.getStorageSync('QQmap').city || '';
+                if (this.region[1] != city) {
                     this.val = '';
                     return false;
                 } else {

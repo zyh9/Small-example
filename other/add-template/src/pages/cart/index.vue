@@ -35,7 +35,7 @@
         <p class="edit_cart" @click="deleteState = !deleteState">{{deleteState?'完成':'编辑'}}</p>
       </div>
       <div class="cart_bot" v-if="cartListItem.length">
-        <p class="sum_money" v-if="openState==1&&deleteState==false"><span>合计:</span>¥{{count}}</p>
+        <p class="sum_money" v-if="openState==1&&deleteState==false"><span>合计 :</span><i>¥</i>{{count}}</p>
         <p class="sum_money" v-if="deleteState==true"></p>
         <button class="sum" plain="true" v-if="openState==1&&deleteState==false" @click="account" :class="{no_active:!sumNum}">结算</button>
         <div class="del_cart" v-if="deleteState==true" @click="delList">
@@ -617,7 +617,7 @@
       right: 0;
       left: 0;
       z-index: 5;
-      padding: 0 35rpx;
+      padding-left: 35rpx;
       box-sizing: border-box;
       z-index: 5;
       &:after {
@@ -633,7 +633,7 @@
         transform-origin: 0 0;
       }
       .sum_money {
-        font-size: 36rpx;
+        font-size: 46rpx;
         color: #1a1a1a;
         height: 100%;
         flex: 1;
@@ -644,15 +644,18 @@
           font-size: 28rpx;
           margin-right: 10rpx;
         }
+        i{
+          font-size: 38rpx;
+          margin-right: 6rpx;
+        }
       }
       .sum {
-        width: 184rpx;
-        height: 64rpx;
+        width: 230rpx;
+        height: 100rpx;
         background-color: #ff4d3a;
-        border-radius: 8rpx;
-        font-size: 24rpx;
+        font-size: 32rpx;
         color: #fff;
-        line-height: 64rpx;
+        line-height: 100rpx;
         text-align: center;
         border: 0;
       }
@@ -668,6 +671,7 @@
         border-radius: 6rpx;
         border: 1px solid #ff4d3a;
         box-sizing: border-box;
+        margin-right: 36rpx;
         p {
           margin-left: 6rpx;
           font-size: 24rpx;
@@ -683,6 +687,7 @@
         align-items: center;
         justify-content: flex-end;
         line-height: 100rpx;
+        padding-right: 36rpx;
       }
     }
   }

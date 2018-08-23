@@ -104,7 +104,7 @@
           return;
         }
         wx.navigateTo({
-          url: '/pages/my-order/main?open=0'
+          url: '/pages/my-order/main?open=2'
         })
       },
       goVip() {

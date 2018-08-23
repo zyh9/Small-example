@@ -5,7 +5,9 @@
                 <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points=""></map>
             </div>
             <div class="order_details_top">
-                <h3 class="title" @click="tracking">{{orderInfo.stateText}}<i v-if='orderInfo.State>3||orderInfo.State<0' class="icon icon_arrowRight"></i></h3>
+                <h3 class="title" @click="tracking">{{orderInfo.stateText}}
+                    <i v-if='orderInfo.State>3||orderInfo.State<0' class="icon icon_arrowRight"></i>
+                </h3>
                 <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
                 <ul class="lis_bottom_btn">
                     <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)' @click="cancelOrder">取消订单</li>
@@ -67,24 +69,38 @@
                         </div>
                         <div class="sum">
                             <i class="icon icon_discount_text" v-if="v.GoodType==-1"></i>
-                            <span>¥</span>{{v.TotalPrice}}</div>
+                            <span>¥</span> {{v.TotalPrice}}
+                        </div>
                     </li>
                 </ul>
                 <div class="consume bor_t">
                     <p class="consume_l">配送费</p>
-                    <p class="consume_r"><i v-if="orderInfo.PaotuiMoneyOff">已减{{orderInfo.PaotuiMoneyOff}}元</i><span>¥</span>{{orderInfo.PaotuiMoney}}</p>
+                    <p class="consume_r">
+                        <i v-if="orderInfo.PaotuiMoneyOff">已减{{orderInfo.PaotuiMoneyOff}}元</i>
+                        <span>¥</span> {{orderInfo.PaotuiMoney}}
+                    </p>
                 </div>
                 <div class="consume">
                     <p class="consume_l">打包费</p>
-                    <p class="consume_r"><span>¥</span>{{orderInfo.PackageMoney}}</p>
+                    <p class="consume_r">
+                        <span>¥</span> {{orderInfo.PackageMoney}}
+                    </p>
                 </div>
                 <div class="consume" v-if="orderInfo.CouponAmountMoney>0">
-                    <p class="consume_l"><i class="icon icon_coupon"></i><span>店铺优惠券</span></p>
-                    <p class="consume_r color_text">-<span>¥</span>{{orderInfo.CouponAmountMoney}}</p>
+                    <p class="consume_l">
+                        <i class="icon icon_coupon"></i>
+                        <span>店铺优惠券</span>
+                    </p>
+                    <p class="consume_r color_text">
+                        -<span>¥</span> {{orderInfo.CouponAmountMoney}}
+                    </p>
                 </div>
                 <div class="consume_sum">
                     <p class="consume_l">小计</p>
-                    <p class="consume_r"><i v-if="orderInfo.orderSumPrice>0">共节省{{orderInfo.orderSumPrice}}元</i><span>¥</span>{{orderInfo.TotalMoney}}</p>
+                    <p class="consume_r">
+                        <i v-if="orderInfo.orderSumPrice>0">共节省{{orderInfo.orderSumPrice}}元</i>
+                        <span>¥</span> {{orderInfo.TotalMoney}}
+                    </p>
                 </div>
                 <div class="shop_info_list">
                     <div class="shop_tel" @click="tel(orderInfo.ShopMobile)">
@@ -103,7 +119,7 @@
                 </div>
                 <div class="options">
                     <p>支付方式</p>
-                    <p style="color:#1a1a1a;">{{orderInfo.PayType==1?'微信支付':'会员卡支付'}}</p>
+                    <p>{{orderInfo.PayType==1?'微信支付':'会员卡支付'}}</p>
                 </div>
                 <div class="options other">
                     <p>备注</p>
@@ -1126,8 +1142,7 @@
                             right: -50%;
                             -webkit-transform: scale(0.5);
                             transform: scale(0.5);
-                            border: 1px solid #999;
-                            // border-radius: 6rpx;
+                            border: 1px solid #999; // border-radius: 6rpx;
                         }
                     }
                 }

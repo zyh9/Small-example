@@ -224,15 +224,25 @@ input::-webkit-input-placeholder {
   height: 30rpx;
   background-image: url('https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_edit.png');
 }
+.icon_delete {
+  width: 30rpx;
+  height: 30rpx;
+  background-image: url('../../static/delete.png');
+}
 .icon_addAddress {
   width: 30rpx;
   height: 30rpx;
-  background-image: url('https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_add.png');
+  background-image: url('../../static/add-address.png');
 }
 .icon_synchro {
   width: 30rpx;
   height: 30rpx;
-  background-image: url('https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_synchro.png');
+  background-image: url('../../static/uu-logo.png');
+}
+.icon_no_address {
+  width: 196rpx;
+  height: 148rpx;
+  background-image: url('../../static/no-address.png');
 }
 .icon_userTel {
   width: 41rpx;

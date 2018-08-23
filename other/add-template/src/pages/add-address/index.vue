@@ -31,8 +31,6 @@
   export default {
     data() {
       return {
-        region: ['点击选择', '', ''],
-        customItem: '请选择',
         note: '',
         userInfo: {},
         address: {
@@ -93,13 +91,12 @@
           return false
         };
       },
-      regionChange(e) {
-        this.region = e.target.value;
-      },
       select() {
         wx.setStorageSync('address', Object.assign({}, this.address, {
           UserNote: this.note
         }));
+        //如果信息是空，就删除缓存
+        !wx.getStorageSync('address').address&&wx.removeStorageSync('address');
         wx.navigateTo({
           url: '/pages/select-address/main'
         })
@@ -172,10 +169,6 @@
     },
     components: {},
     watch: {
-      region: function(newVal, oldVal) {
-        let region = newVal.filter(e => e != "请选择")
-        region.length < 3 && this.msg('收货地址信息还没填完整哦');
-      },
       tel: function(newVal, oldVal) {
         this.address.LinkManMobile = newVal.replace(/[^\d]/g, '');
       },

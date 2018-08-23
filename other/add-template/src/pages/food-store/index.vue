@@ -214,11 +214,11 @@
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
                 <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"> 
-                                                                                                                                                                                    <cover-view class="shareCover" >
-                                                                                                                                                                                    <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                                                                                                                    <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                                                                                                                    </cover-view>
-                                                                                                                                                                                    </canvas>
+                                                                                                                                                                                                <cover-view class="shareCover" >
+                                                                                                                                                                                                <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
+                                                                                                                                                                                                <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
+                                                                                                                                                                                                </cover-view>
+                                                                                                                                                                                                </canvas>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -1276,7 +1276,7 @@
                     }, 1000)
                 } else {
                     wx.navigateTo({
-                        url: '/pages/my-order/main?open=0'
+                        url: '/pages/my-order/main?open=2'
                     })
                 }
             },
@@ -1428,6 +1428,10 @@
                 return this.shopInfoList.OpenState == 0 ? false : true;
             }
         },
+        onUnload() {
+            //删除地址信息
+            wx.getStorageSync('selectAddress') && wx.removeStorageSync('selectAddress');
+        }
     }
 </script>
 
@@ -1544,7 +1548,6 @@
                 width: 156rpx;
                 background: #f5f5f5;
                 .list_item_l {
-                    transition: all 0.3s ease;
                     padding: 35rpx 20rpx;
                     color: #666;
                     font-size: 26rpx;
@@ -1612,8 +1615,8 @@
                             border-radius: 10rpx;
                         }
                         .shop_lis_mask {
-                            width: 136rpx;
-                            height: 136rpx;
+                            width: 156rpx;
+                            height: 156rpx;
                             border-radius: 10rpx;
                             position: absolute;
                             top: 0;
@@ -1623,7 +1626,7 @@
                             color: #fff;
                             font-size: 26rpx;
                             text-align: center;
-                            line-height: 136rpx;
+                            line-height: 156rpx;
                         }
                         .li_info {
                             flex: 1; // overflow: hidden;
@@ -1935,7 +1938,7 @@
         right: 0;
         left: 0;
         z-index: 30;
-        padding: 0 20rpx;
+        padding-left: 20rpx;
         box-sizing: border-box;
         .cart_left {
             flex-flow: 1;
@@ -1972,7 +1975,7 @@
                 color: #fff;
                 font-size: 46rpx;
                 margin-left: 20rpx;
-                span{
+                span {
                     margin-right: 6rpx;
                     font-size: 38rpx;
                 }
@@ -1987,11 +1990,13 @@
                 color: #a3a3a3;
                 font-size: 24rpx;
                 white-space: nowrap;
+                padding-right: 20rpx;
             }
             .no_operate {
                 color: #fff;
                 font-size: 32rpx;
                 white-space: nowrap;
+                padding-right: 20rpx;
             }
             .settlement {
                 width: 230rpx;
@@ -2001,7 +2006,6 @@
                 color: #fff;
                 line-height: 100rpx;
                 text-align: center;
-                transform: translateX(20rpx);
             }
         }
     }

@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 18,
+			"current": 21,
 			"list": [
 				{
 					"id": 1,
@@ -143,7 +143,26 @@
 				{
 					"id": -1,
 					"name": "我的订单",
-					"pathName": "pages/my-order/main"
+					"pathName": "pages/my-order/main",
+					"query": ""
+				},
+				{
+					"id": 19,
+					"name": "我的地址",
+					"pathName": "pages/my-address/main",
+					"query": "type=1"
+				},
+				{
+					"id": 20,
+					"name": "商品详情",
+					"pathName": "pages/product-details/main",
+					"query": "ShopId=1880422132122631&GoodId=1880472231380486"
+				},
+				{
+					"id": -1,
+					"name": "购物车",
+					"pathName": "pages/cart/main",
+					"query": ""
 				}
 			]
 		}

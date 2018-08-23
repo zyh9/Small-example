@@ -78,12 +78,17 @@
       },
       commitSms(userInfo) {
         if (this.phone(this.authTel) && this.smsCoding(this.authVal)) {
-          let QQmap = wx.getStorageSync('QQmap');
-          var result = gcoord.transform(
-            [QQmap.longitude, QQmap.latitude], // 经纬度坐标
-            gcoord.WGS84, // 当前坐标系
-            gcoord.BD09 // 目标坐标系
-          );
+          let QQmap = wx.getStorageSync('QQmap') || {};
+          let result;
+          if (QQmap.city) {
+            result = gcoord.transform(
+              [QQmap.longitude, QQmap.latitude], // 经纬度坐标
+              gcoord.WGS84, // 当前坐标系
+              gcoord.BD09 // 目标坐标系
+            );
+          } else {
+            result = [0, 0];
+          }
           console.log(result)
           this.util.post({
             url: '/api/Customer/VerifyCode/CommitSmsCode',
@@ -100,9 +105,9 @@
               this.msg(res.Msg)
               //登录成功修改用户信息存储
               let loginInfo = Object.assign({}, wx.getStorageSync('loginInfo'), {
-                IsBindPhone: 1,//手机号
-                NickName:userInfo.nickName,//微信昵称
-                Phone:this.authTel,//手机号
+                IsBindPhone: 1, //手机号
+                NickName: userInfo.nickName, //微信昵称
+                Phone: this.authTel, //手机号
               })
               wx.setStorageSync('loginInfo', loginInfo)
               //登录成功清除定时器

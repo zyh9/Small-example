@@ -49,20 +49,30 @@
             address() {
                 if (this.isBindPhone) {
                     this.msg('您还没有登录哦')
-                    return;
+                    setTimeout(_ => {
+                        wx.navigateTo({
+                            url: '/pages/login/main'
+                        })
+                    }, 1000)
+                } else {
+                    wx.navigateTo({
+                        url: '/pages/my-address/main?type=2'
+                    })
                 }
-                wx.navigateTo({
-                    url: '/pages/my-address/main?type=2'
-                })
             },
             order() {
                 if (this.isBindPhone) {
                     this.msg('您还没有登录哦')
-                    return;
+                    setTimeout(_ => {
+                        wx.navigateTo({
+                            url: '/pages/login/main'
+                        })
+                    }, 1000)
+                } else {
+                    wx.navigateTo({
+                        url: '/pages/my-order/main?open=1'
+                    })
                 }
-                wx.navigateTo({
-                    url: '/pages/my-order/main?open=1'
-                })
             },
             userData() {
                 if (wx.getStorageSync('loginInfo')) {
@@ -93,11 +103,16 @@
             goCoupon() {
                 if (this.isBindPhone) {
                     this.msg('您还没有登录哦')
-                    return;
+                    setTimeout(_ => {
+                        wx.navigateTo({
+                            url: '/pages/login/main'
+                        })
+                    }, 1000)
+                } else {
+                    wx.navigateTo({
+                        url: '/pages/my-coupon/main?type=1'
+                    });
                 }
-                wx.navigateTo({
-                    url: '/pages/my-coupon/main?type=1'
-                });
             }
         },
         computed: {},

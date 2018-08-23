@@ -68,12 +68,11 @@
         <!-- 分享保存图片 -->
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
-                <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;position:absolute;top:0;left:0;"> 
-                                                                                                                                                                                            <cover-view class="shareCover" >
-                                                                                                                                                                                            <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                                                                                                                            <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                                                                                                                            </cover-view>
-                                                                                                                                                                                                        </canvas>
+                <canvas canvas-id='myCanvas'></canvas>
+                <div class="shareCover">
+                    <img @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
+                    <img @click='saveImg' class="saveBtn" src="../../../static/saveImg.png" />
+                </div>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -455,6 +454,7 @@
             },
             /* 绘制canvas */
             drawCanvas() {
+                let details = this.goodsInfo.GoodBrief ? this.goodsInfo.GoodBrief : '欢迎光临本店铺，有优惠信息会及时通知您哦......';
                 let windowWidth = '';
                 let windowHeight = '';
                 wx.getSystemInfo({
@@ -467,31 +467,48 @@
                 let XS = windowWidth / 375;
                 const ctx = wx.createCanvasContext('myCanvas');
                 ctx.setFillStyle('#fff')
-                ctx.fillRect(0, 0, 339 * XS, 522 * XS)
+                ctx.fillRect(0, 0, 308 * XS, 512 * XS)
                 /* 店铺logo图片 */
-                ctx.drawImage(this.minShopLogo, 15 * XS, 15 * XS, 21 * XS, 21 * XS)
+                ctx.drawImage(this.minShopLogo, 16 * XS, 16 * XS, 21 * XS, 21 * XS)
                 /* 店铺名称  */
                 ctx.setFontSize(14 * XS);
                 ctx.setFillStyle('#010101')
-                ctx.fillText(this.goodsInfo.ShopName, 43 * XS, 30 * XS)
+                ctx.fillText(this.goodsInfo.ShopName, 42 * XS, 30 * XS)
                 /* 商品图 */
-                ctx.drawImage(this.minGoodsPic, 15 * XS, 51 * XS, 309 * XS, 309 * XS)
+                ctx.drawImage(this.minGoodsPic, 16 * XS, 50 * XS, 248 * XS, 248 * XS)
                 /* 商品名 */
                 ctx.setFontSize(14 * XS);
                 ctx.setFillStyle('#000')
-                this.fontLineFeed(ctx, this.goodsInfo.GoodName, 18 * XS, 18 * XS, 15 * XS, 389 * XS)
+                this.fontLineFeed(ctx, this.goodsInfo.GoodName, 20, 18 * XS, 16 * XS, 320 * XS)
                 /* 商品描述 */
                 ctx.setFontSize(12 * XS);
                 ctx.setFillStyle('#777')
-                this.fontLineFeed(ctx, this.goodsInfo.GoodBrief, 12 * XS, 18 * XS, 15 * XS, 415 * XS)
+                this.fontLineFeed(ctx, details, 20, 18 * XS, 15 * XS, 340 * XS)
                 /* 二维码 */
-                ctx.drawImage(this.QrCodeUrl, 205 * XS, 376 * XS, 121 * XS, 124 * XS)
-                /* 线 */
-                ctx.setLineWidth(0.5)
-                ctx.setStrokeStyle('#ebebeb')
-                ctx.lineTo(182 * XS, 390 * XS)
-                ctx.lineTo(182 * XS, 490 * XS)
-                ctx.stroke();
+                ctx.drawImage(this.QrCodeUrl, 175 * XS, 362 * XS, 90 * XS, 90 * XS)
+                //商品售价
+                ctx.setFontSize(18 * XS);
+                ctx.setFillStyle('#ff4d3a')
+                ctx.fillText('¥' + this.goodsInfo.SalesPrice, 16 * XS, 370 * XS);
+                if (this.goodsInfo.GoodType == -1) {
+                    //商品原价
+                    ctx.setFontSize(14 * XS);
+                    ctx.setFillStyle('#999')
+                    ctx.fillText('¥' + this.goodsInfo.OriginalPrice, (String(this.goodsInfo.SalesPrice).length * 16 + 16) * XS, 370 * XS);
+                    //线
+                    ctx.setLineWidth(0.5)
+                    ctx.setStrokeStyle('#999')
+                    ctx.lineTo((String(this.goodsInfo.SalesPrice).length * 16 + 16) * XS, 365 * XS)
+                    ctx.lineTo(((String(this.goodsInfo.SalesPrice).length * 16 + 16) + (String(this.goodsInfo.OriginalPrice).length * 9)) * XS, 365 * XS)
+                    ctx.stroke();
+                }
+                //文字说明
+                ctx.setFontSize(14 * XS);
+                ctx.setFillStyle('#ccc')
+                ctx.fillText('长按识别小程序码', 16 * XS, 406 * XS);
+                ctx.setFontSize(12 * XS);
+                ctx.setFillStyle('#ccc')
+                ctx.fillText('发现一个好物推荐给你呀', 16 * XS, 426 * XS);
                 ctx.draw()
                 wx.hideLoading()
                 this.shareCard = true;
@@ -514,11 +531,16 @@
                 for (let i = 0, len = str.length / splitLen; i < len; i++) {
                     strArr.push(str.substring(i * splitLen, i * splitLen + splitLen));
                 }
-                let s = 0;
-                for (let j = 0, len = strArr.length; j < len; j++) {
-                    s = s + strHeight;
-                    ctx.fillText(strArr[j], x, y + s);
+                if (str.length > splitLen) {
+                    strArr[0] = strArr[0] + '...';
                 }
+                // console.log(strArr[0])
+                // let s = 0;
+                // for (let j = 0, len = strArr.length; j < len; j++) {
+                //     s = s + strHeight;
+                //     ctx.fillText(strArr[j], x, y + s);
+                // }
+                ctx.fillText(strArr[0], x, y);
             },
             /* 保存图片 */
             saveImg() {
@@ -623,7 +645,8 @@
                     }
                 } else {
                     // console.log('电商模板');
-                    wx.navigateTo({
+                    // 防止回退产生未清空购物车缓存的情况  => 做重定向处理
+                    wx.redirectTo({
                         url: `/pages/cart/main`
                     })
                 }
@@ -903,35 +926,38 @@
                 width: 100%;
                 height: 100%;
             }
-            .main {
-                position: relative;
-            }
             .icon_close {
                 position: absolute;
-                top: 25rpx;
-                right: 25rpx;
+                top: -22rpx;
+                right: -18rpx;
                 z-index: 100;
             }
             .saveBtn {
                 position: absolute;
-                top: 933rpx;
-                left: 34rpx;
-                width: 290rpx;
-                height: 73rpx;
+                bottom: 30rpx;
+                left: 30rpx;
+                width: 556rpx;
+                height: 88rpx;
                 z-index: 100;
             }
             .main {
                 border-radius: 10rpx;
-                background: #fff;
-                width: 339px;
-                height: 522px;
-                overflow: hidden;
-                position: fixed;
+                background: #f2f2f2;
+                width: 616rpx;
+                height: 1118rpx;
+                position: absolute;
                 top: 0;
                 left: 0;
                 bottom: 0;
                 right: 0;
                 margin: auto;
+                padding: 30rpx;
+                box-sizing: border-box;
+            }
+            canvas {
+                background: #fff;
+                width: 100%;
+                height: 932rpx;
             }
         }
         .spec {
