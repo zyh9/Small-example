@@ -59,6 +59,7 @@
             }
         },
         onShow() {
+            // console.log(this.$root.$mp.query.type) 1.添加地址进入  2.无定位搜索地址进入
             this.region = ['-', '请选择', '-'];
             this.val = '';
             let query = wx.createSelectorQuery();
@@ -73,7 +74,7 @@
                     }
                 })
             })
-            if (wx.getStorageSync('QQmap').mapGet) {
+            if (wx.getStorageSync('QQmap') && wx.getStorageSync('QQmap').mapGet) {
                 let {
                     longitude,
                     latitude
@@ -151,19 +152,31 @@
                 let {
                     address
                 } = e.currentTarget.dataset;
-                //转换坐标之后的地址
-                const location = this.trans(address.location);
-                // console.log(location)
-                wx.setStorageSync('address', Object.assign({}, wx.getStorageSync('address'), {
-                    name: address.address,
-                    location: {
-                        lat: location[1],
-                        lng: location[0]
-                    },
-                    title: address.title,
-                    city: address.city || address.ad_info.city,
-                    district: address.district || address.ad_info.district
-                }))
+                if (this.$root.$mp.query.type == 1) { //添加地址进入
+                    //转换坐标之后的地址
+                    const location = this.trans(address.location);
+                    // console.log(location)
+                    wx.setStorageSync('address', Object.assign({}, wx.getStorageSync('address'), {
+                        name: address.address,
+                        location: {
+                            lat: location[1],
+                            lng: location[0]
+                        },
+                        title: address.title,
+                        city: address.city || address.ad_info.city,
+                        district: address.district || address.ad_info.district
+                    }))
+                } else { //搜索地址进入
+                    // console.log(address)
+                    //城市 经纬度
+                    let pos = {
+                        city: address.city,
+                        latitude: address.location.lat,
+                        longitude: address.location.lng,
+                        mapGet: false
+                    }
+                    wx.setStorageSync('QQmap', pos)
+                }
                 // return;
                 wx.navigateBack({
                     delta: 1

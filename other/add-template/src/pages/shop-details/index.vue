@@ -1,5 +1,5 @@
 <template>
-  <div class="shop_details">
+  <div class="shop_details fade_in">
     <h3 class="title">店铺信息</h3>
     <div class="store_banner details_bor">
       <img :src="shopInfoList.Logo?shopInfoList.Logo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="" class="shop_img fade_in">
@@ -58,12 +58,11 @@
     </div>
     <div class="saveImg" v-if='shareCard'>
       <div class="main">
-        <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"> 
-                                                                                      <cover-view class="shareCover" >
-                                                                                      <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                      <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                      </cover-view>
-                                                                                      </canvas>
+        <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"></canvas>
+        <cover-view class="shareCover">
+          <cover-image @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
+          <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png" />
+        </cover-view>
       </div>
     </div>
   </div>

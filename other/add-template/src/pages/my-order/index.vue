@@ -32,7 +32,7 @@
                     <ul class="lis_bottom_btn">
                         <!-- 取消订单：商家未接单，商家已接单未发货 -->
                         <!-- <li v-if='item.State==0||item.State==1||(item.State==2&&item.CancelApplyState ==0)' @click="cancelOrder(item)">取消订单</li>
-                                                                                            <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li> -->
+                                                                                                            <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li> -->
                         <li class="btn_other" v-if='item.State==0' @click="OrderRePay(item)">继续支付</li>
                         <!-- 再来一单  -->
                         <li @click="againOrder(item)" v-if='item.State==10||item.State<0'>再来一单</li>
@@ -65,23 +65,21 @@
                 title: '加载中',
                 mask: true
             })
-            this.open = false;
             this.newOrder = [];
         },
-        onReady() { //页面渲染就会触发
-        },
+        onReady() {},
         onShow() {
+            this.open = this.$root.$mp.query.open == 1 ? true : false;
             this.page = 1;
             this.quest = true;
             this.nomore = false;
-            this.open = this.$root.$mp.query.open == 1 ? true : false;
+            this.orderInfo(this.page)
             // console.log(this.$store.state.mutations.newOrder ? '有新订单支付' : '正常进入列表')
             // if (this.$store.state.mutations.newOrder) {
             //     wx.startPullDownRefresh();
             //     this.$store.dispatch('newOrder', false)
             // }
             // wx.startPullDownRefresh();
-            this.orderInfo()
         },
         onPullDownRefresh() { //下拉刷新
             this.page = 1;

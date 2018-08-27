@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 21,
+			"current": 22,
 			"list": [
 				{
 					"id": 1,
@@ -163,6 +163,12 @@
 					"name": "购物车",
 					"pathName": "pages/cart/main",
 					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "曲奇",
+					"pathName": "pages/food-store/main",
+					"query": "ShopId=1883249876878341"
 				}
 			]
 		}

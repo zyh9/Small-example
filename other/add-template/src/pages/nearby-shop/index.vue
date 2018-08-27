@@ -1,38 +1,47 @@
 <template>
-    <div class="nearby_shop" v-if="block">
-        <div class="nearby_top">
-            <div class="search" @click="search">
-                <i class="icon icon_sear"></i>
-                <p class="text">搜索</p>
+    <div>
+        <div class="no_pos" v-if="noPos">
+            <div class="no_pos_con">
+                <i class="icon icon_no_pos"></i>
+                <p>无法获取地理位置，请选择收货地址</p>
+                <div class="search_address" @click="searchAddress">搜索地址</div>
             </div>
         </div>
-        <!-- <scroll-view scroll-y="true" :style="{height:winHeight+'px'}" lower-threshold="20" @scrolltolower="scrollHandler"> -->
-        <div class="banner"></div>
-        <ul class="nearby_shop_list">
-            <li class="nearby_item" v-for="(item,index) in nearbyrList" :key="index" @click="openShop(item)">
-                <div class="item_top">
-                    <div class="item_left">
-                        <img :src="item.ShopLogo" alt="" class="item_left_img fade_in" lazy-load="true">
-                        <div class="item_left_text">
-                            <div class="name">
-                                <div class="name_left">
-                                    <span class="rest" v-if="item.OpenState==0">休息中</span>
-                                    <p class="shop_name">{{item.ShopName}}</p>
+        <div class="nearby_shop" v-if="block">
+            <div class="nearby_top">
+                <div class="search" @click="search">
+                    <i class="icon icon_sear"></i>
+                    <p class="text">搜索</p>
+                </div>
+            </div>
+            <!-- <scroll-view scroll-y="true" :style="{height:winHeight+'px'}" lower-threshold="20" @scrolltolower="scrollHandler"> -->
+            <div class="banner"></div>
+            <ul class="nearby_shop_list">
+                <li class="nearby_item" v-for="(item,index) in nearbyrList" :key="index" @click="openShop(item)">
+                    <div class="item_top">
+                        <div class="item_left">
+                            <img :src="item.ShopLogo" alt="" class="item_left_img fade_in" lazy-load="true">
+                            <div class="item_left_text">
+                                <div class="name">
+                                    <div class="name_left">
+                                        <span class="rest" v-if="item.OpenState==0">休息中</span>
+                                        <p class="shop_name">{{item.ShopName}}</p>
+                                    </div>
+                                    <span class="distance">{{item.Distance}}km</span>
                                 </div>
-                                <span class="distance">{{item.Distance}}km</span>
+                                <p class="address">{{item.ShopAddress}}</p>
+                                <div class="option" v-if="item.PaotuiPriceOff"><i class="icon_set"></i><span class="coupon_text">{{item.PaotuiPriceOff}}</span></div>
+                                <div class="option" v-if="item.Coupons"><i class="icon icon_coupon"></i><span class="coupon_text">{{item.Coupons}}</span></div>
+                                <div class="option" v-if="!item.PaotuiPriceOff&&!item.Coupons"><span class="no_coupon_text">{{item.NoPerMessage}}</span></div>
                             </div>
-                            <p class="address">{{item.ShopAddress}}</p>
-                            <div class="option" v-if="item.PaotuiPriceOff"><i class="icon_set"></i><span class="coupon_text">{{item.PaotuiPriceOff}}</span></div>
-                            <div class="option" v-if="item.Coupons"><i class="icon icon_coupon"></i><span class="coupon_text">{{item.Coupons}}</span></div>
-                            <div class="option" v-if="!item.PaotuiPriceOff&&!item.Coupons"><span class="no_coupon_text">{{item.NoPerMessage}}</span></div>
                         </div>
                     </div>
-                </div>
-                <div class="li_mask" v-if="item.OpenState==0"></div>
-            </li>
-            <div class="no_more" v-if="nomore">附近没有更多店铺了</div>
-        </ul>
-        <!-- </scroll-view> -->
+                    <div class="li_mask" v-if="item.OpenState==0"></div>
+                </li>
+                <div class="no_more" v-if="nomore">附近没有更多店铺了</div>
+            </ul>
+            <!-- </scroll-view> -->
+        </div>
     </div>
 </template>
 
@@ -50,6 +59,7 @@
                 quest: true,
                 nomore: false,
                 block: false,
+                noPos: false, //无地理位置
             }
         },
         onLoad() {
@@ -58,6 +68,7 @@
                 title: '加载中',
                 mask: true
             })
+            this.noPos = false;
         },
         onReady() { //页面渲染就会触发
             this.page = 1;
@@ -70,24 +81,44 @@
                 this.nearbyShop()
             }).catch(err => {
                 console.log(err)
+                this.noPos = true;
             })
         },
-        onShow() {},
-        onPullDownRefresh() { //下拉刷新
-            this.page = 1;
-            this.nomore = false;
-            this.util.getLoc().then(res => {
+        onShow() {
+            //搜索位置获取
+            if (wx.getStorageSync('QQmap') && !wx.getStorageSync('QQmap').mapGet) {
                 this.mapInfo = wx.getStorageSync('QQmap')
-                // console.log('下拉')
-                this.nearbyShop(this.page)
-            }).catch(err => {
-                // this.msg('位置信息获取错误，请稍后重试')
-            })
+                this.page = 1;
+                this.nomore = false;
+                this.nearbyShop()
+            }
+        },
+        onPullDownRefresh() { //下拉刷新
+            if (wx.getStorageSync('QQmap')) {
+                this.page = 1;
+                this.nomore = false;
+                this.mapInfo = wx.getStorageSync('QQmap')
+                if (this.mapInfo.mapGet) {
+                    this.util.getLoc().then(res => {
+                        // console.log('下拉')
+                        this.nearbyShop(this.page)
+                    }).catch(err => {
+                        // this.msg('位置信息获取错误，请稍后重试')
+                    })
+                } else {
+                    this.nearbyShop(this.page)
+                }
+            } else {
+                wx.stopPullDownRefresh();
+                this.msg('位置获取失败')
+            }
         },
         onReachBottom() { //触底事件
-            if (this.quest) {
-                this.page++;
-                this.nearbyShop()
+            if (wx.getStorageSync('QQmap')) {
+                if (this.quest) {
+                    this.page++;
+                    this.nearbyShop()
+                }
             }
         },
         methods: {
@@ -173,6 +204,11 @@
                 let location = `${result[1]},${result[0]}`;
                 return location;
             },
+            searchAddress() {
+                wx.navigateTo({
+                    url: '/pages/select-address/main?type=2'
+                })
+            }
         },
         components: {}
     }
@@ -334,5 +370,34 @@
         color: #999;
         text-align: center;
         background: #f3f3f3;
+    }
+    .no_pos {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        .no_pos_con {
+            padding-top: 300rpx;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            p {
+                font-size: 24rpx;
+                color: #999;
+                margin: 30rpx 0 40rpx;
+            }
+            .search_address {
+                width: 184rpx;
+                height: 64rpx;
+                background-color: #ff4d3a;
+                border-radius: 6rpx;
+                font-size: 26rpx;
+                line-height: 64rpx;
+                color: #fff;
+                text-align: center;
+            }
+        }
     }
 </style>

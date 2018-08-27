@@ -243,7 +243,7 @@
         font-size: 24rpx;
         color: #ff4d3a;
         background: transparent;
-        border: 1rpx solid #ff4d3a;
+        border: 1px solid #ff4d3a;
         border-radius: 6rpx;
         outline: none;
         white-space: nowrap;

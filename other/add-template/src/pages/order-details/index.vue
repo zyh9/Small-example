@@ -1,9 +1,6 @@
 <template>
-    <div class="order_details" v-if="block">
+    <div class="order_details fade_in" v-if="block">
         <div class="order_con">
-            <div class="map_details" v-if="mapErr&&mapBlock&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2" :style="{height:winHeight+'px'}">
-                <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points=""></map>
-            </div>
             <div class="order_details_top">
                 <h3 class="title" @click="tracking">{{orderInfo.stateText}}
                     <i v-if='orderInfo.State>3||orderInfo.State<0' class="icon icon_arrowRight"></i>
@@ -49,9 +46,15 @@
                     </div>
                     <i class="icon icon_tel"></i>
                 </div>
-                <div class="line_box" @click="moveMap" v-if="mapErr&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2">
-                    <i></i>
-                    <i></i>
+                <!-- 商家自送 -->
+                <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==4&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
+                    <div class="info_left">
+                        <i class="icon icon_shop_set left_icon"></i>
+                        <div class="info_text">
+                            <p class="uu_man_name">商家自送</p>
+                        </div>
+                    </div>
+                    <i class="icon icon_tel"></i>
                 </div>
             </div>
             <div class="order_details_con">
@@ -151,6 +154,10 @@
                 </div>
             </div>
         </div>
+        <div class="order_btn">
+            <i class="icon icon_look_map" @click="mapOnoff=true" v-if="orderInfo.ExpressType== 1&&orderInfo.ExpressType== 3&&orderInfo.State>=4&&orderInfo.State<10"></i>
+            <i class="icon icon_go_index" v-if="goIndexBlock" @click="goIndex"></i>
+        </div>
         <div class="mask" v-if='isTracking||saleMask' @click='isTracking=false,saleMask=false'></div>
         <div class="orderTracking" v-if='isTracking'>
             <h2 class="title">订单状态跟踪</h2>
@@ -202,13 +209,19 @@
         <div class="cancel_mask" v-if="false">
             <div class="cancel_con">
                 <h3>取消确认</h3>
-                <p>跑男已接单，此时取消将扣除跑男上门 费，剩余费用将退回</p>
+                <p>跑男已接单，此时取消将扣除跑男上门费，剩余费用将退回</p>
                 <span class="deduct">本次将扣取上门费：15元</span>
                 <div class="btn_sum">
                     <div class="btn btn_left">确认取消</div>
                     <div class="btn btn_right">再想想</div>
                 </div>
             </div>
+        </div>
+        <div class="map_mask" v-if="mapOnoff">
+            <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points="" :style="{height:winHeight+'px'}"></map>
+            <cover-view class="close_map" @click="mapOnoff=false">
+                <cover-image class="icon_close_map" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
+            </cover-view>
         </div>
     </div>
 </template>
@@ -224,10 +237,6 @@
                 block: false,
                 timer: null,
                 markers: [],
-                winHeight: 0,
-                scrollTop: 0,
-                mapBlockHeight: 0,
-                mapBlock: true,
                 latitude: 0,
                 longitude: 0,
                 shopMap: '',
@@ -242,6 +251,10 @@
                     text: '直接申请退款'
                 }],
                 forOrder: false,
+                mapOnoff: false,
+                winHeight: 0, //高度
+                scrollTop: 0, //滚动距离
+                goIndexBlock: false, //回到首页按钮
             }
         },
         onLoad() {
@@ -251,22 +264,20 @@
                 mask: true
             })
             this.forOrder = false;
+            this.mapOnoff = false;
+            this.goIndexBlock = false;
         },
         onReady() {
-            // console.log(this.$mp.query.type)
+            if (this.$mp.query.from && this.$mp.query.from == 1) {
+                //服务通知进入
+                this.goIndexBlock = true;
+            }
             clearInterval(this.timer);
             this.timer = null;
-            this.winHeight = this.mapBlockHeight = 0;
-            this.mapBlock = true;
-            this.mapErr = true;
             this.isTracking = false;
             this.saleMask = false;
             this.tips = '';
             this.orderDetails()
-        },
-        onPageScroll(e) {
-            // console.log(e.scrollTop)
-            this.scrollTop = e.scrollTop;
         },
         methods: {
             /* 订单状态文字 */
@@ -362,30 +373,6 @@
                 wx.redirectTo({
                     url: `/pages/uu-pay/main?OrderId=${this.orderInfo.OrderID}&shopId=${this.orderInfo.ShopID}`
                 })
-                // this.util.post({
-                //     url: '/api/Customer/Order/OrderRePay',
-                //     data: {
-                //         OrderId: this.orderInfo.OrderID,
-                //     }
-                // }).then(res => {
-                //     if (res.State == 1) {
-                //         wx.requestPayment({
-                //             timeStamp: res.Body.timeStamp,
-                //             nonceStr: res.Body.nonceStr,
-                //             package: res.Body.package,
-                //             signType: res.Body.signType,
-                //             paySign: res.Body.paySign,
-                //             success: payres => {
-                //                 this.orderDetails()
-                //             },
-                //             fail: err => {
-                //                 this.msg('您已取消支付')
-                //             }
-                //         })
-                //     }
-                // }).catch(err => {
-                //     this.msg(err.Msg)
-                // })
             },
             async requireImg(ExpressType, State) {
                 this.shopMap = await this.util.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/mapicon/shop-map.png');
@@ -410,9 +397,10 @@
                             latitude: this.orderInfo.PaotuiInfo.DriverLastLoc.split(',')[1],
                             longitude: this.orderInfo.PaotuiInfo.DriverLastLoc.split(',')[0],
                         })
-                    } else {
-                        this.mapErr = false;
                     }
+                    //  else {
+                    //     this.mapErr = false;
+                    // }
                 } else {
                     console.log('达达订单');
                     if (this.orderInfo.PaotuiInfo.DriverLastLoc) {
@@ -420,9 +408,10 @@
                             latitude: this.orderInfo.PaotuiInfo.DriverLastLoc.split(',')[1],
                             longitude: this.orderInfo.PaotuiInfo.DriverLastLoc.split(',')[0],
                         })
-                    } else {
-                        this.mapErr = false;
                     }
+                    //  else {
+                    //     this.mapErr = false;
+                    // }
                 }
                 // console.log(ShopLoc, DriverLastLoc, ReceiverLoc)
                 //跑男坐标存在
@@ -451,17 +440,6 @@
                     }];
                     this.latitude = DriverLastLoc.latitude;
                     this.longitude = DriverLastLoc.longitude;
-                    // this.util.QQMap.calculateDistance({
-                    //     mode: 'driving',
-                    //     from: `${DriverLastLoc.latitude},${DriverLastLoc.longitude}`,
-                    //     to: State == 4 ? `${ShopLoc.latitude},${ShopLoc.longitude}` : `${ReceiverLoc.latitude},${ReceiverLoc.longitude}`,
-                    //     success: res => {
-                    //         this.tips = State == 4 ? `跑男距店${res.result.elements[0].distance}m` : `跑男距您${res.result.elements[0].distance}m`;
-                    //     },
-                    //     fail: err => {
-                    //         this.msg('订单距离计算失败')
-                    //     }
-                    // });
                     if (State == 4) {
                         let num = Math.floor(this.distance(DriverLastLoc.latitude, DriverLastLoc.longitude, ShopLoc.latitude, ShopLoc.longitude) * 1000);
                         this.tips = `跑男距店${num}m`;
@@ -469,24 +447,23 @@
                         let num = Math.floor(this.distance(DriverLastLoc.latitude, DriverLastLoc.longitude, ReceiverLoc.latitude, ReceiverLoc.longitude) * 1000);
                         this.tips = `跑男距您${num}m`;
                     };
-                    if (this.mapBlock) {
-                        setTimeout(_ => {
-                            let query = wx.createSelectorQuery();
-                            query.select('.order_details_top').boundingClientRect()
-                            query.exec(res => {
-                                let height = res[0].height;
-                                wx.getSystemInfo({
-                                    success: res => {
-                                        // console.log(res)
-                                        this.winHeight = this.mapBlockHeight = res.windowHeight - height;
-                                    }
-                                })
+                    setTimeout(_ => {
+                        let query = wx.createSelectorQuery();
+                        query.select('.order_details_top').boundingClientRect()
+                        query.exec(res => {
+                            let height = res[0].height;
+                            wx.getSystemInfo({
+                                success: res => {
+                                    // console.log(res)
+                                    this.winHeight = res.windowHeight - height;
+                                }
                             })
-                        }, 200)
-                    }
-                } else {
-                    this.mapErr = false;
+                        })
+                    }, 200)
                 }
+                // else {
+                //     this.mapErr = false;
+                // }
             },
             distance(lat1, lng1, lat2, lng2) {
                 var radLat1 = lat1 * Math.PI / 180.0;
@@ -516,10 +493,13 @@
                     //地图所需信息 （不包含快递和商家自送）
                     if (this.orderInfo.State >= 4 && this.orderInfo.State < 10 && this.orderInfo.ExpressType != 2 && this.orderInfo.ExpressType != 4) {
                         // console.log(this.util.downImg)
+                        this.mapOnoff = true;
                         this.forOrder = true;
                         this.requireImg(this.orderInfo.ExpressType, this.orderInfo.State).catch(err => {
                             this.msg('地图信息获取失败')
                         })
+                    } else {
+                        this.mapOnoff = false; //地图去除
                     }
                     //订单跟踪信息 (不包含商家自送)
                     if (this.orderInfo.State > 3 || this.orderInfo.State < 0) {
@@ -545,6 +525,7 @@
                     }
                     if (this.orderInfo.State == 10) {
                         this.tips = '感谢光临，很高兴为您服务';
+                        this.mapOnoff = false; //地图去除
                         this.timer = null;
                         clearInterval(this.timer);
                     }
@@ -608,18 +589,7 @@
             },
             tracking() {
                 if (this.orderInfo.State > 3 || this.orderInfo.State < 0) {
-                    this.winHeight = 0;
-                    this.mapBlock = false;
                     this.isTracking = true;
-                }
-            },
-            moveMap() {
-                if (this.mapBlock && this.winHeight > 0) {
-                    this.winHeight = 0;
-                    this.mapBlock = false;
-                } else {
-                    this.mapBlock = true;
-                    this.winHeight = this.mapBlockHeight;
                 }
             },
             trans(pos) {
@@ -657,6 +627,11 @@
                 }
                 // console.log(location)
                 return location;
+            },
+            goIndex() {
+                wx.redirectTo({
+                    url: `/pages/my-store/main?ShopId=${this.orderInfo.ShopID}&temp=${this.orderInfo.ShopTemplateId}`
+                })
             }
         },
         components: {},
@@ -677,10 +652,6 @@
                     }, 7000)
                 }
             },
-            scrollTop: function(newVal, oldVal) {
-                newVal > this.winHeight && (this.mapBlock = false, this.winHeight = 0);
-                // console.log(newVal, this.mapBlock)
-            }
         },
         onUnload() {
             clearInterval(this.timer)
@@ -714,14 +685,6 @@
             height: 100%;
             overflow-x: hidden;
             overflow-y: scroll;
-        }
-        .map_details {
-            height: 820rpx;
-            transition: all 0.2s ease;
-            map {
-                height: 100%;
-                width: 100%;
-            }
         }
         .order_details_top {
             margin-bottom: 20rpx;
@@ -780,6 +743,9 @@
                     }
                     .info_text {
                         flex: 1;
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
                         .company {
                             font-size: 28rpx;
                             color: #555;
@@ -951,6 +917,8 @@
                         }
                     }
                     .sum {
+                        display: flex;
+                        align-items: center;
                         font-size: 30rpx;
                         color: #1d1d1d;
                         line-height: 28rpx;
@@ -958,7 +926,7 @@
                         span {
                             font-size: 22rpx;
                             margin-right: 6rpx;
-                            transform: translateY(-1rpx);
+                            transform: translateY(2rpx);
                         }
                     }
                 }
@@ -980,14 +948,15 @@
                     }
                 }
                 .consume_r {
+                    display: flex;
+                    align-items: center;
                     font-size: 30rpx;
                     white-space: nowrap;
                     color: #1d1d1d;
                     span {
                         font-size: 22rpx;
-                        display: inline-block;
                         margin-right: 6rpx;
-                        transform: translateY(-1rpx);
+                        transform: translateY(2rpx);
                     }
                     &.color_text {
                         color: #ff4d3a;
@@ -998,7 +967,6 @@
                     i {
                         font-size: 24rpx;
                         color: #ff4d3a;
-                        display: inline-block;
                         margin-right: 16rpx;
                     }
                 }
@@ -1016,18 +984,19 @@
                     color: #1a1a1a;
                 }
                 .consume_r {
+                    display: flex;
+                    align-items: center;
                     font-size: 36rpx;
                     white-space: nowrap;
                     color: #ff4d3a;
                     span {
                         font-size: 24rpx;
                         margin-right: 6rpx;
-                        transform: translateY(-1rpx);
+                        transform: translateY(2rpx);
                     }
                     i {
                         font-size: 24rpx;
                         color: #666;
-                        display: inline-block;
                         margin-right: 16rpx;
                     }
                 }
@@ -1366,13 +1335,13 @@
         .after_sale_active {
             transform: translateY(0);
         }
-        .cancel_mask {
+        .cancel_mask,
+        .map_mask {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
+            bottom: 0; // background: rgba(0, 0, 0, 0.6);
             z-index: 10;
             transition: all 0.1s ease;
         }
@@ -1432,6 +1401,39 @@
                     color: #fff;
                     background-color: #ff4d3a;
                 }
+            }
+        }
+        .map_mask {
+            map {
+                width: 100%;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                transition: all 0.2s ease;
+            }
+            .close_map {
+                position: absolute;
+                bottom: 60rpx;
+                left: 50%;
+                transform: translateX(-50%);
+                .icon_close_map {
+                    width: 96rpx;
+                    height: 96rpx;
+                }
+            }
+            .map_none {
+                height: 0;
+            }
+        }
+        .order_btn {
+            position: absolute;
+            right: 36rpx;
+            bottom: 188rpx;
+            display: flex;
+            flex-direction: column;
+            i {
+                margin-top: 40rpx;
             }
         }
     }

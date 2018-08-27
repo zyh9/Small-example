@@ -6,7 +6,7 @@ const QQMap = new QQMapWX({
 })
 
 //线上地址
-// const baseUrl = 'https://stunnercustomer.uupt.com';
+const baseUrl = 'https://stunnercustomer.uupt.com';
 //光明地址
 // const baseUrl = 'http://192.168.6.180:8070'; 
 //鹏浩地址
@@ -15,7 +15,7 @@ const QQMap = new QQMapWX({
 //袁沼
 // const baseUrl = 'http://192.168.6.66:6001';
 //海涛
-const baseUrl = 'http://192.168.6.156:50654';
+// const baseUrl = 'http://192.168.6.156:50654';
 
 const commonHeader = _ => {
   //headers每次必传数据存放位置
@@ -133,22 +133,27 @@ const qqMapInfo = _ => {
       },
       fail: err => {
         wx.hideLoading();
-        wx.getSetting({
-          success: ok => {
-            if(!(ok.authSetting['scope.userLocation'])){
-              //小程序位置信息权限关闭
-              console.log('小程序定位未开启')
-              model(1);
-            }else{
-              console.log('手机定位未开启')
-              model(2);
+        //无定位判断
+        if(wx.getStorageSync('QQmap')&&!wx.getStorageSync('QQmap').mapGet){
+          reject('位置信息获取失败，启用无定位搜索');
+        }else{
+          wx.getSetting({
+            success: ok => {
+              if(!(ok.authSetting['scope.userLocation'])){
+                //小程序位置信息权限关闭
+                console.log('小程序定位未开启')
+                model(1);
+              }else{
+                console.log('手机定位未开启')
+                model(2);
+              }
+            },
+            fail: error => {
+                console.log('权限获取失败')
             }
-          },
-          fail: error => {
-              console.log('权限获取失败')
-          }
-        })
-        reject('位置信息获取失败');
+          })
+          reject('位置信息获取失败');
+        }
       }
     })
   })

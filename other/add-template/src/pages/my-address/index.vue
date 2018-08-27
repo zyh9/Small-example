@@ -24,10 +24,6 @@
                     </div>
                 </li>
             </ul>
-            <div class="address_bottom">
-                <p @click="synchronize" class="set-flex set-align set-center"><i class="icon icon_synchro"></i>使用UU跑腿地址</p>
-                <p @click="addAddress" class="set-flex set-align set-center"><i class="icon icon_addAddress"></i>添加新地址</p>
-            </div>
         </div>
         <div class="address_mask" v-if="maskOnoff">
             <div class="mask_con">
@@ -50,6 +46,10 @@
                     <p class="set-flex set-align set-center" @click="uuAddress">确定</p>
                 </div>
             </div>
+        </div>
+        <div class="address_bottom">
+            <p @click="synchronize" class="set-flex set-align set-center"><i class="icon icon_synchro"></i>使用UU跑腿地址</p>
+            <p @click="addAddress" class="set-flex set-align set-center"><i class="icon icon_addAddress"></i>添加新地址</p>
         </div>
     </div>
 </template>
@@ -312,47 +312,10 @@
             padding-left: 36rpx;
             background-color: #fff;
         }
-        .address_bottom {
-            width: 100%;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 104rpx;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-top: 1rpx solid #ededde;
-            background: #fff;
-            padding: 0 36rpx;
-            box-sizing: border-box;
-            z-index: 10;
-            p {
-                height: 80rpx;
-                width: 50%;
-                text-align: center;
-                line-height: 50rpx;
-                font-size: 26rpx;
-                box-sizing: border-box;
-                border-radius: 6rpx;
-                .icon {
-                    margin-right: 10rpx;
-                }
-            }
-            p:nth-of-type(1) {
-                margin-right: 24rpx;
-                color: #ff8b03;
-                border: 1px solid #ff8b03;
-            }
-            p:nth-of-type(2) {
-                background-color: #ff4d3a;
-                color: #fff;
-                border: 1px solid #ff4d3a;
-            }
-        }
     }
     .my_address_list {
         li {
-            box-sizing: border-box; // transition: margin-left 0.6s ease;
+            box-sizing: border-box;
             margin-bottom: 20rpx;
             background-color: #fff;
             .edit_box {
@@ -414,6 +377,43 @@
         } // li:nth-last-of-type(1){
         //     margin-bottom: 0;
         // }
+    }
+    .address_bottom {
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        height: 104rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-top: 1rpx solid #ededde;
+        background: #fff;
+        padding: 0 36rpx;
+        box-sizing: border-box;
+        z-index: 10;
+        p {
+            height: 80rpx;
+            width: 50%;
+            text-align: center;
+            line-height: 50rpx;
+            font-size: 26rpx;
+            box-sizing: border-box;
+            border-radius: 6rpx;
+            .icon {
+                margin-right: 10rpx;
+            }
+        }
+        p:nth-of-type(1) {
+            margin-right: 24rpx;
+            color: #ff8b03;
+            border: 1px solid #ff8b03;
+        }
+        p:nth-of-type(2) {
+            background-color: #ff4d3a;
+            color: #fff;
+            border: 1px solid #ff4d3a;
+        }
     }
     .no_address {
         position: absolute;

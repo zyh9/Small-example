@@ -1,5 +1,5 @@
 <template>
-    <div class="couponList">
+    <div class="couponList fade_in" v-if="block">
         <div class="coupon" v-if="couponList.length">
             <div class="title_text">
                 <i class="icon icon_coupon"></i>
@@ -36,14 +36,21 @@
                 //优惠券文字
                 CouponText: '',
                 noInfo: false,
-                PaotuiPriceRule:''
+                PaotuiPriceRule: '',
+                block: false,
             }
         },
-        onLoad() {},
+        onLoad() {
+            this.block = false;
+            wx.showLoading({
+                title: '加载中',
+                mask: true
+            })
+        },
         onReady() { //进入页面触发，回退不触发
             this.isBindPhone = wx.getStorageSync('loginInfo').IsBindPhone == 1 ? false : true;
             this.noInfo = false;
-            this.PaotuiPriceRule = wx.getStorageSync('shopInfo').PaotuiPriceRule?wx.getStorageSync('shopInfo').PaotuiPriceRule:'';
+            this.PaotuiPriceRule = wx.getStorageSync('shopInfo').PaotuiPriceRule ? wx.getStorageSync('shopInfo').PaotuiPriceRule : '';
             // console.log(this.PaotuiPriceRule)
             this.getCoupon();
         },
@@ -56,6 +63,8 @@
                         ShopID: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
                     }
                 }).then(res => {
+                    wx.hideLoading();
+                    this.block = true;
                     let getCouponText = res.Body.map(e => {
                         return `满${e.MinimumAmount}元减${e.Amount}元；`;
                     })
@@ -64,6 +73,7 @@
                     this.couponList = res.Body;
                     !res.Body.length && (this.noInfo = true);
                 }).catch(err => {
+                    wx.hideLoading();
                     this.msg(error.Msg)
                 })
             },
@@ -144,7 +154,8 @@
                 line-height: 24rpx;
             }
         }
-        .coupon,.lower {
+        .coupon,
+        .lower {
             margin: 0 36rpx;
             padding-bottom: 40rpx;
             max-height: 560rpx;

@@ -1,6 +1,6 @@
 <template>
     <div class="product-details" v-if="block">
-        <scroll-view v-if="!noShopInfo" scroll-y="true" style="height: 100%;padding:0  35rpx 110rpx;box-sizing:border-box;" lower-threshold="60" @scrolltolower="scrollHandler">
+        <scroll-view v-if="!noShopInfo" scroll-y="true" style="height: 100%;padding-bottom: 110rpx;box-sizing:border-box;" lower-threshold="60" @scrolltolower="scrollHandler">
             <div class="shop_top">
                 <img :src="goodsInfo.GoodMasterPic?goodsInfo.GoodMasterPic+'?x-oss-process=image/resize,w_1000/format,jpg':''" alt="" class="shop_img fade_in">
                 <i class="icon icon_goodsShare" @click="share"></i>
@@ -414,7 +414,7 @@
                     url: '/api/Customer/Common/CreateWxOpenQrCode',
                     data: {
                         CodeType: 1,
-                        CodeValue: this.$store.state.mutations.qrcode || this.$root.$mp.query.GoodId || '', //对应的商品id
+                        CodeValue: this.$root.$mp.query.GoodId || this.GoodId || '', //对应的商品id
                         RequestType: 2
                     }
                 }).then(res => {
@@ -682,6 +682,7 @@
         overflow: hidden;
         padding-top: 10rpx;
         .shop_top {
+            margin: 0 auto;
             width: 678rpx;
             height: 678rpx;
             position: relative;
@@ -698,7 +699,7 @@
             }
         }
         .info {
-            padding: 50rpx 0 20rpx 0;
+            padding: 50rpx 35rpx 20rpx;
             overflow: hidden;
             .name {
                 font-size: 36rpx;

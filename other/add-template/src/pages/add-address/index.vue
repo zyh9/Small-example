@@ -98,7 +98,7 @@
         //如果信息是空，就删除缓存
         !wx.getStorageSync('address').address&&wx.removeStorageSync('address');
         wx.navigateTo({
-          url: '/pages/select-address/main'
+          url: '/pages/select-address/main?type=1'
         })
       },
       addAddress() {
