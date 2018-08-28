@@ -30,37 +30,39 @@
             <swiper-item class="swiper-item">
                 <div class="store_index">
                     <div class="store_index_list">
-                        <scroll-view scroll-y="true" style="height: 100%" class="scroll_left">
-                            <div v-for="(v,i) in allShopInfoList" :key="i" class="list_item_l" :data-id="i" @click="checked(v,i)" :class="{left_select:i==selected}">
+                        <scroll-view scroll-y="true" style="height: 100%" class="scroll_left" :scroll-top="leftToTop" scroll-with-animation="true">
+                            <div v-for="(v,i) in allShopInfoList" :key="i" class="list_item_l" @click="checked(v,i)" :class="{left_select:i==selected}" :id="'id'+i">
                                 <i class="icon_discount" v-if="v.ID==-1"></i>{{v.Name}}
                                 <i class="left_num" v-if="v.sum>0||v.sum=='99+'">{{v.sum}}</i>
                             </div>
                         </scroll-view>
                         <div class="right_con">
-                            <scroll-view v-for="(item,index) in allShopInfoList" :key="index" v-if="selected==index" scroll-y="true" style="height: 100%" class="scroll_right">
-                                <!-- <p class="no_shop" v-if="!item.length">此分类暂无商品信息哦</p> -->
-                                <div class="list_item_r" v-if="item.GoodsInfo.length" v-for="(v,i) in item.GoodsInfo" :key="i">
-                                    <div class="lis_item_left" @click="goGoodsDetail(v)">
-                                        <img :src="v.GoodsMasterPic?v.GoodsMasterPic+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="" class="shop_lis_img fade_in" lazy-load="true">
-                                        <div class="shop_lis_mask" v-if="v.State==3||(v.MultiSpec==0&&v.RealStock<=0)||(v.MultiSpec==1&&!v.List.length)">已售罄</div>
-                                        <div class="li_info">
-                                            <p class="shop_name">{{v.GoodName}}<span v-if="v.GoodsType==-1">{{v.SpecName}}</span></p>
-                                            <div class="discount"><span v-if="v.GoodsType==-1" class="price_tips">{{v.PriceOffNote}}</span><span v-if="v.MultiSpec==0&&v.RealStock>0&&v.RealStock<=10">仅剩{{v.RealStock}}份</span></div>
-                                            <div class="discount_shop" v-if="v.GoodsType==-1">
-                                                <p class="price"><span>¥</span>{{v.SalesPrice}}</p>
-                                                <p class="original_price">¥{{v.OriginalPrice}}</p>
+                            <scroll-view scroll-y="true" style="height: 100%" class="scroll_right" @scroll="rightScroll" :scroll-into-view="'id'+selected" scroll-with-animation="true">
+                                <div v-for="(item,index) in allShopInfoList" :key="index" :id="'id'+index">
+                                    <!-- <p class="no_shop" v-if="!item.length">此分类暂无商品信息哦</p> -->
+                                    <div class="list_item_r" v-if="item.GoodsInfo.length" v-for="(v,i) in item.GoodsInfo" :key="i">
+                                        <div class="lis_item_left" @click="goGoodsDetail(v)">
+                                            <img :src="v.GoodsMasterPic?v.GoodsMasterPic+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="" class="shop_lis_img fade_in" lazy-load="true">
+                                            <div class="shop_lis_mask" v-if="v.State==3||(v.MultiSpec==0&&v.RealStock<=0)||(v.MultiSpec==1&&!v.List.length)">已售罄</div>
+                                            <div class="li_info">
+                                                <p class="shop_name">{{v.GoodName}}<span v-if="v.GoodsType==-1">{{v.SpecName}}</span></p>
+                                                <div class="discount"><span v-if="v.GoodsType==-1" class="price_tips">{{v.PriceOffNote}}</span><span v-if="v.MultiSpec==0&&v.RealStock>0&&v.RealStock<=10">仅剩{{v.RealStock}}份</span></div>
+                                                <div class="discount_shop" v-if="v.GoodsType==-1">
+                                                    <p class="price"><span>¥</span>{{v.SalesPrice}}</p>
+                                                    <p class="original_price">¥{{v.OriginalPrice}}</p>
+                                                </div>
+                                                <p class="price_init" v-else><span>¥</span>{{v.SalesPrice?v.SalesPrice:v.OriginalPrice}}</p>
                                             </div>
-                                            <p class="price_init" v-else><span>¥</span>{{v.SalesPrice?v.SalesPrice:v.OriginalPrice}}</p>
                                         </div>
+                                        <div class="count" v-if="OpenState &&(v.MultiSpec==0&&v.State==1)&&v.RealStock>0">
+                                            <i class="icon icon_lower" @click="lower($event)" :data-info="v" v-if="v.num>0"></i>
+                                            <span v-if="v.num>0">{{v.num}}</span>
+                                            <i class="icon icon_add" @click="add($event)" :data-info="v"></i>
+                                        </div>
+                                        <div class="select_rule" v-if="OpenState &&(v.MultiSpec==1&&v.State==1)&&v.List.length" :data-info="v" @click="format($event)">选规格</div>
+                                        <!-- <p v-if="v.State==3" class="sold_out">已售罄</p> -->
+                                        <div class="shop_mask_state" v-if="!OpenState" @click="shopOpenState"></div>
                                     </div>
-                                    <div class="count" v-if="OpenState &&(v.MultiSpec==0&&v.State==1)&&v.RealStock>0">
-                                        <i class="icon icon_lower" @click="lower($event)" :data-info="v" v-if="v.num>0"></i>
-                                        <span v-if="v.num>0">{{v.num}}</span>
-                                        <i class="icon icon_add" @click="add($event)" :data-info="v"></i>
-                                    </div>
-                                    <div class="select_rule" v-if="OpenState &&(v.MultiSpec==1&&v.State==1)&&v.List.length" :data-info="v" @click="format($event)">选规格</div>
-                                    <!-- <p v-if="v.State==3" class="sold_out">已售罄</p> -->
-                                    <div class="shop_mask_state" v-if="!OpenState" @click="shopOpenState"></div>
                                 </div>
                             </scroll-view>
                         </div>
@@ -213,11 +215,11 @@
         </div>
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
-                <canvas canvas-id='myCanvas'></canvas>
-                <div class="shareCover">
-                    <img @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
-                    <img @click='saveImg' class="saveBtn" src="../../../static/saveImg.png" />
-                </div>
+                <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"></canvas>
+                <cover-view class="shareCover">
+                    <cover-image @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
+                    <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png" />
+                </cover-view>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -287,6 +289,8 @@
                 couponList: [],
                 //优惠券文字
                 CouponText: '',
+                leftToTop: 0,
+                lisHeight: 0,
             }
         },
         onShareAppMessage(res) {
@@ -314,6 +318,8 @@
             })
         },
         onReady() { //进入页面触发，回退不触发
+            this.leftToTop = 0;
+            this.lisHeight = 0;
             this.currentTab = 0;
             this.shopPageListSum = [];
             this.allShopInfoList = [];
@@ -485,7 +491,7 @@
                 this.allShopInfoList = allShopInfo.Body.filter(e => e.GoodsInfo.length);
                 // console.log(this.allShopInfoList)
                 if (!this.allShopInfoList.length) this.noShop = true;
-                this.allShopInfoList.forEach(e => {
+                this.allShopInfoList.forEach((e, i) => {
                     e.GoodsInfo.forEach(item => {
                         if (item.MultiSpec == 1) {
                             item.GoodsSpec.forEach(ele => {
@@ -511,6 +517,7 @@
                         }
                         this.sumList.push(item)
                     })
+                    e.id = 'id' + i;
                     //单项分类设置页面索引以及终止状态
                     // this.shopPageIndex.push({
                     //     page: 1,
@@ -518,6 +525,7 @@
                     // })
                     // this.shopPageListSum.push([])
                 })
+                console.log(this.allShopInfoList)
                 wx.hideLoading()
                 this.block = true;
                 this.$store.dispatch('backIndex', false)
@@ -535,6 +543,14 @@
                     //缓存length不存在，直接清除
                     !cartListSum.length && wx.removeStorageSync('cartListSum');
                 }
+                setTimeout(_ => {
+                    let query = wx.createSelectorQuery();
+                    query.select('.list_item_r').boundingClientRect()
+                    query.exec(res => {
+                        this.lisHeight = Math.round(res[0].height);
+                        this.getRightToTop(this.lisHeight)
+                    })
+                }, 0)
                 return;
                 // console.log(this.shopPageIndex)
                 //获取分类以及分页
@@ -755,17 +771,24 @@
                 // 屏幕系数比，以设计稿375*667（iphone7）为例
                 let XS = windowWidth / 375;
                 const ctx = wx.createCanvasContext('myCanvas');
-                ctx.setFillStyle('#fff')
+                // ctx.setFillStyle('#f1f1f1')
                 ctx.fillRect(0, 0, 339 * XS, 522 * XS)
                 /* 背景图 */
-                ctx.drawImage(this.shareBg, 0 * XS, 0 * XS, 280 * XS, 466 * XS)
+                ctx.drawImage(this.shareBg, 0 * XS, 0 * XS, 339 * XS, 522 * XS)
                 /* 小程序logo */
-                ctx.drawImage(this.minShopLogo, 10 * XS, 10 * XS, 24 * XS, 24 * XS)
-                ctx.setFontSize(14 * XS);
+                ctx.drawImage(this.Logo, 13 * XS, 12 * XS, 34 * XS, 34 * XS)
+                ctx.setFontSize(13 * XS);
                 ctx.setFillStyle('#1a1a1a')
-                this.fontLineFeed(ctx, this.shopInfoList.ShopName, 16, 18 * XS, 52 * XS, 28 * XS)
+                ctx.fillText('足不出户 随意享购全城店铺', 55 * XS, 32 * XS);
+                /* 店铺logo图片 */
+                ctx.drawImage(this.minShopLogo, 160 * XS, 400 * XS, 20 * XS, 20 * XS)
                 /* 二维码 */
                 ctx.drawImage(this.QrCodeUrl, 77 * XS, 197 * XS, 185 * XS, 185 * XS)
+                /* 店铺名字 */
+                ctx.setFontSize(20 * XS);
+                ctx.setFillStyle('#333')
+                ctx.setTextAlign('center');
+                this.fontLineFeed(ctx, this.shopInfoList.ShopName, 18 * XS, 18 * XS, 175 * XS, 428 * XS)
                 ctx.draw()
                 wx.hideLoading()
                 this.shareCard = true; //分享图展示
@@ -788,16 +811,11 @@
                 for (let i = 0, len = str.length / splitLen; i < len; i++) {
                     strArr.push(str.substring(i * splitLen, i * splitLen + splitLen));
                 }
-                if (str.length > splitLen) {
-                    strArr[0] = strArr[0] + '...';
+                let s = 0;
+                for (let j = 0, len = strArr.length; j < len; j++) {
+                    s = s + strHeight;
+                    ctx.fillText(strArr[j], x, y + s);
                 }
-                // console.log(strArr[0])
-                // let s = 0;
-                // for (let j = 0, len = strArr.length; j < len; j++) {
-                //     s = s + strHeight;
-                //     ctx.fillText(strArr[j], x, y + s);
-                // }
-                ctx.fillText(strArr[0], x, y);
             },
             /* 保存图片 */
             saveImg() {
@@ -1358,6 +1376,41 @@
                     }
                 }
             },
+            getRightToTop(height) {
+                // console.log(height)
+                let obj = {};
+                let totop = 0;
+                const barHeight = 0; //bar的高度
+                const item_height = height; //子类的高度
+                obj[this.allShopInfoList[0].id] = totop; // 右侧第一类顶部的距离为 0
+                for (let i = 1; i < (this.allShopInfoList.length + 1); i++) { // 循环来计算每个子类到顶部的高度
+                    totop += (barHeight + this.allShopInfoList[i - 1].GoodsInfo.length * item_height)
+                    obj[this.allShopInfoList[i] ? this.allShopInfoList[i].id : 'id9999'] = totop // 这个的目的是 例如有两类，最后需要 0-1 1-2 2-3 的数据，所以需要一个不存在的 'last' 项，此项即为第一类加上第二类的高度。
+                }
+                return obj
+            },
+            rightScroll(e) { // 监听右侧的滚动事件与 getRightToTop 的循环作对比 从而判断当前可视区域为第几类，从而渲染左侧的对应类
+                let obj = this.getRightToTop(this.lisHeight)
+                // console.log(this.lisHeight, obj, e.mp.detail.scrollTop)
+                let leftItemHeight;
+                setTimeout(_ => {
+                    let query = wx.createSelectorQuery();
+                    query.select('.list_item_l').boundingClientRect()
+                    query.exec(res => {
+                        leftItemHeight = Math.round(res[0].height);
+                        // console.log(leftItemHeight)
+                        for (let i = 0; i < this.allShopInfoList.length; i++) {
+                            let top = obj[this.allShopInfoList[i].id];
+                            let bot = obj[this.allShopInfoList[i + 1] ? this.allShopInfoList[i + 1].id : 'id9999'];
+                            if (e.mp.detail.scrollTop < bot && e.mp.detail.scrollTop >= top) {
+                                // console.log(this.allShopInfoList[i].id)
+                                this.leftToTop = leftItemHeight * i;
+                                this.selected = i;
+                            }
+                        }
+                    })
+                }, 0)
+            },
         },
         computed: {
             //购物车商品总价
@@ -1554,10 +1607,9 @@
                     -webkit-box-orient: vertical;
                     -webkit-line-clamp: 2;
                     text-align: left;
-                    position: relative;
-                    &:first-child {
-                        padding-top: 38rpx;
-                    }
+                    position: relative; // &:first-child {
+                    //     padding-top: 38rpx;
+                    // }
                     .left_num {
                         position: absolute;
                         right: 15rpx;
@@ -1741,10 +1793,9 @@
                         bottom: 0;
                         z-index: 2;
                     }
-                }
-                .list_item_r:first-child {
-                    padding-top: 38rpx;
-                }
+                } // .list_item_r:first-child {
+                //     padding-top: 38rpx;
+                // }
             }
         }
         .user_info_right {
@@ -2322,8 +2373,24 @@
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.7);
+        padding: 10rpx 36rpx 0;
         box-sizing: border-box;
         z-index: 50;
+        .icon_close {
+            position: absolute;
+            top: 25rpx;
+            right: 25rpx;
+            z-index: 100;
+        }
+        .saveBtn {
+            position: absolute;
+            left: 50%;
+            top: 919rpx;
+            width: 290rpx;
+            height: 73rpx;
+            z-index: 100;
+            transform: translateX(-50%);
+        }
         .shareCover {
             position: absolute;
             top: 0;
@@ -2331,38 +2398,60 @@
             width: 100%;
             height: 100%;
         }
-        .icon_close {
-            position: absolute;
-            top: -22rpx;
-            right: -18rpx;
-            z-index: 100;
-        }
-        .saveBtn {
-            position: absolute;
-            bottom: 30rpx;
-            left: 30rpx;
-            width: 556rpx;
-            height: 88rpx;
-            z-index: 100;
-        }
         .main {
             border-radius: 10rpx;
-            background: #f2f2f2;
-            width: 616rpx;
-            height: 1118rpx;
-            position: absolute;
+            background: #f1f1f1;
+            position: relative;
+            width: 339px;
+            height: 522px;
+            overflow: hidden;
+            position: fixed;
             top: 0;
             left: 0;
             bottom: 0;
             right: 0;
             margin: auto;
-            padding: 30rpx;
-            box-sizing: border-box;
-        }
-        canvas {
-            background: #fff;
-            width: 100%;
-            height: 932rpx;
+            .title {
+                padding: 30rpx 0;
+                position: relative;
+                img {
+                    width: 42rpx;
+                    height: 42rpx;
+                    margin-right: 14rpx;
+                }
+                .namea {
+                    font-size: 28rpx;
+                    color: #010101;
+                }
+            }
+            img.goodsImg {
+                width: 618rpx;
+                height: 618rpx;
+                margin-bottom: 35rpx;
+            }
+            .ft {
+                .info {
+                    padding-top: 26rpx;
+                    padding-right: 44rpx;
+                    border-right: 1rpx solid #ebebeb;
+                    .name {
+                        font-size: 28rpx;
+                        color: #000;
+                    }
+                    .detail {
+                        font-size: 24rpx;
+                        color: #777;
+                    }
+                }
+                .qr {
+                    width: 240rpx;
+                    height: 240rpx;
+                    img {
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+            }
         }
     }
     .format {

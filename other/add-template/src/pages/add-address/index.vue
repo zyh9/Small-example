@@ -46,6 +46,7 @@
       this.note = '';
       this.userInfo = wx.getStorageSync('userInfo');
       this.address = wx.getStorageSync('address') || {};
+      console.log(this.address)
       this.note = this.address.UserNote;
       this.title = this.$root.$mp.query.type == 1 ? '新增地址' : '修改地址';
     },
@@ -95,8 +96,6 @@
         wx.setStorageSync('address', Object.assign({}, this.address, {
           UserNote: this.note
         }));
-        //如果信息是空，就删除缓存
-        !wx.getStorageSync('address').address&&wx.removeStorageSync('address');
         wx.navigateTo({
           url: '/pages/select-address/main?type=1'
         })

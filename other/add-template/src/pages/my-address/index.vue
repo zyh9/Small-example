@@ -135,6 +135,7 @@
                         res.Body.forEach(e => {
                             e.Id = 0;
                             e.type = 2;
+                            e.LinkMan = e.LinkMan==""?'未填写':e.LinkMan;
                         })
                         // this.msg('已同步UU跑腿地址')
                         this.uuptList = res.Body;

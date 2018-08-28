@@ -917,7 +917,6 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            padding: 10rpx 36rpx 140rpx;
             box-sizing: border-box;
             z-index: 50;
             .shareCover {

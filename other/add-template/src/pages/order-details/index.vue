@@ -155,7 +155,7 @@
             </div>
         </div>
         <div class="order_btn">
-            <i class="icon icon_look_map" @click="mapOnoff=true" v-if="orderInfo.ExpressType== 1&&orderInfo.ExpressType== 3&&orderInfo.State>=4&&orderInfo.State<10"></i>
+            <i class="icon icon_look_map" @click="mapOnoff=true" v-if="(orderInfo.ExpressType== 1||orderInfo.ExpressType== 3)&&orderInfo.State>=4&&orderInfo.State<10"></i>
             <i class="icon icon_go_index" v-if="goIndexBlock" @click="goIndex"></i>
         </div>
         <div class="mask" v-if='isTracking||saleMask' @click='isTracking=false,saleMask=false'></div>
@@ -217,7 +217,7 @@
                 </div>
             </div>
         </div>
-        <div class="map_mask" v-if="mapOnoff">
+        <div class="map_mask fade_in" :class="{map_mask_active:mapOnoff}">
             <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points="" :style="{height:winHeight+'px'}"></map>
             <cover-view class="close_map" @click="mapOnoff=false">
                 <cover-image class="icon_close_map" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
@@ -491,9 +491,9 @@
                     this.orderInfo.orderSumPrice = (Math.round(this.orderInfo.PaotuiMoneyOff * 10000) + Math.round(this.orderInfo.CouponAmountMoney * 10000)) / 10000;
                     // console.log(this.orderInfo.orderSumPrice)
                     //地图所需信息 （不包含快递和商家自送）
-                    if (this.orderInfo.State >= 4 && this.orderInfo.State < 10 && this.orderInfo.ExpressType != 2 && this.orderInfo.ExpressType != 4) {
+                    if ((this.orderInfo.ExpressType == 1 || this.orderInfo.ExpressType == 3) && this.orderInfo.State >= 4 && this.orderInfo.State < 10) {
                         // console.log(this.util.downImg)
-                        this.mapOnoff = true;
+                        // this.mapOnoff = true;
                         this.forOrder = true;
                         this.requireImg(this.orderInfo.ExpressType, this.orderInfo.State).catch(err => {
                             this.msg('地图信息获取失败')
@@ -1335,13 +1335,13 @@
         .after_sale_active {
             transform: translateY(0);
         }
-        .cancel_mask,
-        .map_mask {
+        .cancel_mask {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0; // background: rgba(0, 0, 0, 0.6);
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
             z-index: 10;
             transition: all 0.1s ease;
         }
@@ -1404,13 +1404,20 @@
             }
         }
         .map_mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            transform: translateY(100%);
+            transition: all 0.4s ease;
             map {
                 width: 100%;
                 position: absolute;
                 bottom: 0;
                 left: 0;
                 right: 0;
-                transition: all 0.2s ease;
             }
             .close_map {
                 position: absolute;
@@ -1425,6 +1432,9 @@
             .map_none {
                 height: 0;
             }
+        }
+        .map_mask_active {
+            transform: translateY(0%);
         }
         .order_btn {
             position: absolute;

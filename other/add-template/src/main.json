@@ -43,8 +43,7 @@
 		"pages/forget-pay-password/main",
 		"pages/uu-pay/main",
 		"pages/after-sale/main",
-		"pages/upload-img/main",
-		"pages/scanCode/main"
+		"pages/upload-img/main"
 	],
 	"window": {
 		"backgroundTextStyle": "light",
