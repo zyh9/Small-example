@@ -733,9 +733,9 @@
             },
             async requireImg() {
                 this.QrCodeUrl = await this.downImg(this.QrCodeUrl)
-                this.Logo = await this.downImg(this.Logo)
-                this.minShopLogo = await this.downImg(this.shopInfoList.Logo + '?x-oss-process=image/resize,h_50/rounded-corners,r_10');
-                this.shareBg = await this.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/shareCard.png?x-oss-process=image/resize,w_500/format,jpg');
+                // this.Logo = await this.downImg(this.Logo)
+                this.minShopLogo = await this.downImg(this.shopInfoList.Logo + '?x-oss-process=image/resize,w_200/format,jpg');
+                this.shareBg = await this.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/shop-card-bg.png');
                 this.drawCanvas();
             },
             /* 绘制canvas */
@@ -759,13 +759,20 @@
                 ctx.fillRect(0, 0, 339 * XS, 522 * XS)
                 /* 背景图 */
                 ctx.drawImage(this.shareBg, 0 * XS, 0 * XS, 280 * XS, 466 * XS)
-                /* 小程序logo */
-                ctx.drawImage(this.minShopLogo, 10 * XS, 10 * XS, 24 * XS, 24 * XS)
+                /* 店铺logo */
+                ctx.save()
+                ctx.beginPath()
+                ctx.arc((116 + 44 / 2) * XS, (42 + 44 / 2) * XS, (44 * XS) / 2, 0, 2 * Math.PI)
+                ctx.clip()
+                ctx.drawImage(this.minShopLogo, 116 * XS, 42 * XS, 44 * XS, 44 * XS);
+                ctx.restore()
+                //店铺名字
                 ctx.setFontSize(14 * XS);
-                ctx.setFillStyle('#1a1a1a')
-                this.fontLineFeed(ctx, this.shopInfoList.ShopName, 16, 18 * XS, 52 * XS, 28 * XS)
+                ctx.setFillStyle('#4c2901')
+                ctx.setTextAlign('center');
+                this.fontLineFeed(ctx, this.shopInfoList.ShopName, 16, 18 * XS, 138 * XS, 110 * XS)
                 /* 二维码 */
-                ctx.drawImage(this.QrCodeUrl, 77 * XS, 197 * XS, 185 * XS, 185 * XS)
+                ctx.drawImage(this.QrCodeUrl, 86 * XS, 242 * XS, 108 * XS, 108 * XS)
                 ctx.draw()
                 wx.hideLoading()
                 this.shareCard = true; //分享图展示

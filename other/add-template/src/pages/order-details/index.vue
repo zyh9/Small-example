@@ -220,7 +220,7 @@
         <div class="map_mask fade_in" :class="{map_mask_active:mapOnoff}">
             <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points="" :style="{height:winHeight+'px'}"></map>
             <cover-view class="close_map" @click="mapOnoff=false">
-                <cover-image class="icon_close_map" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
+                <cover-image class="icon_close_map" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/black-close.png" />
             </cover-view>
         </div>
     </div>

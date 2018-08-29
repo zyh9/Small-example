@@ -101,6 +101,7 @@
                         }
                     }).then(res => {
                         // console.log("正确信息", res)
+                        this.tips = res.Body.Shops.length ? false : true;
                         res.Body.Shops.forEach(e => {
                             e.ShopAddress = e.ShopAddress.replace(/\n/g, '').split('($)').join('');
                             e.ShopLogo = e.ShopLogo + '?x-oss-process=image/resize,w_100/format,jpg';
@@ -110,7 +111,6 @@
                             this.nomore = true;
                         }
                         this.shopList.push(...res.Body.Shops);
-                        if (this.shopList.length == 0) this.tips = true;
                     }).catch(err => {
                         this.msg(err.Msg)
                     })

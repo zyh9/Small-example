@@ -11,7 +11,7 @@
 	"compileType": "miniprogram",
 	"appid": "wxbf3133166adc4375",
 	"projectname": "%E6%96%B0%E6%A8%A1%E6%9D%BF",
-	"libVersion": "2.2.0",
+	"libVersion": "2.2.4",
 	"condition": {
 		"search": {
 			"current": -1,
@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": -1,
+			"current": 22,
 			"list": [
 				{
 					"id": 1,
@@ -165,10 +165,22 @@
 					"query": ""
 				},
 				{
-					"id": -1,
-					"name": "曲奇",
+					"id": 22,
+					"name": "满满炸鸡",
 					"pathName": "pages/food-store/main",
-					"query": "ShopId=1883249876878341"
+					"query": "ShopId=1881445960483844"
+				},
+				{
+					"id": -1,
+					"name": "薄荷味",
+					"pathName": "pages/food-store/main",
+					"query": "ShopId=1883224464524293"
+				},
+				{
+					"id": -1,
+					"name": "中间页",
+					"pathName": "pages/my-store/main",
+					"query": ""
 				}
 			]
 		}

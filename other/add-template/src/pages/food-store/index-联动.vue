@@ -31,14 +31,14 @@
                 <div class="store_index">
                     <div class="store_index_list">
                         <scroll-view scroll-y="true" style="height: 100%" class="scroll_left" :scroll-top="leftToTop" scroll-with-animation="true">
-                            <div v-for="(v,i) in allShopInfoList" :key="i" class="list_item_l" @click="checked(v,i)" :class="{left_select:i==selected}" :id="'id'+i">
+                            <div v-for="(v,i) in allShopInfoList" :key="i" class="list_item_l" @click="checked(v,i)" :class="{left_select:i==selected}" :id="v.id">
                                 <i class="icon_discount" v-if="v.ID==-1"></i>{{v.Name}}
                                 <i class="left_num" v-if="v.sum>0||v.sum=='99+'">{{v.sum}}</i>
                             </div>
                         </scroll-view>
                         <div class="right_con">
-                            <scroll-view scroll-y="true" style="height: 100%" class="scroll_right" @scroll="rightScroll" :scroll-into-view="'id'+selected" scroll-with-animation="true">
-                                <div v-for="(item,index) in allShopInfoList" :key="index" :id="'id'+index">
+                            <scroll-view scroll-y="true" style="height: 100%" class="scroll_right" @scroll="rightScroll" :scroll-into-view="selectedId" scroll-with-animation="true">
+                                <div v-for="(item,index) in allShopInfoList" :key="index" :id="item.id">
                                     <!-- <p class="no_shop" v-if="!item.length">此分类暂无商品信息哦</p> -->
                                     <div class="list_item_r" v-if="item.GoodsInfo.length" v-for="(v,i) in item.GoodsInfo" :key="i">
                                         <div class="lis_item_left" @click="goGoodsDetail(v)">
@@ -215,11 +215,11 @@
         </div>
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
-                <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"></canvas>
-                <cover-view class="shareCover">
-                    <cover-image @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
-                    <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png" />
-                </cover-view>
+                <canvas canvas-id='myCanvas'></canvas>
+                <div class="shareCover">
+                    <img @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
+                    <img @click='saveImg' class="saveBtn" src="../../../static/saveImg.png" />
+                </div>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -291,6 +291,8 @@
                 CouponText: '',
                 leftToTop: 0,
                 lisHeight: 0,
+                scrollTop: 0,
+                selectedId: 'id0',
             }
         },
         onShareAppMessage(res) {
@@ -318,7 +320,9 @@
             })
         },
         onReady() { //进入页面触发，回退不触发
+            this.selectedId = 'id0';
             this.leftToTop = 0;
+            this.scrollTop = 0;
             this.lisHeight = 0;
             this.currentTab = 0;
             this.shopPageListSum = [];
@@ -525,7 +529,7 @@
                     // })
                     // this.shopPageListSum.push([])
                 })
-                console.log(this.allShopInfoList)
+                // console.log(this.allShopInfoList)
                 wx.hideLoading()
                 this.block = true;
                 this.$store.dispatch('backIndex', false)
@@ -550,7 +554,7 @@
                         this.lisHeight = Math.round(res[0].height);
                         this.getRightToTop(this.lisHeight)
                     })
-                }, 0)
+                }, 200)
                 return;
                 // console.log(this.shopPageIndex)
                 //获取分类以及分页
@@ -595,6 +599,30 @@
                 //     this.shopPageInfo(this.itemId, index)
                 // }
                 this.selected = index;
+                this.selectedId = this.allShopInfoList[index].id;
+                // return;
+                let obj = this.getRightToTop(this.lisHeight)
+                let leftItemHeight;
+                setTimeout(_ => {
+                    let query = wx.createSelectorQuery();
+                    query.select('.list_item_l').boundingClientRect()
+                    query.exec(res => {
+                        leftItemHeight = Math.round(res[0].height);
+                        // console.log(leftItemHeight)
+                        for (let i = 0; i < this.allShopInfoList.length; i++) {
+                            let top = obj[this.allShopInfoList[i].id];
+                            let bot = obj[this.allShopInfoList[i + 1] ? this.allShopInfoList[i + 1].id : 'id9999'];
+                            if (this.scrollTop < bot && this.scrollTop >= top) {
+                                if (this.allShopInfoList[index].GoodsInfo.length * this.lisHeight > this.winHeight) {
+                                    // console.log('点击高度大于内容区')
+                                    this.selectedId = this.allShopInfoList[index].id;
+                                } else {
+                                    // console.log('点击高度小于内容区')
+                                }
+                            }
+                        }
+                    })
+                }, 20)
             },
             //单项分类商品信息获取  index默认为0  select={}
             shopPageInfo(id, index = 0, select = {
@@ -749,9 +777,9 @@
             },
             async requireImg() {
                 this.QrCodeUrl = await this.downImg(this.QrCodeUrl)
-                this.Logo = await this.downImg(this.Logo)
-                this.minShopLogo = await this.downImg(this.shopInfoList.Logo + '?x-oss-process=image/resize,h_50/rounded-corners,r_10');
-                this.shareBg = await this.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/shareCard.png?x-oss-process=image/resize,w_500/format,jpg');
+                // this.Logo = await this.downImg(this.Logo)
+                this.minShopLogo = await this.downImg(this.shopInfoList.Logo + '?x-oss-process=image/resize,w_200/format,jpg');
+                this.shareBg = await this.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/shop-card-bg.png');
                 this.drawCanvas();
             },
             /* 绘制canvas */
@@ -771,24 +799,24 @@
                 // 屏幕系数比，以设计稿375*667（iphone7）为例
                 let XS = windowWidth / 375;
                 const ctx = wx.createCanvasContext('myCanvas');
-                // ctx.setFillStyle('#f1f1f1')
+                ctx.setFillStyle('#fff')
                 ctx.fillRect(0, 0, 339 * XS, 522 * XS)
                 /* 背景图 */
-                ctx.drawImage(this.shareBg, 0 * XS, 0 * XS, 339 * XS, 522 * XS)
-                /* 小程序logo */
-                ctx.drawImage(this.Logo, 13 * XS, 12 * XS, 34 * XS, 34 * XS)
-                ctx.setFontSize(13 * XS);
-                ctx.setFillStyle('#1a1a1a')
-                ctx.fillText('足不出户 随意享购全城店铺', 55 * XS, 32 * XS);
-                /* 店铺logo图片 */
-                ctx.drawImage(this.minShopLogo, 160 * XS, 400 * XS, 20 * XS, 20 * XS)
-                /* 二维码 */
-                ctx.drawImage(this.QrCodeUrl, 77 * XS, 197 * XS, 185 * XS, 185 * XS)
-                /* 店铺名字 */
-                ctx.setFontSize(20 * XS);
-                ctx.setFillStyle('#333')
+                ctx.drawImage(this.shareBg, 0 * XS, 0 * XS, 280 * XS, 466 * XS)
+                /* 店铺logo */
+                ctx.save()
+                ctx.beginPath()
+                ctx.arc((116 + 44 / 2) * XS, (42 + 44 / 2) * XS, (44 * XS) / 2, 0, 2 * Math.PI)
+                ctx.clip()
+                ctx.drawImage(this.minShopLogo, 116 * XS, 42 * XS, 44 * XS, 44 * XS);
+                ctx.restore()
+                //店铺名字
+                ctx.setFontSize(14 * XS);
+                ctx.setFillStyle('#4c2901')
                 ctx.setTextAlign('center');
-                this.fontLineFeed(ctx, this.shopInfoList.ShopName, 18 * XS, 18 * XS, 175 * XS, 428 * XS)
+                this.fontLineFeed(ctx, this.shopInfoList.ShopName, 16, 18 * XS, 138 * XS, 110 * XS)
+                /* 二维码 */
+                ctx.drawImage(this.QrCodeUrl, 86 * XS, 242 * XS, 108 * XS, 108 * XS)
                 ctx.draw()
                 wx.hideLoading()
                 this.shareCard = true; //分享图展示
@@ -811,11 +839,16 @@
                 for (let i = 0, len = str.length / splitLen; i < len; i++) {
                     strArr.push(str.substring(i * splitLen, i * splitLen + splitLen));
                 }
-                let s = 0;
-                for (let j = 0, len = strArr.length; j < len; j++) {
-                    s = s + strHeight;
-                    ctx.fillText(strArr[j], x, y + s);
+                if (str.length > splitLen) {
+                    strArr[0] = strArr[0] + '...';
                 }
+                // console.log(strArr[0])
+                // let s = 0;
+                // for (let j = 0, len = strArr.length; j < len; j++) {
+                //     s = s + strHeight;
+                //     ctx.fillText(strArr[j], x, y + s);
+                // }
+                ctx.fillText(strArr[0], x, y);
             },
             /* 保存图片 */
             saveImg() {
@@ -1390,8 +1423,10 @@
                 return obj
             },
             rightScroll(e) { // 监听右侧的滚动事件与 getRightToTop 的循环作对比 从而判断当前可视区域为第几类，从而渲染左侧的对应类
+                this.scrollTop = e.mp.detail.scrollTop;
                 let obj = this.getRightToTop(this.lisHeight)
-                // console.log(this.lisHeight, obj, e.mp.detail.scrollTop)
+                // console.log(obj, 'scrollTop' + this.scrollTop)
+                // return
                 let leftItemHeight;
                 setTimeout(_ => {
                     let query = wx.createSelectorQuery();
@@ -1402,14 +1437,19 @@
                         for (let i = 0; i < this.allShopInfoList.length; i++) {
                             let top = obj[this.allShopInfoList[i].id];
                             let bot = obj[this.allShopInfoList[i + 1] ? this.allShopInfoList[i + 1].id : 'id9999'];
-                            if (e.mp.detail.scrollTop < bot && e.mp.detail.scrollTop >= top) {
-                                // console.log(this.allShopInfoList[i].id)
-                                this.leftToTop = leftItemHeight * i;
-                                this.selected = i;
+                            if (this.scrollTop < bot && this.scrollTop >= top) {
+                                if (this.allShopInfoList[i].GoodsInfo.length * this.lisHeight > this.winHeight) {
+                                    // console.log('高度大于内容区')
+                                    this.selected = i;
+                                    this.leftToTop = leftItemHeight * i;
+                                } else {
+                                    // console.log('高度小于内容区')
+                                }
+                                // console.log(this.allShopInfoList[i].id, this.selected)
                             }
                         }
                     })
-                }, 0)
+                }, 200)
             },
         },
         computed: {
@@ -1478,6 +1518,7 @@
                 return this.shopInfoList.OpenState == 0 ? false : true;
             }
         },
+        watch: {},
         onUnload() {
             //删除地址信息
             wx.getStorageSync('selectAddress') && wx.removeStorageSync('selectAddress');
@@ -2373,24 +2414,8 @@
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.7);
-        padding: 10rpx 36rpx 0;
         box-sizing: border-box;
         z-index: 50;
-        .icon_close {
-            position: absolute;
-            top: 25rpx;
-            right: 25rpx;
-            z-index: 100;
-        }
-        .saveBtn {
-            position: absolute;
-            left: 50%;
-            top: 919rpx;
-            width: 290rpx;
-            height: 73rpx;
-            z-index: 100;
-            transform: translateX(-50%);
-        }
         .shareCover {
             position: absolute;
             top: 0;
@@ -2398,60 +2423,38 @@
             width: 100%;
             height: 100%;
         }
+        .icon_close {
+            position: absolute;
+            top: -22rpx;
+            right: -18rpx;
+            z-index: 100;
+        }
+        .saveBtn {
+            position: absolute;
+            bottom: 30rpx;
+            left: 30rpx;
+            width: 556rpx;
+            height: 88rpx;
+            z-index: 100;
+        }
         .main {
             border-radius: 10rpx;
-            background: #f1f1f1;
-            position: relative;
-            width: 339px;
-            height: 522px;
-            overflow: hidden;
-            position: fixed;
+            background: #f2f2f2;
+            width: 616rpx;
+            height: 1118rpx;
+            position: absolute;
             top: 0;
             left: 0;
             bottom: 0;
             right: 0;
             margin: auto;
-            .title {
-                padding: 30rpx 0;
-                position: relative;
-                img {
-                    width: 42rpx;
-                    height: 42rpx;
-                    margin-right: 14rpx;
-                }
-                .namea {
-                    font-size: 28rpx;
-                    color: #010101;
-                }
-            }
-            img.goodsImg {
-                width: 618rpx;
-                height: 618rpx;
-                margin-bottom: 35rpx;
-            }
-            .ft {
-                .info {
-                    padding-top: 26rpx;
-                    padding-right: 44rpx;
-                    border-right: 1rpx solid #ebebeb;
-                    .name {
-                        font-size: 28rpx;
-                        color: #000;
-                    }
-                    .detail {
-                        font-size: 24rpx;
-                        color: #777;
-                    }
-                }
-                .qr {
-                    width: 240rpx;
-                    height: 240rpx;
-                    img {
-                        width: 100%;
-                        height: 100%;
-                    }
-                }
-            }
+            padding: 30rpx;
+            box-sizing: border-box;
+        }
+        canvas {
+            background: #fff;
+            width: 100%;
+            height: 932rpx;
         }
     }
     .format {

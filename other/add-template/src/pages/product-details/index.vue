@@ -709,6 +709,7 @@
             }
             .price_sum {
                 position: relative;
+                padding-bottom: 30rpx;
                 .discount_shop {
                     display: flex;
                     .original_price {
@@ -767,7 +768,7 @@
                 .select_rule {
                     position: absolute;
                     right: 27rpx;
-                    bottom: 16rpx;
+                    bottom: 46rpx;
                     font-size: 24rpx;
                     color: #fff;
                     height: 42rpx;

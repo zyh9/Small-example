@@ -6,7 +6,7 @@ const QQMap = new QQMapWX({
 })
 
 //线上地址
-// const baseUrl = 'https://stunnercustomer.uupt.com';
+const baseUrl = 'https://stunnercustomer.uupt.com';
 //光明地址
 // const baseUrl = 'http://192.168.6.180:8070'; 
 //鹏浩地址
@@ -15,12 +15,12 @@ const QQMap = new QQMapWX({
 //袁沼
 // const baseUrl = 'http://192.168.6.66:6001';
 //海涛
-const baseUrl = 'http://192.168.6.156:50654';
+// const baseUrl = 'http://192.168.6.156:50654';
 
 const commonHeader = _ => {
   //headers每次必传数据存放位置
   return {
-    // v: '1.1.7.2',
+    // v: '1.1.8',
     appid: '1',
     token: wx.getStorageSync('loginInfo').Token || '',
     qrcode: wx.setStorageSync('scene', this.scene) || ''
@@ -92,12 +92,14 @@ const post = (opt = {}) => {
 }
 
 //地理位置获取
-const qqMapInfo = _ => {
+const qqMapInfo = none => {
   return new Promise((resolve, reject) => {
-    wx.showLoading({
-      title: '加载中',
-      mask: true,
-    })
+    if(none == undefined){
+      wx.showLoading({
+        title: '加载中',
+        mask: true,
+      })
+    }
     wx.getLocation({
       type: 'wgs84',
       success: res => {
@@ -221,6 +223,7 @@ const openTime = str => {
     return [`${a}:${b}-${c}:${d}`];
   }
 }
+
 ///格式化时间  date时间对象  fmt时间格式 如yyyy/MM/dd hh:mm:ss
 const FmtTime = (date, fmt) => {
   var o = {
