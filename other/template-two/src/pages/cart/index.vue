@@ -35,7 +35,7 @@
         <p class="edit_cart" @click="deleteState = !deleteState">{{deleteState?'完成':'编辑'}}</p>
       </div>
       <div class="cart_bot" v-if="cartListItem.length">
-        <p class="sum_money" v-if="openState==1&&deleteState==false"><span>合计:</span>¥{{count}}</p>
+        <p class="sum_money" v-if="openState==1&&deleteState==false"><span>合计 :</span><i>¥</i>{{count}}</p>
         <p class="sum_money" v-if="deleteState==true"></p>
         <button class="sum" plain="true" v-if="openState==1&&deleteState==false" @click="account" :class="{no_active:!sumNum}">结算</button>
         <div class="del_cart" v-if="deleteState==true" @click="delList">
@@ -85,8 +85,9 @@
       // 先获取缓存数据
       let cartListSum = wx.getStorageSync('cartListSum') || [];
       //再找到对应店铺
-      let cartItem = cartListSum.filter(e => e.ShopId == wx.getStorageSync('shopInfo').ShopId);
+      let cartItem = cartListSum.filter(e => e.ShopId == (wx.getStorageSync('shopInfo').ShopId || wx.setStorageSync('ShopId')));
       this.cartListItem = cartItem.length ? cartItem[0].cartList : [];
+      // console.log(cartItem)
       this.cartListItem = this.cartListItem.filter(e => e.num != 0);
       // 再设置缓存数据
       wx.setStorageSync('cartListSum', cartListSum);
@@ -164,6 +165,7 @@
             content: '确认从购物车中删除选中的商品',
             confirmText: '删除',
             cancelText: '再想一下',
+            confirmColor: '#ff4d3a',
             success: res => {
               if (res.confirm) {
                 this.cartListItem = this.cartListItem.filter(e => e.check == false);
@@ -500,6 +502,7 @@
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+            width: 365rpx;
           }
           .lis_shop_norm {
             height: 42rpx;
@@ -617,7 +620,7 @@
       right: 0;
       left: 0;
       z-index: 5;
-      padding: 0 35rpx;
+      padding-left: 35rpx;
       box-sizing: border-box;
       z-index: 5;
       &:after {
@@ -633,7 +636,7 @@
         transform-origin: 0 0;
       }
       .sum_money {
-        font-size: 36rpx;
+        font-size: 46rpx;
         color: #1a1a1a;
         height: 100%;
         flex: 1;
@@ -644,15 +647,18 @@
           font-size: 28rpx;
           margin-right: 10rpx;
         }
+        i {
+          font-size: 38rpx;
+          margin-right: 6rpx;
+        }
       }
       .sum {
-        width: 184rpx;
-        height: 64rpx;
+        width: 230rpx;
+        height: 100rpx;
         background-color: #ff4d3a;
-        border-radius: 8rpx;
-        font-size: 24rpx;
+        font-size: 32rpx;
         color: #fff;
-        line-height: 64rpx;
+        line-height: 100rpx;
         text-align: center;
         border: 0;
       }
@@ -668,6 +674,7 @@
         border-radius: 6rpx;
         border: 1px solid #ff4d3a;
         box-sizing: border-box;
+        margin-right: 36rpx;
         p {
           margin-left: 6rpx;
           font-size: 24rpx;
@@ -683,6 +690,7 @@
         align-items: center;
         justify-content: flex-end;
         line-height: 100rpx;
+        padding-right: 36rpx;
       }
     }
   }

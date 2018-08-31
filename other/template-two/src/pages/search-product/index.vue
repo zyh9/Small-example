@@ -91,12 +91,12 @@
                             PageIndex: this.page
                         }
                     }).then(res => {
+                        this.tips = res.Body.GoodsList.length ? false : true;
                         if (res.Body.GoodsList.length < 10 && this.page > 1) {
                             this.quest = false;
                             this.nomore = true;
                         }
                         this.productList.push(...res.Body.GoodsList);
-                        if (this.productList.length == 0) this.tips = true;
                     }).catch(err => {
                         this.msg(err.Msg)
                     })

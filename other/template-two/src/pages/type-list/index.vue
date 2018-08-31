@@ -1,5 +1,5 @@
 <template>
-  <div class="type_list">
+  <div class="type_list fade_in" v-if="block">
     <h3 class="title">分类列表</h3>
     <div class="options" v-for="(v,i) in typeList" :key="i" @click="openLis(v)">
       <p>{{v.Name}}</p>
@@ -11,11 +11,17 @@
   export default {
     data() {
       return {
-        typeList: []
+        typeList: [],
+        block: false,
       }
     },
     onLoad() {
       this.typeList = [];
+      this.block = false;
+      wx.showLoading({
+        title: '加载中',
+        mask: true
+      })
     },
     onReady() {
       this.getTypeList()
@@ -28,6 +34,8 @@
             ShopId: String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
           }
         }).then(res => {
+          wx.hideLoading();
+          this.block = true;
           this.typeList = res.Body;
         }).catch(err => {
           this.msg(err.Msg)

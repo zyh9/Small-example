@@ -21,7 +21,7 @@
     </div>
     <div class="options other itemBor">
       <p class="potions_text"><i class="icon"></i></p>
-      <input type="text" placeholder-class='placeholderStyle' maxlength="24" placeholder="详细地址，例1号楼2层201室" v-model="note">
+      <input type="text" placeholder-class='placeholderStyle' maxlength="50" placeholder="详细地址，例1号楼2层201室" v-model="note">
     </div>
     <div class="add_btn" @click="addAddress">保存</div>
   </div>
@@ -31,8 +31,6 @@
   export default {
     data() {
       return {
-        region: ['点击选择', '', ''],
-        customItem: '请选择',
         note: '',
         userInfo: {},
         address: {
@@ -48,6 +46,7 @@
       this.note = '';
       this.userInfo = wx.getStorageSync('userInfo');
       this.address = wx.getStorageSync('address') || {};
+      console.log(this.address)
       this.note = this.address.UserNote;
       this.title = this.$root.$mp.query.type == 1 ? '新增地址' : '修改地址';
     },
@@ -93,15 +92,12 @@
           return false
         };
       },
-      regionChange(e) {
-        this.region = e.target.value;
-      },
       select() {
         wx.setStorageSync('address', Object.assign({}, this.address, {
           UserNote: this.note
         }));
         wx.navigateTo({
-          url: '/pages/select-address/main'
+          url: '/pages/select-address/main?type=1'
         })
       },
       addAddress() {
@@ -172,10 +168,6 @@
     },
     components: {},
     watch: {
-      region: function(newVal, oldVal) {
-        let region = newVal.filter(e => e != "请选择")
-        region.length < 3 && this.msg('收货地址信息还没填完整哦');
-      },
       tel: function(newVal, oldVal) {
         this.address.LinkManMobile = newVal.replace(/[^\d]/g, '');
       },

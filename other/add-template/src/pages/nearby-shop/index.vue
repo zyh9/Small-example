@@ -85,8 +85,9 @@
             })
         },
         onShow() {
-            //搜索位置获取
+            //搜索位置获取，去除无定位结构
             if (wx.getStorageSync('QQmap') && !wx.getStorageSync('QQmap').mapGet) {
+                this.noPos = false;
                 this.mapInfo = wx.getStorageSync('QQmap')
                 this.page = 1;
                 this.nomore = false;

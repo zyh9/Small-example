@@ -135,7 +135,7 @@
                         res.Body.forEach(e => {
                             e.Id = 0;
                             e.type = 2;
-                            e.LinkMan = e.LinkMan==""?'未填写':e.LinkMan;
+                            e.LinkMan = e.LinkMan == "" ? '未填写' : e.LinkMan;
                         })
                         // this.msg('已同步UU跑腿地址')
                         this.uuptList = res.Body;
@@ -170,22 +170,35 @@
             },
             //删除某条地址
             delAddress(v) {
-                this.util.post({
-                    url: '/api/Customer/PersonerCenter/DeleteAddress',
-                    data: {
-                        AddressId: v.Id
+                wx.showModal({
+                    title: '删除确认',
+                    content: '确定删除该收获地址吗？',
+                    confirmText: '删除',
+                    cancelText: '取消',
+                    confirmColor: '#ff4d3a',
+                    success: res => {
+                        if (res.confirm) {
+                            this.util.post({
+                                url: '/api/Customer/PersonerCenter/DeleteAddress',
+                                data: {
+                                    AddressId: v.Id
+                                }
+                            }).then(res => {
+                                if (res.State == 1) {
+                                    this.msg('删除成功')
+                                    setTimeout(_ => {
+                                        this.addressInfo();
+                                    }, 400)
+                                } else {
+                                    this.msg(res.Msg);
+                                }
+                            }).catch(err => {
+                                this.msg(err);
+                            })
+                        } else if (res.cancel) {
+                            console.log('取消')
+                        }
                     }
-                }).then(res => {
-                    if (res.State == 1) {
-                        this.msg('删除成功')
-                        setTimeout(_ => {
-                            this.addressInfo();
-                        }, 400)
-                    } else {
-                        this.msg(res.Msg);
-                    }
-                }).catch(err => {
-                    this.msg(err);
                 })
             },
             touchS(e) {

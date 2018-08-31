@@ -21,7 +21,8 @@
         onReady() { //进入页面触发，回退不触发
         },
         onShow() { //页面渲染就会触发
-            this.util.qqMapInfo().then(res => {
+            this.util.wxLogin().then(res => {
+                // console.log(res)
                 //分享有参数，才去解析
                 if (this.scene) { //太阳码跳转
                     console.log('太阳码跳转')

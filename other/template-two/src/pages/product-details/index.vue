@@ -1,6 +1,6 @@
 <template>
     <div class="product-details" v-if="block">
-        <scroll-view v-if="!noShopInfo" scroll-y="true" style="height: 100%;padding:0  35rpx 110rpx;box-sizing:border-box;" lower-threshold="60" @scrolltolower="scrollHandler">
+        <scroll-view v-if="!noShopInfo" scroll-y="true" style="height: 100%;padding-bottom: 110rpx;box-sizing:border-box;" lower-threshold="60" @scrolltolower="scrollHandler">
             <div class="shop_top">
                 <img :src="goodsInfo.GoodMasterPic?goodsInfo.GoodMasterPic+'?x-oss-process=image/resize,w_1000/format,jpg':''" alt="" class="shop_img fade_in">
                 <i class="icon icon_goodsShare" @click="share"></i>
@@ -68,12 +68,11 @@
         <!-- 分享保存图片 -->
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
-                <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;position:absolute;top:0;left:0;"> 
-                                                                                                                                                                                            <cover-view class="shareCover" >
-                                                                                                                                                                                            <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                                                                                                                            <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                                                                                                                            </cover-view>
-                                                                                                                                                                                                        </canvas>
+                <canvas canvas-id='myCanvas'></canvas>
+                <div class="shareCover">
+                    <img @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
+                    <img @click='saveImg' class="saveBtn" src="../../../static/saveImg.png" />
+                </div>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -143,7 +142,10 @@
             //options 中的 scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
             this.scene = options.scene;
             wx.setStorageSync('scene', this.scene);
-            wx.setStorageSync('ShopId', options.ShopId)
+            //获取信息
+            if (options.ShopId) {
+                wx.setStorageSync('ShopId', options.ShopId)
+            }
             this.block = false;
             wx.showLoading({
                 title: '加载中',
@@ -161,11 +163,12 @@
                 this.getGoodsInfo()
             } else {
                 console.log('走分享')
-                this.util.qqMapInfo().then(res => {
+                this.util.wxLogin().then(res => {
+                    // console.log(res)
                     if (this.scene) {
                         this.sceneInfo()
                     } else {
-                        this.getGoodsInfo()
+                        this.getShopInfo()
                     }
                 }).catch(err => {
                     console.log(err)
@@ -188,7 +191,7 @@
             // 先获取缓存数据
             let cartListSum = wx.getStorageSync('cartListSum') || [];
             //再找到对应店铺
-            let cartItem = cartListSum.filter(e => e.ShopId == wx.getStorageSync('shopInfo').ShopId);
+            let cartItem = cartListSum.filter(e => e.ShopId == (wx.getStorageSync('shopInfo').ShopId || wx.setStorageSync('ShopId')));
             this.cartListItem = cartItem.length ? cartItem[0].cartList : [];
             // console.log(this.cartListItem, '进入子页面获取信息')
         },
@@ -215,8 +218,8 @@
                         this.botTips = '进入购物车结算';
                     }
                     wx.setStorageSync('ShopId', this.ShopId)
-                    //获取商品信息
-                    this.getGoodsInfo()
+                    //获取店铺=>商品信息
+                    this.getShopInfo()
                 }).catch(err => {
                     this.msg(err.Msg)
                 })
@@ -415,7 +418,7 @@
                     url: '/api/Customer/Common/CreateWxOpenQrCode',
                     data: {
                         CodeType: 1,
-                        CodeValue: this.$store.state.mutations.qrcode || this.$root.$mp.query.GoodId || '', //对应的商品id
+                        CodeValue: this.$root.$mp.query.GoodId || this.GoodId || '', //对应的商品id
                         RequestType: 2
                     }
                 }).then(res => {
@@ -455,6 +458,7 @@
             },
             /* 绘制canvas */
             drawCanvas() {
+                let details = this.goodsInfo.GoodBrief ? this.goodsInfo.GoodBrief : '欢迎光临本店铺，有优惠信息会及时通知您哦......';
                 let windowWidth = '';
                 let windowHeight = '';
                 wx.getSystemInfo({
@@ -467,31 +471,48 @@
                 let XS = windowWidth / 375;
                 const ctx = wx.createCanvasContext('myCanvas');
                 ctx.setFillStyle('#fff')
-                ctx.fillRect(0, 0, 339 * XS, 522 * XS)
+                ctx.fillRect(0, 0, 308 * XS, 512 * XS)
                 /* 店铺logo图片 */
-                ctx.drawImage(this.minShopLogo, 15 * XS, 15 * XS, 21 * XS, 21 * XS)
+                ctx.drawImage(this.minShopLogo, 16 * XS, 16 * XS, 21 * XS, 21 * XS)
                 /* 店铺名称  */
                 ctx.setFontSize(14 * XS);
                 ctx.setFillStyle('#010101')
-                ctx.fillText(this.goodsInfo.ShopName, 43 * XS, 30 * XS)
+                ctx.fillText(this.goodsInfo.ShopName, 42 * XS, 30 * XS)
                 /* 商品图 */
-                ctx.drawImage(this.minGoodsPic, 15 * XS, 51 * XS, 309 * XS, 309 * XS)
+                ctx.drawImage(this.minGoodsPic, 16 * XS, 50 * XS, 248 * XS, 248 * XS)
                 /* 商品名 */
                 ctx.setFontSize(14 * XS);
                 ctx.setFillStyle('#000')
-                this.fontLineFeed(ctx, this.goodsInfo.GoodName, 18 * XS, 18 * XS, 15 * XS, 389 * XS)
+                this.fontLineFeed(ctx, this.goodsInfo.GoodName, 20, 18 * XS, 16 * XS, 320 * XS)
                 /* 商品描述 */
                 ctx.setFontSize(12 * XS);
                 ctx.setFillStyle('#777')
-                this.fontLineFeed(ctx, this.goodsInfo.GoodBrief, 12 * XS, 18 * XS, 15 * XS, 415 * XS)
+                this.fontLineFeed(ctx, details, 20, 18 * XS, 15 * XS, 340 * XS)
                 /* 二维码 */
-                ctx.drawImage(this.QrCodeUrl, 205 * XS, 376 * XS, 121 * XS, 124 * XS)
-                /* 线 */
-                ctx.setLineWidth(0.5)
-                ctx.setStrokeStyle('#ebebeb')
-                ctx.lineTo(182 * XS, 390 * XS)
-                ctx.lineTo(182 * XS, 490 * XS)
-                ctx.stroke();
+                ctx.drawImage(this.QrCodeUrl, 175 * XS, 362 * XS, 90 * XS, 90 * XS)
+                //商品售价
+                ctx.setFontSize(18 * XS);
+                ctx.setFillStyle('#ff4d3a')
+                ctx.fillText('¥' + this.goodsInfo.SalesPrice, 16 * XS, 370 * XS);
+                if (this.goodsInfo.GoodType == -1) {
+                    //商品原价
+                    ctx.setFontSize(14 * XS);
+                    ctx.setFillStyle('#999')
+                    ctx.fillText('¥' + this.goodsInfo.OriginalPrice, (String(this.goodsInfo.SalesPrice).length * 16 + 16) * XS, 370 * XS);
+                    //线
+                    ctx.setLineWidth(0.5)
+                    ctx.setStrokeStyle('#999')
+                    ctx.lineTo((String(this.goodsInfo.SalesPrice).length * 16 + 16) * XS, 365 * XS)
+                    ctx.lineTo(((String(this.goodsInfo.SalesPrice).length * 16 + 16) + (String(this.goodsInfo.OriginalPrice).length * 9)) * XS, 365 * XS)
+                    ctx.stroke();
+                }
+                //文字说明
+                ctx.setFontSize(14 * XS);
+                ctx.setFillStyle('#ccc')
+                ctx.fillText('长按识别小程序码', 16 * XS, 406 * XS);
+                ctx.setFontSize(12 * XS);
+                ctx.setFillStyle('#ccc')
+                ctx.fillText('发现一个好物推荐给你呀', 16 * XS, 426 * XS);
                 ctx.draw()
                 wx.hideLoading()
                 this.shareCard = true;
@@ -514,11 +535,16 @@
                 for (let i = 0, len = str.length / splitLen; i < len; i++) {
                     strArr.push(str.substring(i * splitLen, i * splitLen + splitLen));
                 }
-                let s = 0;
-                for (let j = 0, len = strArr.length; j < len; j++) {
-                    s = s + strHeight;
-                    ctx.fillText(strArr[j], x, y + s);
+                if (str.length > splitLen) {
+                    strArr[0] = strArr[0] + '...';
                 }
+                // console.log(strArr[0])
+                // let s = 0;
+                // for (let j = 0, len = strArr.length; j < len; j++) {
+                //     s = s + strHeight;
+                //     ctx.fillText(strArr[j], x, y + s);
+                // }
+                ctx.fillText(strArr[0], x, y);
             },
             /* 保存图片 */
             saveImg() {
@@ -609,6 +635,20 @@
                         this.msg(err.Msg)
                     })
             },
+            getShopInfo() {
+                this.util.post({
+                    url: '/api/Customer/Browse/GetShopInfo',
+                    data: {
+                        shopId: this.$root.$mp.query.ShopId || this.ShopId,
+                    }
+                }).then(res => {
+                    wx.setStorageSync('shopInfo', res.Body)
+                    this.getGoodsInfo()
+                }).catch(err=>{
+                    wx.hideLoading();
+                    this.msg(err.Msg)
+                })
+            },
             goIndex() {
                 if (this.$root.$mp.query.temp == 1 || this.ShopTemplateId == 1) {
                     // console.log('餐饮模板')
@@ -623,7 +663,8 @@
                     }
                 } else {
                     // console.log('电商模板');
-                    wx.navigateTo({
+                    // 防止回退产生未清空购物车缓存的情况  => 做重定向处理
+                    wx.redirectTo({
                         url: `/pages/cart/main`
                     })
                 }
@@ -659,6 +700,7 @@
         overflow: hidden;
         padding-top: 10rpx;
         .shop_top {
+            margin: 0 auto;
             width: 678rpx;
             height: 678rpx;
             position: relative;
@@ -675,7 +717,7 @@
             }
         }
         .info {
-            padding: 50rpx 0 20rpx 0;
+            padding: 50rpx 35rpx 20rpx;
             overflow: hidden;
             .name {
                 font-size: 36rpx;
@@ -685,6 +727,7 @@
             }
             .price_sum {
                 position: relative;
+                padding-bottom: 30rpx;
                 .discount_shop {
                     display: flex;
                     .original_price {
@@ -743,7 +786,7 @@
                 .select_rule {
                     position: absolute;
                     right: 27rpx;
-                    bottom: 16rpx;
+                    bottom: 46rpx;
                     font-size: 24rpx;
                     color: #fff;
                     height: 42rpx;
@@ -893,7 +936,6 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            padding: 10rpx 36rpx 140rpx;
             box-sizing: border-box;
             z-index: 50;
             .shareCover {
@@ -903,35 +945,38 @@
                 width: 100%;
                 height: 100%;
             }
-            .main {
-                position: relative;
-            }
             .icon_close {
                 position: absolute;
-                top: 25rpx;
-                right: 25rpx;
+                top: -22rpx;
+                right: -18rpx;
                 z-index: 100;
             }
             .saveBtn {
                 position: absolute;
-                top: 933rpx;
-                left: 34rpx;
-                width: 290rpx;
-                height: 73rpx;
+                bottom: 30rpx;
+                left: 30rpx;
+                width: 556rpx;
+                height: 88rpx;
                 z-index: 100;
             }
             .main {
                 border-radius: 10rpx;
-                background: #fff;
-                width: 339px;
-                height: 522px;
-                overflow: hidden;
-                position: fixed;
+                background: #f2f2f2;
+                width: 616rpx;
+                height: 1118rpx;
+                position: absolute;
                 top: 0;
                 left: 0;
                 bottom: 0;
                 right: 0;
                 margin: auto;
+                padding: 30rpx;
+                box-sizing: border-box;
+            }
+            canvas {
+                background: #fff;
+                width: 100%;
+                height: 932rpx;
             }
         }
         .spec {

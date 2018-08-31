@@ -1,5 +1,5 @@
 <template>
-    <div class="myCoupon" v-if="block">
+    <div class="myCoupon fade_in" v-if="block">
         <div v-if='nullCouponList.length||couponList.length'>
             <div class="title" v-if="couponList.length"><span>可用优惠券{{couponList.length}}张</span></div>
             <ul class="list" v-if="couponList.length">

@@ -1,5 +1,5 @@
 <template>
-  <div class="vip_info">
+  <div class="vip_info fade_in">
     <div class="options" @click="editName">
       <p>姓名</p>
       <div class="op_right">

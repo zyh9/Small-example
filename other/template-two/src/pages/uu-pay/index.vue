@@ -81,7 +81,7 @@
     methods: {
       getPayInfo() {
         this.util.post({
-          url: '/api/Customer/Order/GetPrePaymentOrder',
+          url: '/api/Customer/Browse/GetPrePaymentOrder',
           data: {
             ShopId: this.uuPayInfo.shopId || String(wx.getStorageSync('shopInfo').ShopId) || wx.getStorageSync('ShopId') || '',
             OrderId: this.uuPayInfo.OrderId ? this.uuPayInfo.OrderId : 0,

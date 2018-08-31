@@ -16,7 +16,7 @@
                     <img class="vip_bg fade_in" :src="info.CardImage?info.CardImage+'?x-oss-process=image/resize,w_600/format,jpg':defaultCard" alt="">
                     <div class="vip_card_info">
                         <img :src="shopLogo?shopLogo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="">
-                        <p class="vip_shop_name">{{info.Name}}</p>
+                        <p class="vip_shop_name">{{shopName}}</p>
                     </div>
                 </div>
                 <img class="qrcode" :src="info.VipCardBarcode" alt="">
@@ -183,6 +183,10 @@
                         font-size: 40rpx;
                         line-height: 72rpx;
                         color: #fff;
+                        width: 365rpx;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
                     }
                     .vip_user_info {
                         overflow: hidden;

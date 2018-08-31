@@ -1,5 +1,5 @@
 <template>
-  <div class="shop_details">
+  <div class="shop_details fade_in">
     <h3 class="title">店铺信息</h3>
     <div class="store_banner details_bor">
       <img :src="shopInfoList.Logo?shopInfoList.Logo+'?x-oss-process=image/resize,w_200/format,jpg':''" alt="" class="shop_img fade_in">
@@ -58,12 +58,11 @@
     </div>
     <div class="saveImg" v-if='shareCard'>
       <div class="main">
-        <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"> 
-                                                                                      <cover-view class="shareCover" >
-                                                                                      <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                      <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                      </cover-view>
-                                                                                      </canvas>
+        <canvas canvas-id='myCanvas'></canvas>
+        <div class="shareCover">
+          <img @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
+          <img @click='saveImg' class="saveBtn" src="../../../static/saveImg.png" />
+        </div>
       </div>
     </div>
   </div>
@@ -187,9 +186,9 @@
       },
       async requireImg() {
         this.QrCodeUrl = await this.downImg(this.QrCodeUrl)
-        this.Logo = await this.downImg(this.Logo)
-        this.minShopLogo = await this.downImg(this.shopInfoList.Logo + '?x-oss-process=image/resize,h_50/rounded-corners,r_10');
-        this.shareBg = await this.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/shareCard.png?x-oss-process=image/resize,w_500/format,jpg');
+        // this.Logo = await this.downImg(this.Logo)
+        this.minShopLogo = await this.downImg(this.shopInfoList.Logo + '?x-oss-process=image/resize,w_200/format,jpg');
+        this.shareBg = await this.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/shop-card-bg.png');
         this.drawCanvas();
       },
       /* 绘制canvas */
@@ -209,24 +208,24 @@
         // 屏幕系数比，以设计稿375*667（iphone7）为例
         let XS = windowWidth / 375;
         const ctx = wx.createCanvasContext('myCanvas');
-        // ctx.setFillStyle('#f1f1f1')
+        ctx.setFillStyle('#fff')
         ctx.fillRect(0, 0, 339 * XS, 522 * XS)
         /* 背景图 */
-        ctx.drawImage(this.shareBg, 0 * XS, 0 * XS, 339 * XS, 522 * XS)
-        /* 小程序logo */
-        ctx.drawImage(this.Logo, 13 * XS, 12 * XS, 34 * XS, 34 * XS)
-        ctx.setFontSize(13 * XS);
-        ctx.setFillStyle('#1a1a1a')
-        ctx.fillText('足不出户 随意享购全城店铺', 55 * XS, 32 * XS);
-        /* 店铺logo图片 */
-        ctx.drawImage(this.minShopLogo, 160 * XS, 400 * XS, 20 * XS, 20 * XS)
-        /* 二维码 */
-        ctx.drawImage(this.QrCodeUrl, 77 * XS, 197 * XS, 185 * XS, 185 * XS)
-        /* 店铺名字 */
-        ctx.setFontSize(20 * XS);
-        ctx.setFillStyle('#333')
+        ctx.drawImage(this.shareBg, 0 * XS, 0 * XS, 280 * XS, 466 * XS)
+        /* 店铺logo */
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc((116 + 44 / 2) * XS, (42 + 44 / 2) * XS, (44 * XS) / 2, 0, 2 * Math.PI)
+        ctx.clip()
+        ctx.drawImage(this.minShopLogo, 116 * XS, 42 * XS, 44 * XS, 44 * XS);
+        ctx.restore()
+        //店铺名字
+        ctx.setFontSize(14 * XS);
+        ctx.setFillStyle('#4c2901')
         ctx.setTextAlign('center');
-        this.fontLineFeed(ctx, this.shopInfoList.ShopName, 18 * XS, 18 * XS, 175 * XS, 428 * XS)
+        this.fontLineFeed(ctx, this.shopInfoList.ShopName, 16, 18 * XS, 138 * XS, 110 * XS)
+        /* 二维码 */
+        ctx.drawImage(this.QrCodeUrl, 86 * XS, 242 * XS, 108 * XS, 108 * XS)
         ctx.draw()
         wx.hideLoading()
         this.shareCard = true; //分享图展示
@@ -249,11 +248,16 @@
         for (let i = 0, len = str.length / splitLen; i < len; i++) {
           strArr.push(str.substring(i * splitLen, i * splitLen + splitLen));
         }
-        let s = 0;
-        for (let j = 0, len = strArr.length; j < len; j++) {
-          s = s + strHeight;
-          ctx.fillText(strArr[j], x, y + s);
+        if (str.length > splitLen) {
+          strArr[0] = strArr[0] + '...';
         }
+        // console.log(strArr[0])
+        // let s = 0;
+        // for (let j = 0, len = strArr.length; j < len; j++) {
+        //     s = s + strHeight;
+        //     ctx.fillText(strArr[j], x, y + s);
+        // }
+        ctx.fillText(strArr[0], x, y);
       },
       /* 保存图片 */
       saveImg() {
@@ -435,7 +439,7 @@
           align-items: center;
           justify-content: center;
           background-color: #f5f5f5;
-          padding: 20rpx 0;
+          height: 84rpx;
           border-radius: 8rpx;
           .icon_info {
             width: 30rpx;
@@ -443,8 +447,8 @@
             margin-right: 8rpx;
           }
           p {
-            font-size: 24rpx;
-            color: #666;
+            font-size: 28rpx;
+            color: #444;
           }
         }
         .shop_tel {
@@ -555,24 +559,8 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
-    padding: 10rpx 36rpx 0;
     box-sizing: border-box;
     z-index: 50;
-    .icon_close {
-      position: absolute;
-      top: 25rpx;
-      right: 25rpx;
-      z-index: 100;
-    }
-    .saveBtn {
-      position: absolute;
-      left: 50%;
-      top: 919rpx;
-      width: 290rpx;
-      height: 73rpx;
-      z-index: 100;
-      transform: translateX(-50%);
-    }
     .shareCover {
       position: absolute;
       top: 0;
@@ -580,60 +568,38 @@
       width: 100%;
       height: 100%;
     }
+    .icon_close {
+      position: absolute;
+      top: -22rpx;
+      right: -18rpx;
+      z-index: 100;
+    }
+    .saveBtn {
+      position: absolute;
+      bottom: 30rpx;
+      left: 30rpx;
+      width: 556rpx;
+      height: 88rpx;
+      z-index: 100;
+    }
     .main {
       border-radius: 10rpx;
-      background: #f1f1f1;
-      position: relative;
-      width: 339px;
-      height: 522px;
-      overflow: hidden;
-      position: fixed;
+      background: #f2f2f2;
+      width: 616rpx;
+      height: 1118rpx;
+      position: absolute;
       top: 0;
       left: 0;
       bottom: 0;
       right: 0;
       margin: auto;
-      .title {
-        padding: 30rpx 0;
-        position: relative;
-        img {
-          width: 42rpx;
-          height: 42rpx;
-          margin-right: 14rpx;
-        }
-        .namea {
-          font-size: 28rpx;
-          color: #010101;
-        }
-      }
-      img.goodsImg {
-        width: 618rpx;
-        height: 618rpx;
-        margin-bottom: 35rpx;
-      }
-      .ft {
-        .info {
-          padding-top: 26rpx;
-          padding-right: 44rpx;
-          border-right: 1rpx solid #ebebeb;
-          .name {
-            font-size: 28rpx;
-            color: #000;
-          }
-          .detail {
-            font-size: 24rpx;
-            color: #777;
-          }
-        }
-        .qr {
-          width: 240rpx;
-          height: 240rpx;
-          img {
-            width: 100%;
-            height: 100%;
-          }
-        }
-      }
+      padding: 30rpx;
+      box-sizing: border-box;
+    }
+    canvas {
+      background: #fff;
+      width: 100%;
+      height: 932rpx;
     }
   }
   .share_mask {

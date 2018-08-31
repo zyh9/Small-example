@@ -7,7 +7,7 @@
     </div>
     <p class="shop_name">{{info.shopName}}</p>
     <div class="btn_list">
-      <div class="btn btn_left" @click="other">逛逛其他店铺</div>
+      <!-- <div class="btn btn_left" @click="other">逛逛其他店铺</div> -->
       <div class="btn btn_right" @click="openShop">进入本店</div>
     </div>
     <img class="bot_img" :src="imgUrl" alt="">

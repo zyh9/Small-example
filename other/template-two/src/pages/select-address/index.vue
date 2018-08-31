@@ -4,7 +4,6 @@
             <div class="pageTitle">选择收货地址</div>
             <div class="address_top set-between">
                 <p class="city">
-                    <!-- {{city}} -->
                     <picker mode="region" @change="bindRegionChange" :value="region" class="citySelect">
                         <view class="picker">
                             {{region[1]}}
@@ -51,20 +50,18 @@
     export default {
         data() {
             return {
-                city: '定位中...',
                 val: '',
                 addressList: [],
                 winWidth: '',
                 winHeight: '',
-                region: [],
-                customItem: '请选择',
+                region: ['-', '请选择', '-'],
                 poiList: [],
             }
         },
         onShow() {
+            // console.log(this.$root.$mp.query.type) 1.添加地址进入  2.无定位搜索地址进入
+            this.region = ['-', '请选择', '-'];
             this.val = '';
-        },
-        mounted() {
             let query = wx.createSelectorQuery();
             query.select('.top').boundingClientRect()
             query.exec(res => {
@@ -77,23 +74,21 @@
                     }
                 })
             })
-            // 实例化API核心类
-            wx.getLocation({
-                type: 'wgs84',
-                success: res => {
-                    let result = gcoord.transform(
-                        [res.longitude, res.latitude], // 经纬度坐标
-                        gcoord.WGS84, // 当前坐标系
-                        gcoord.GCJ02, // 目标坐标系
-                    );
-                    this.QQcityInfo(result)
-                },
-                fail: err => {}
-            })
+            if (wx.getStorageSync('QQmap') && wx.getStorageSync('QQmap').mapGet) {
+                let {
+                    longitude,
+                    latitude
+                } = wx.getStorageSync('QQmap');
+                let result = gcoord.transform(
+                    [longitude, latitude], // 经纬度坐标
+                    gcoord.WGS84, // 当前坐标系
+                    gcoord.GCJ02, // 目标坐标系
+                );
+                this.QQcityInfo(result)
+            }
         },
         methods: {
             bindRegionChange: function(e) {
-                this.city = e.target.value[1];
                 this.region = ['', e.target.value[1] == '县' ? e.target.value[0] : e.target.value[1]];
             },
             //坐标转地址
@@ -114,7 +109,6 @@
                         res.result.pois.sort((a, b) => a.distance - b.distance)
                         this.poiList = res.result.pois;
                         // console.log(this.poiList)
-                        this.city = res.result.address_component.city;
                         this.region = [res.result.address_component.province, res.result.address_component.city, '']
                     },
                     fail: err => {
@@ -135,9 +129,8 @@
             siteInfo() {
                 this.util.QQMap.getSuggestion({
                     keyword: this.val,
-                    region: this.city,
+                    region: this.region[1],
                     success: res => {
-                        console.log(res, '新检索')
                         this.addressList = res.data;
                     },
                     fail: err => {
@@ -159,19 +152,31 @@
                 let {
                     address
                 } = e.currentTarget.dataset;
-                //转换坐标之后的地址
-                const location = this.trans(address.location);
-                // console.log(location)
-                wx.setStorageSync('address', Object.assign({}, wx.getStorageSync('address'), {
-                    name: address.address,
-                    location: {
-                        lat: location[1],
-                        lng: location[0]
-                    },
-                    title: address.title,
-                    city: address.city || address.ad_info.city,
-                    district: address.district || address.ad_info.district
-                }))
+                if (this.$root.$mp.query.type == 1) { //添加地址进入
+                    //转换坐标之后的地址
+                    const location = this.trans(address.location);
+                    // console.log(location)
+                    wx.setStorageSync('address', Object.assign({}, wx.getStorageSync('address'), {
+                        name: address.address,
+                        location: {
+                            lat: location[1],
+                            lng: location[0]
+                        },
+                        title: address.title,
+                        city: address.city || address.ad_info.city,
+                        district: address.district || address.ad_info.district
+                    }))
+                } else { //搜索地址进入
+                    // console.log(address)
+                    //城市 经纬度
+                    let pos = {
+                        city: address.city,
+                        latitude: address.location.lat,
+                        longitude: address.location.lng,
+                        mapGet: false
+                    }
+                    wx.setStorageSync('QQmap', pos)
+                }
                 // return;
                 wx.navigateBack({
                     delta: 1
@@ -180,7 +185,8 @@
         },
         computed: {
             pos: function() {
-                if (this.region[1] != wx.getStorageSync('QQmap').city) {
+                let city = wx.getStorageSync('QQmap').city || '';
+                if (this.region[1] != city) {
                     this.val = '';
                     return false;
                 } else {

@@ -224,15 +224,25 @@ input::-webkit-input-placeholder {
   height: 30rpx;
   background-image: url('https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_edit.png');
 }
+.icon_delete {
+  width: 30rpx;
+  height: 30rpx;
+  background-image: url('../../static/delete.png');
+}
 .icon_addAddress {
   width: 30rpx;
   height: 30rpx;
-  background-image: url('https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_add.png');
+  background-image: url('../../static/add-address.png');
 }
 .icon_synchro {
   width: 30rpx;
   height: 30rpx;
-  background-image: url('https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_synchro.png');
+  background-image: url('../../static/uu-logo.png');
+}
+.icon_no_address {
+  width: 196rpx;
+  height: 148rpx;
+  background-image: url('../../static/no-address.png');
 }
 .icon_userTel {
   width: 41rpx;
@@ -352,6 +362,9 @@ input::-webkit-input-placeholder {
 }
 .icon_dada {
   background-image: url('../../static/dada-img.png');
+}
+.icon_shop_set {
+  background-image: url('../../static/shop-set.png');
 }
 .icon_commodity {
   display: inline-block;
@@ -519,6 +532,26 @@ input::-webkit-input-placeholder {
   width: 40rpx ;
   height: 40rpx;
   background-image: url('../../static/refund.png');
+}
+.icon_no_pos {
+  width: 200rpx ;
+  height: 200rpx;
+  background-image: url('../../static/no-pos.png');
+}
+.icon_look_map {
+  width: 96rpx ;
+  height: 96rpx;
+  background-image: url('../../static/look-map.png');
+}
+.icon_go_index {
+  width: 96rpx ;
+  height: 96rpx;
+  background-image: url('../../static/go-index.png');
+}
+.icon_black_close {
+  width: 96rpx ;
+  height: 96rpx;
+  background-image: url('../../static/black-close.png');
 }
 @keyframes fadeIn {
   0% {

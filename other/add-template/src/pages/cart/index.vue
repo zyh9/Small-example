@@ -85,8 +85,9 @@
       // 先获取缓存数据
       let cartListSum = wx.getStorageSync('cartListSum') || [];
       //再找到对应店铺
-      let cartItem = cartListSum.filter(e => e.ShopId == wx.getStorageSync('shopInfo').ShopId);
+      let cartItem = cartListSum.filter(e => e.ShopId == (wx.getStorageSync('shopInfo').ShopId || wx.setStorageSync('ShopId')));
       this.cartListItem = cartItem.length ? cartItem[0].cartList : [];
+      // console.log(cartItem)
       this.cartListItem = this.cartListItem.filter(e => e.num != 0);
       // 再设置缓存数据
       wx.setStorageSync('cartListSum', cartListSum);
@@ -164,6 +165,7 @@
             content: '确认从购物车中删除选中的商品',
             confirmText: '删除',
             cancelText: '再想一下',
+            confirmColor: '#ff4d3a',
             success: res => {
               if (res.confirm) {
                 this.cartListItem = this.cartListItem.filter(e => e.check == false);
@@ -500,6 +502,7 @@
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+            width: 365rpx;
           }
           .lis_shop_norm {
             height: 42rpx;
@@ -644,7 +647,7 @@
           font-size: 28rpx;
           margin-right: 10rpx;
         }
-        i{
+        i {
           font-size: 38rpx;
           margin-right: 6rpx;
         }

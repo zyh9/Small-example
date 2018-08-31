@@ -337,6 +337,11 @@
                 this.shopInfoSum().catch(err => {
                     wx.hideLoading();
                     this.msg(err.Msg)
+                    setTimeout(_ => {
+                        wx.switchTab({
+                            url: '/pages/nearby-shop/main'
+                        })
+                    }, 1000)
                 })
             } else {
                 console.log('不走分享')

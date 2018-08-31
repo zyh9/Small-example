@@ -20,7 +20,7 @@ const baseUrl = 'https://stunnercustomer.uupt.com';
 const commonHeader = _ => {
   //headers每次必传数据存放位置
   return {
-    // v: '1.1.8',
+    v: '1.1.8.3',
     appid: '1',
     token: wx.getStorageSync('loginInfo').Token || '',
     qrcode: wx.setStorageSync('scene', this.scene) || ''
@@ -100,6 +100,9 @@ const qqMapInfo = none => {
         mask: true,
       })
     }
+    //在进入小程序之前做删除之前缓存操作
+    wx.getStorageSync('shopInfo')&&wx.removeStorageSync('shopInfo');
+    wx.getStorageSync('QQmap')&&wx.removeStorageSync('QQmap');
     wx.getLocation({
       type: 'wgs84',
       success: res => {
@@ -115,9 +118,6 @@ const qqMapInfo = none => {
               latitude: res.latitude,
               longitude: res.longitude,
               mapGet: true
-            }
-            if (wx.getStorageSync('QQmap')) {
-              wx.removeStorageSync('QQmap');
             }
             wx.setStorageSync('QQmap', pos)
             //调用wxLogin接口
@@ -246,6 +246,7 @@ const FmtTime = (date, fmt) => {
 //获取地理位置信息
 const getLoc = _ => {
   return new Promise((resolve, reject) => {
+    wx.getStorageSync('QQmap')&&wx.removeStorageSync('QQmap');
     wx.getLocation({
       type: 'wgs84',
       success: res => {
@@ -261,9 +262,6 @@ const getLoc = _ => {
               latitude: res.latitude,
               longitude: res.longitude,
               mapGet: true
-            }
-            if (wx.getStorageSync('QQmap')) {
-              wx.removeStorageSync('QQmap');
             }
             wx.setStorageSync('QQmap', pos)
             resolve(wx.getStorageSync('QQmap'))
@@ -372,4 +370,4 @@ const phModel = _ => {
   })
 }
 
-export default { get, post, openTime, qqMapInfo, FmtTime, getLoc, downImg, QQMap, phModel, loginModel};
+export default { get, post, openTime, qqMapInfo, FmtTime, getLoc, downImg, QQMap, phModel, loginModel, wxLogin};

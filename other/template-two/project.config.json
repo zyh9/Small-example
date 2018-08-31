@@ -29,8 +29,14 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": -1,
-			"list": []
+			"current": 0,
+			"list": [
+				{
+					"id": -1,
+					"name": "成功",
+					"pathName": "pages/pay-ok/main"
+				}
+			]
 		}
 	}
 }

@@ -21,7 +21,7 @@
     </div>
     <div class="options other itemBor">
       <p class="potions_text"><i class="icon"></i></p>
-      <input type="text" placeholder-class='placeholderStyle' maxlength="24" placeholder="详细地址，例1号楼2层201室" v-model="note">
+      <input type="text" placeholder-class='placeholderStyle' maxlength="50" placeholder="详细地址，例1号楼2层201室" v-model="note">
     </div>
     <div class="add_btn" @click="addAddress">保存</div>
   </div>

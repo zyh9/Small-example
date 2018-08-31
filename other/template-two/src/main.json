@@ -2,7 +2,7 @@
 	"pages": [
 		"pages/my-store/main",
 		"pages/search-product/main",
-    "pages/business/main",
+    	"pages/business/main",
 		"pages/shop-user/main",
 		"pages/my-vip/main",
 		"pages/inp-info/main",

@@ -137,7 +137,7 @@
                     <i class="icon icon_active cart_img" v-if="number>0||number=='99+'"></i>
                     <i v-if="cartListItem.length" class="number">{{number}}</i>
                 </div>
-                <p class="money" v-if="OpenState">¥ {{count}}</p>
+                <p class="money" v-if="OpenState"><span>¥</span>{{count}}</p>
             </div>
             <div class="cart_right">
                 <span class="no_num" v-if="OpenState&&!cartListItem.length">快去挑选商品吧</span>
@@ -213,12 +213,11 @@
         </div>
         <div class="saveImg" v-if='shareCard'>
             <div class="main">
-                <canvas canvas-id='myCanvas' style="background:#fff;width: 100%;height: 100%;"> 
-                                                                                                                                                                                    <cover-view class="shareCover" >
-                                                                                                                                                                                    <cover-image  @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png"/>
-                                                                                                                                                                                    <cover-image @click='saveImg' class="saveBtn" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/saveImg.png"/>
-                                                                                                                                                                                    </cover-view>
-                                                                                                                                                                                    </canvas>
+                <canvas canvas-id='myCanvas'></canvas>
+                <div class="shareCover">
+                    <img @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
+                    <img @click='saveImg' class="saveBtn" src="../../../static/saveImg.png" />
+                </div>
             </div>
         </div>
         <div class="format_mask" @click="formatMask=false,formatLi = 0" v-if="formatMask">
@@ -346,11 +345,6 @@
                     // console.log(err)
                     wx.hideLoading();
                     this.msg(err.Msg)
-                    setTimeout(_ => {
-                        wx.redirectTo({
-                            url: '/pages/my-store/main'
-                        })
-                    }, 1000)
                 })
             }
         },
@@ -734,9 +728,9 @@
             },
             async requireImg() {
                 this.QrCodeUrl = await this.downImg(this.QrCodeUrl)
-                this.Logo = await this.downImg(this.Logo)
-                this.minShopLogo = await this.downImg(this.shopInfoList.Logo + '?x-oss-process=image/resize,h_50/rounded-corners,r_10');
-                this.shareBg = await this.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/shareCard.png?x-oss-process=image/resize,w_500/format,jpg');
+                // this.Logo = await this.downImg(this.Logo)
+                this.minShopLogo = await this.downImg(this.shopInfoList.Logo + '?x-oss-process=image/resize,w_200/format,jpg');
+                this.shareBg = await this.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/shop-card-bg.png');
                 this.drawCanvas();
             },
             /* 绘制canvas */
@@ -756,24 +750,24 @@
                 // 屏幕系数比，以设计稿375*667（iphone7）为例
                 let XS = windowWidth / 375;
                 const ctx = wx.createCanvasContext('myCanvas');
-                // ctx.setFillStyle('#f1f1f1')
+                ctx.setFillStyle('#fff')
                 ctx.fillRect(0, 0, 339 * XS, 522 * XS)
                 /* 背景图 */
-                ctx.drawImage(this.shareBg, 0 * XS, 0 * XS, 339 * XS, 522 * XS)
-                /* 小程序logo */
-                ctx.drawImage(this.Logo, 13 * XS, 12 * XS, 34 * XS, 34 * XS)
-                ctx.setFontSize(13 * XS);
-                ctx.setFillStyle('#1a1a1a')
-                ctx.fillText('足不出户 随意享购全城店铺', 55 * XS, 32 * XS);
-                /* 店铺logo图片 */
-                ctx.drawImage(this.minShopLogo, 160 * XS, 400 * XS, 20 * XS, 20 * XS)
-                /* 二维码 */
-                ctx.drawImage(this.QrCodeUrl, 77 * XS, 197 * XS, 185 * XS, 185 * XS)
-                /* 店铺名字 */
-                ctx.setFontSize(20 * XS);
-                ctx.setFillStyle('#333')
+                ctx.drawImage(this.shareBg, 0 * XS, 0 * XS, 280 * XS, 466 * XS)
+                /* 店铺logo */
+                ctx.save()
+                ctx.beginPath()
+                ctx.arc((116 + 44 / 2) * XS, (42 + 44 / 2) * XS, (44 * XS) / 2, 0, 2 * Math.PI)
+                ctx.clip()
+                ctx.drawImage(this.minShopLogo, 116 * XS, 42 * XS, 44 * XS, 44 * XS);
+                ctx.restore()
+                //店铺名字
+                ctx.setFontSize(14 * XS);
+                ctx.setFillStyle('#4c2901')
                 ctx.setTextAlign('center');
-                this.fontLineFeed(ctx, this.shopInfoList.ShopName, 18 * XS, 18 * XS, 175 * XS, 428 * XS)
+                this.fontLineFeed(ctx, this.shopInfoList.ShopName, 16, 18 * XS, 138 * XS, 110 * XS)
+                /* 二维码 */
+                ctx.drawImage(this.QrCodeUrl, 86 * XS, 242 * XS, 108 * XS, 108 * XS)
                 ctx.draw()
                 wx.hideLoading()
                 this.shareCard = true; //分享图展示
@@ -796,11 +790,16 @@
                 for (let i = 0, len = str.length / splitLen; i < len; i++) {
                     strArr.push(str.substring(i * splitLen, i * splitLen + splitLen));
                 }
-                let s = 0;
-                for (let j = 0, len = strArr.length; j < len; j++) {
-                    s = s + strHeight;
-                    ctx.fillText(strArr[j], x, y + s);
+                if (str.length > splitLen) {
+                    strArr[0] = strArr[0] + '...';
                 }
+                // console.log(strArr[0])
+                // let s = 0;
+                // for (let j = 0, len = strArr.length; j < len; j++) {
+                //     s = s + strHeight;
+                //     ctx.fillText(strArr[j], x, y + s);
+                // }
+                ctx.fillText(strArr[0], x, y);
             },
             /* 保存图片 */
             saveImg() {
@@ -1276,7 +1275,7 @@
                     }, 1000)
                 } else {
                     wx.navigateTo({
-                        url: '/pages/my-order/main?open=0'
+                        url: '/pages/my-order/main?open=2'
                     })
                 }
             },
@@ -1428,6 +1427,10 @@
                 return this.shopInfoList.OpenState == 0 ? false : true;
             }
         },
+        onUnload() {
+            //删除地址信息
+            wx.getStorageSync('selectAddress') && wx.removeStorageSync('selectAddress');
+        }
     }
 </script>
 
@@ -1490,7 +1493,7 @@
                     align-items: center;
                     justify-content: center;
                     background-color: #f5f5f5;
-                    padding: 20rpx 0;
+                    height: 84rpx;
                     border-radius: 8rpx;
                     .icon_info {
                         width: 30rpx;
@@ -1498,8 +1501,8 @@
                         margin-right: 8rpx;
                     }
                     p {
-                        font-size: 24rpx;
-                        color: #666;
+                        font-size: 28rpx;
+                        color: #444;
                     }
                 }
                 .shop_tel {
@@ -1541,10 +1544,11 @@
                 }
             }
             .scroll_left {
-                width: 180rpx;
+                width: 156rpx;
+                background: #f5f5f5;
                 .list_item_l {
-                    padding: 35rpx 28rpx;
-                    color: #444;
+                    padding: 35rpx 20rpx;
+                    color: #666;
                     font-size: 26rpx;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -1574,6 +1578,7 @@
                 .left_select {
                     color: #1d1d1d;
                     font-weight: 700;
+                    background: #fff;
                 }
             }
             .right_con {
@@ -1591,10 +1596,11 @@
                 }
                 .list_item_r {
                     position: relative;
-                    padding: 20rpx 0;
+                    padding: 20rpx 0 20rpx 20rpx;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
+                    box-sizing: border-box;
                     .lis_item_left {
                         flex: 1;
                         display: flex;
@@ -1602,14 +1608,14 @@
                         overflow: hidden;
                         position: relative;
                         .shop_lis_img {
-                            width: 136rpx;
-                            height: 136rpx;
+                            width: 156rpx;
+                            height: 156rpx;
                             margin-right: 20rpx;
                             border-radius: 10rpx;
                         }
                         .shop_lis_mask {
-                            width: 136rpx;
-                            height: 136rpx;
+                            width: 156rpx;
+                            height: 156rpx;
                             border-radius: 10rpx;
                             position: absolute;
                             top: 0;
@@ -1619,20 +1625,20 @@
                             color: #fff;
                             font-size: 26rpx;
                             text-align: center;
-                            line-height: 136rpx;
+                            line-height: 156rpx;
                         }
                         .li_info {
                             flex: 1; // overflow: hidden;
                             position: relative;
+                            height: 156rpx;
                             .shop_name {
                                 color: #1d1d1d;
-                                font-size: 28rpx;
-                                line-height: 60rpx;
-                                transform: translateY(-18%);
+                                font-size: 30rpx;
+                                line-height: 42rpx;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
                                 white-space: nowrap;
-                                width: 300rpx;
+                                width: 330rpx;
                                 font-weight: 700;
                             }
                             .discount {
@@ -1649,21 +1655,20 @@
                                 color: #ff4d3a;
                                 line-height: 60rpx;
                                 font-size: 36rpx;
-                                transform: translateY(20rpx);
+                                transform: translateY(64rpx);
                                 font-weight: 700;
                                 span {
                                     font-size: 24rpx;
                                 }
                             }
                             .discount_shop {
+                                margin-top: 74rpx;
                                 display: flex;
                                 align-items: center;
-                                transform: translateY(10rpx);
                                 .price {
                                     color: #ff4d3a;
-                                    line-height: 60rpx;
+                                    line-height: 42rpx;
                                     font-size: 36rpx;
-                                    transform: translateY(18%);
                                     font-weight: 700;
                                     span {
                                         font-size: 24rpx;
@@ -1672,7 +1677,6 @@
                                 .original_price {
                                     font-size: 22rpx;
                                     color: #ccc;
-                                    transform: translateY(14rpx);
                                     margin-left: 12rpx;
                                     position: relative;
                                     &:after {
@@ -1694,7 +1698,7 @@
                     .count {
                         position: absolute;
                         right: 27rpx;
-                        bottom: 16rpx;
+                        bottom: 24rpx;
                         display: flex;
                         align-items: center;
                         width: 170rpx;
@@ -1713,7 +1717,7 @@
                     .select_rule {
                         position: absolute;
                         right: 27rpx;
-                        bottom: 16rpx;
+                        bottom: 24rpx;
                         font-size: 24rpx;
                         color: #fff;
                         height: 42rpx;
@@ -1933,7 +1937,7 @@
         right: 0;
         left: 0;
         z-index: 30;
-        padding: 0 20rpx;
+        padding-left: 20rpx;
         box-sizing: border-box;
         .cart_left {
             flex-flow: 1;
@@ -1947,7 +1951,7 @@
                 .cart_img {
                     width: 112rpx;
                     height: 112rpx;
-                    transform: translateY(-8%);
+                    transform: translateY(-12%);
                 }
                 .number {
                     position: absolute;
@@ -1968,12 +1972,16 @@
             }
             .money {
                 color: #fff;
-                font-size: 36rpx;
+                font-size: 46rpx;
                 margin-left: 20rpx;
+                span {
+                    margin-right: 6rpx;
+                    font-size: 38rpx;
+                }
             }
         }
         .cart_right {
-            height: 100%;
+            height: 100rpx;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1981,20 +1989,21 @@
                 color: #a3a3a3;
                 font-size: 24rpx;
                 white-space: nowrap;
+                padding-right: 20rpx;
             }
             .no_operate {
                 color: #fff;
                 font-size: 32rpx;
                 white-space: nowrap;
+                padding-right: 20rpx;
             }
             .settlement {
-                width: 184rpx;
-                height: 64rpx;
+                width: 230rpx;
+                height: 100rpx;
                 background-color: #ff4d3a;
-                border-radius: 8rpx;
-                font-size: 24rpx;
+                font-size: 32rpx;
                 color: #fff;
-                line-height: 64rpx;
+                line-height: 100rpx;
                 text-align: center;
             }
         }
@@ -2315,24 +2324,8 @@
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.7);
-        padding: 10rpx 36rpx 0;
         box-sizing: border-box;
         z-index: 50;
-        .icon_close {
-            position: absolute;
-            top: 25rpx;
-            right: 25rpx;
-            z-index: 100;
-        }
-        .saveBtn {
-            position: absolute;
-            left: 50%;
-            top: 919rpx;
-            width: 290rpx;
-            height: 73rpx;
-            z-index: 100;
-            transform: translateX(-50%);
-        }
         .shareCover {
             position: absolute;
             top: 0;
@@ -2340,60 +2333,38 @@
             width: 100%;
             height: 100%;
         }
+        .icon_close {
+            position: absolute;
+            top: -22rpx;
+            right: -18rpx;
+            z-index: 100;
+        }
+        .saveBtn {
+            position: absolute;
+            bottom: 30rpx;
+            left: 30rpx;
+            width: 556rpx;
+            height: 88rpx;
+            z-index: 100;
+        }
         .main {
             border-radius: 10rpx;
-            background: #f1f1f1;
-            position: relative;
-            width: 339px;
-            height: 522px;
-            overflow: hidden;
-            position: fixed;
+            background: #f2f2f2;
+            width: 616rpx;
+            height: 1118rpx;
+            position: absolute;
             top: 0;
             left: 0;
             bottom: 0;
             right: 0;
             margin: auto;
-            .title {
-                padding: 30rpx 0;
-                position: relative;
-                img {
-                    width: 42rpx;
-                    height: 42rpx;
-                    margin-right: 14rpx;
-                }
-                .namea {
-                    font-size: 28rpx;
-                    color: #010101;
-                }
-            }
-            img.goodsImg {
-                width: 618rpx;
-                height: 618rpx;
-                margin-bottom: 35rpx;
-            }
-            .ft {
-                .info {
-                    padding-top: 26rpx;
-                    padding-right: 44rpx;
-                    border-right: 1rpx solid #ebebeb;
-                    .name {
-                        font-size: 28rpx;
-                        color: #000;
-                    }
-                    .detail {
-                        font-size: 24rpx;
-                        color: #777;
-                    }
-                }
-                .qr {
-                    width: 240rpx;
-                    height: 240rpx;
-                    img {
-                        width: 100%;
-                        height: 100%;
-                    }
-                }
-            }
+            padding: 30rpx;
+            box-sizing: border-box;
+        }
+        canvas {
+            background: #fff;
+            width: 100%;
+            height: 932rpx;
         }
     }
     .format {

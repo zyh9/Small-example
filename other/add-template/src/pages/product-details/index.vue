@@ -142,7 +142,10 @@
             //options 中的 scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
             this.scene = options.scene;
             wx.setStorageSync('scene', this.scene);
-            wx.setStorageSync('ShopId', options.ShopId)
+            //获取信息
+            if (options.ShopId) {
+                wx.setStorageSync('ShopId', options.ShopId)
+            }
             this.block = false;
             wx.showLoading({
                 title: '加载中',
@@ -160,11 +163,12 @@
                 this.getGoodsInfo()
             } else {
                 console.log('走分享')
-                this.util.qqMapInfo().then(res => {
+                this.util.wxLogin().then(res => {
+                    // console.log(res)
                     if (this.scene) {
                         this.sceneInfo()
                     } else {
-                        this.getGoodsInfo()
+                        this.getShopInfo()
                     }
                 }).catch(err => {
                     console.log(err)
@@ -187,7 +191,7 @@
             // 先获取缓存数据
             let cartListSum = wx.getStorageSync('cartListSum') || [];
             //再找到对应店铺
-            let cartItem = cartListSum.filter(e => e.ShopId == wx.getStorageSync('shopInfo').ShopId);
+            let cartItem = cartListSum.filter(e => e.ShopId == (wx.getStorageSync('shopInfo').ShopId || wx.setStorageSync('ShopId')));
             this.cartListItem = cartItem.length ? cartItem[0].cartList : [];
             // console.log(this.cartListItem, '进入子页面获取信息')
         },
@@ -214,8 +218,8 @@
                         this.botTips = '进入购物车结算';
                     }
                     wx.setStorageSync('ShopId', this.ShopId)
-                    //获取商品信息
-                    this.getGoodsInfo()
+                    //获取店铺=>商品信息
+                    this.getShopInfo()
                 }).catch(err => {
                     this.msg(err.Msg)
                 })
@@ -630,6 +634,20 @@
                         }
                         this.msg(err.Msg)
                     })
+            },
+            getShopInfo() {
+                this.util.post({
+                    url: '/api/Customer/Browse/GetShopInfo',
+                    data: {
+                        shopId: this.$root.$mp.query.ShopId || this.ShopId,
+                    }
+                }).then(res => {
+                    wx.setStorageSync('shopInfo', res.Body)
+                    this.getGoodsInfo()
+                }).catch(err => {
+                    wx.hideLoading();
+                    this.msg(err.Msg)
+                })
             },
             goIndex() {
                 if (this.$root.$mp.query.temp == 1 || this.ShopTemplateId == 1) {

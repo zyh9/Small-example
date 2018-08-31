@@ -1,11 +1,10 @@
 <template>
-    <div class="order_details" v-if="block">
+    <div class="order_details fade_in" v-if="block">
         <div class="order_con">
-            <div class="map_details" v-if="mapErr&&mapBlock&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2" :style="{height:winHeight+'px'}">
-                <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points=""></map>
-            </div>
             <div class="order_details_top">
-                <h3 class="title" @click="tracking">{{orderInfo.stateText}}<i v-if='orderInfo.State>3||orderInfo.State<0' class="icon icon_arrowRight"></i></h3>
+                <h3 class="title" @click="tracking">{{orderInfo.stateText}}
+                    <i v-if='orderInfo.State>3||orderInfo.State<0' class="icon icon_arrowRight"></i>
+                </h3>
                 <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
                 <ul class="lis_bottom_btn">
                     <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)' @click="cancelOrder">取消订单</li>
@@ -47,14 +46,20 @@
                     </div>
                     <i class="icon icon_tel"></i>
                 </div>
-                <div class="line_box" @click="moveMap" v-if="mapErr&&orderInfo.State>=4&&orderInfo.State<10&&orderInfo.ExpressType!= 2">
-                    <i></i>
-                    <i></i>
+                <!-- 商家自送 -->
+                <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==4&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
+                    <div class="info_left">
+                        <i class="icon icon_shop_set left_icon"></i>
+                        <div class="info_text">
+                            <p class="uu_man_name">商家自送</p>
+                        </div>
+                    </div>
+                    <i class="icon icon_tel"></i>
                 </div>
             </div>
             <div class="order_details_con">
                 <div class="shop_info_sum">
-                    <img class="fade_in" :src="orderInfo.ShopLogo+'?x-oss-process=image/resize,w_100/format,jpg'" alt="">
+                    <!-- <img class="fade_in" :src="orderInfo.ShopLogo+'?x-oss-process=image/resize,w_100/format,jpg'" alt=""> -->
                     <p>{{orderInfo.ShopName}}</p>
                 </div>
                 <ul class="con_order_list">
@@ -62,27 +67,43 @@
                         <img class="fade_in" :src="v.GoodMasterPic+'?x-oss-process=image/resize,w_100/format,jpg'" alt="">
                         <div class="item">
                             <p class="name">{{v.GoodName}}</p>
-                            <p class="spec">{{v.SpecName}}</p>
+                            <p class="spec">{{v.SpecName=="默认"?'':v.SpecName}}</p>
                             <p class="num">X{{v.GoodNum}}</p>
                         </div>
-                        <div class="sum"><span>¥</span>{{v.TotalPrice}}</div>
+                        <div class="sum">
+                            <i class="icon icon_discount_text" v-if="v.GoodType==-1"></i>
+                            <span>¥</span> {{v.TotalPrice}}
+                        </div>
                     </li>
                 </ul>
-                <div class="consume">
+                <div class="consume bor_t">
                     <p class="consume_l">配送费</p>
-                    <p class="consume_r"><i v-if="orderInfo.PaotuiMoneyOff">已减{{orderInfo.PaotuiMoneyOff}}元</i><span>¥</span>{{orderInfo.PaotuiMoney}}</p>
+                    <p class="consume_r">
+                        <i v-if="orderInfo.PaotuiMoneyOff">已减{{orderInfo.PaotuiMoneyOff}}元</i>
+                        <span>¥</span> {{orderInfo.PaotuiMoney}}
+                    </p>
                 </div>
                 <div class="consume">
                     <p class="consume_l">打包费</p>
-                    <p class="consume_r"><span>¥</span>{{orderInfo.PackageMoney}}</p>
+                    <p class="consume_r">
+                        <span>¥</span> {{orderInfo.PackageMoney}}
+                    </p>
                 </div>
                 <div class="consume" v-if="orderInfo.CouponAmountMoney>0">
-                    <p class="consume_l">店铺优惠券</p>
-                    <p class="consume_r color_text">-<span>¥</span>{{orderInfo.CouponAmountMoney}}</p>
+                    <p class="consume_l">
+                        <i class="icon icon_coupon"></i>
+                        <span>店铺优惠券</span>
+                    </p>
+                    <p class="consume_r color_text">
+                        -<span>¥</span> {{orderInfo.CouponAmountMoney}}
+                    </p>
                 </div>
                 <div class="consume_sum">
                     <p class="consume_l">小计</p>
-                    <p class="consume_r"><i v-if="orderInfo.orderSumPrice>0">共节省{{orderInfo.orderSumPrice}}元</i><span>¥</span>{{orderInfo.TotalMoney}}</p>
+                    <p class="consume_r">
+                        <i v-if="orderInfo.orderSumPrice>0">共节省{{orderInfo.orderSumPrice}}元</i>
+                        <span>¥</span> {{orderInfo.TotalMoney}}
+                    </p>
                 </div>
                 <div class="shop_info_list">
                     <div class="shop_tel" @click="tel(orderInfo.ShopMobile)">
@@ -101,7 +122,7 @@
                 </div>
                 <div class="options">
                     <p>支付方式</p>
-                    <p style="color:#1a1a1a;">{{orderInfo.PayType==1?'微信支付':'会员卡支付'}}</p>
+                    <p>{{orderInfo.PayType==1?'微信支付':'会员卡支付'}}</p>
                 </div>
                 <div class="options other">
                     <p>备注</p>
@@ -132,6 +153,10 @@
                     <p>{{orderInfo.OrderCreateTime}}</p>
                 </div>
             </div>
+        </div>
+        <div class="order_btn">
+            <i class="icon icon_look_map" @click="mapOnoff=true" v-if="(orderInfo.ExpressType== 1||orderInfo.ExpressType== 3)&&orderInfo.State>=4&&orderInfo.State<10"></i>
+            <i class="icon icon_go_index" v-if="goIndexBlock" @click="goIndex"></i>
         </div>
         <div class="mask" v-if='isTracking||saleMask' @click='isTracking=false,saleMask=false'></div>
         <div class="orderTracking" v-if='isTracking'>
@@ -184,13 +209,19 @@
         <div class="cancel_mask" v-if="false">
             <div class="cancel_con">
                 <h3>取消确认</h3>
-                <p>跑男已接单，此时取消将扣除跑男上门 费，剩余费用将退回</p>
+                <p>跑男已接单，此时取消将扣除跑男上门费，剩余费用将退回</p>
                 <span class="deduct">本次将扣取上门费：15元</span>
                 <div class="btn_sum">
                     <div class="btn btn_left">确认取消</div>
                     <div class="btn btn_right">再想想</div>
                 </div>
             </div>
+        </div>
+        <div class="map_mask fade_in" :class="{map_mask_active:mapOnoff}">
+            <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points="" :style="{height:winHeight+'px'}"></map>
+            <cover-view class="close_map" @click="mapOnoff=false">
+                <cover-image class="icon_close_map" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/black-close.png" />
+            </cover-view>
         </div>
     </div>
 </template>
@@ -206,10 +237,6 @@
                 block: false,
                 timer: null,
                 markers: [],
-                winHeight: 0,
-                scrollTop: 0,
-                mapBlockHeight: 0,
-                mapBlock: true,
                 latitude: 0,
                 longitude: 0,
                 shopMap: '',
@@ -224,6 +251,10 @@
                     text: '直接申请退款'
                 }],
                 forOrder: false,
+                mapOnoff: false,
+                winHeight: 0, //高度
+                scrollTop: 0, //滚动距离
+                goIndexBlock: false, //回到首页按钮
             }
         },
         onLoad() {
@@ -233,22 +264,20 @@
                 mask: true
             })
             this.forOrder = false;
+            this.mapOnoff = false;
+            this.goIndexBlock = false;
         },
         onReady() {
-            // console.log(this.$mp.query.type)
+            if (this.$mp.query.from && this.$mp.query.from == 1) {
+                //服务通知进入
+                this.goIndexBlock = true;
+            }
             clearInterval(this.timer);
             this.timer = null;
-            this.winHeight = this.mapBlockHeight = 0;
-            this.mapBlock = true;
-            this.mapErr = true;
             this.isTracking = false;
             this.saleMask = false;
             this.tips = '';
             this.orderDetails()
-        },
-        onPageScroll(e) {
-            // console.log(e.scrollTop)
-            this.scrollTop = e.scrollTop;
         },
         methods: {
             /* 订单状态文字 */
@@ -344,30 +373,6 @@
                 wx.redirectTo({
                     url: `/pages/uu-pay/main?OrderId=${this.orderInfo.OrderID}&shopId=${this.orderInfo.ShopID}`
                 })
-                // this.util.post({
-                //     url: '/api/Customer/Order/OrderRePay',
-                //     data: {
-                //         OrderId: this.orderInfo.OrderID,
-                //     }
-                // }).then(res => {
-                //     if (res.State == 1) {
-                //         wx.requestPayment({
-                //             timeStamp: res.Body.timeStamp,
-                //             nonceStr: res.Body.nonceStr,
-                //             package: res.Body.package,
-                //             signType: res.Body.signType,
-                //             paySign: res.Body.paySign,
-                //             success: payres => {
-                //                 this.orderDetails()
-                //             },
-                //             fail: err => {
-                //                 this.msg('您已取消支付')
-                //             }
-                //         })
-                //     }
-                // }).catch(err => {
-                //     this.msg(err.Msg)
-                // })
             },
             async requireImg(ExpressType, State) {
                 this.shopMap = await this.util.downImg('https://otherfiles-ali.uupt.com/Stunner/FE/C/mapicon/shop-map.png');
@@ -392,9 +397,10 @@
                             latitude: this.orderInfo.PaotuiInfo.DriverLastLoc.split(',')[1],
                             longitude: this.orderInfo.PaotuiInfo.DriverLastLoc.split(',')[0],
                         })
-                    } else {
-                        this.mapErr = false;
                     }
+                    //  else {
+                    //     this.mapErr = false;
+                    // }
                 } else {
                     console.log('达达订单');
                     if (this.orderInfo.PaotuiInfo.DriverLastLoc) {
@@ -402,9 +408,10 @@
                             latitude: this.orderInfo.PaotuiInfo.DriverLastLoc.split(',')[1],
                             longitude: this.orderInfo.PaotuiInfo.DriverLastLoc.split(',')[0],
                         })
-                    } else {
-                        this.mapErr = false;
                     }
+                    //  else {
+                    //     this.mapErr = false;
+                    // }
                 }
                 // console.log(ShopLoc, DriverLastLoc, ReceiverLoc)
                 //跑男坐标存在
@@ -433,17 +440,6 @@
                     }];
                     this.latitude = DriverLastLoc.latitude;
                     this.longitude = DriverLastLoc.longitude;
-                    // this.util.QQMap.calculateDistance({
-                    //     mode: 'driving',
-                    //     from: `${DriverLastLoc.latitude},${DriverLastLoc.longitude}`,
-                    //     to: State == 4 ? `${ShopLoc.latitude},${ShopLoc.longitude}` : `${ReceiverLoc.latitude},${ReceiverLoc.longitude}`,
-                    //     success: res => {
-                    //         this.tips = State == 4 ? `跑男距店${res.result.elements[0].distance}m` : `跑男距您${res.result.elements[0].distance}m`;
-                    //     },
-                    //     fail: err => {
-                    //         this.msg('订单距离计算失败')
-                    //     }
-                    // });
                     if (State == 4) {
                         let num = Math.floor(this.distance(DriverLastLoc.latitude, DriverLastLoc.longitude, ShopLoc.latitude, ShopLoc.longitude) * 1000);
                         this.tips = `跑男距店${num}m`;
@@ -451,24 +447,23 @@
                         let num = Math.floor(this.distance(DriverLastLoc.latitude, DriverLastLoc.longitude, ReceiverLoc.latitude, ReceiverLoc.longitude) * 1000);
                         this.tips = `跑男距您${num}m`;
                     };
-                    if (this.mapBlock) {
-                        setTimeout(_ => {
-                            let query = wx.createSelectorQuery();
-                            query.select('.order_details_top').boundingClientRect()
-                            query.exec(res => {
-                                let height = res[0].height;
-                                wx.getSystemInfo({
-                                    success: res => {
-                                        // console.log(res)
-                                        this.winHeight = this.mapBlockHeight = res.windowHeight - height;
-                                    }
-                                })
+                    setTimeout(_ => {
+                        let query = wx.createSelectorQuery();
+                        query.select('.order_details_top').boundingClientRect()
+                        query.exec(res => {
+                            let height = res[0].height;
+                            wx.getSystemInfo({
+                                success: res => {
+                                    // console.log(res)
+                                    this.winHeight = res.windowHeight - height;
+                                }
                             })
-                        }, 200)
-                    }
-                } else {
-                    this.mapErr = false;
+                        })
+                    }, 200)
                 }
+                // else {
+                //     this.mapErr = false;
+                // }
             },
             distance(lat1, lng1, lat2, lng2) {
                 var radLat1 = lat1 * Math.PI / 180.0;
@@ -478,7 +473,7 @@
                 var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
                 s = s * 6378.137;
                 s = Math.round(s * 10000) / 10000;
-                return s * 10
+                return s;
             },
             //订单详情
             orderDetails() {
@@ -496,12 +491,15 @@
                     this.orderInfo.orderSumPrice = (Math.round(this.orderInfo.PaotuiMoneyOff * 10000) + Math.round(this.orderInfo.CouponAmountMoney * 10000)) / 10000;
                     // console.log(this.orderInfo.orderSumPrice)
                     //地图所需信息 （不包含快递和商家自送）
-                    if (this.orderInfo.State >= 4 && this.orderInfo.State < 10 && this.orderInfo.ExpressType != 2 && this.orderInfo.ExpressType != 4) {
+                    if ((this.orderInfo.ExpressType == 1 || this.orderInfo.ExpressType == 3) && this.orderInfo.State >= 4 && this.orderInfo.State < 10) {
                         // console.log(this.util.downImg)
+                        // this.mapOnoff = true;
                         this.forOrder = true;
                         this.requireImg(this.orderInfo.ExpressType, this.orderInfo.State).catch(err => {
                             this.msg('地图信息获取失败')
                         })
+                    } else {
+                        this.mapOnoff = false; //地图去除
                     }
                     //订单跟踪信息 (不包含商家自送)
                     if (this.orderInfo.State > 3 || this.orderInfo.State < 0) {
@@ -527,6 +525,7 @@
                     }
                     if (this.orderInfo.State == 10) {
                         this.tips = '感谢光临，很高兴为您服务';
+                        this.mapOnoff = false; //地图去除
                         this.timer = null;
                         clearInterval(this.timer);
                     }
@@ -590,18 +589,7 @@
             },
             tracking() {
                 if (this.orderInfo.State > 3 || this.orderInfo.State < 0) {
-                    this.winHeight = 0;
-                    this.mapBlock = false;
                     this.isTracking = true;
-                }
-            },
-            moveMap() {
-                if (this.mapBlock && this.winHeight > 0) {
-                    this.winHeight = 0;
-                    this.mapBlock = false;
-                } else {
-                    this.mapBlock = true;
-                    this.winHeight = this.mapBlockHeight;
                 }
             },
             trans(pos) {
@@ -639,6 +627,11 @@
                 }
                 // console.log(location)
                 return location;
+            },
+            goIndex() {
+                wx.redirectTo({
+                    url: `/pages/my-store/main?ShopId=${this.orderInfo.ShopID}&temp=${this.orderInfo.ShopTemplateId}`
+                })
             }
         },
         components: {},
@@ -659,10 +652,6 @@
                     }, 7000)
                 }
             },
-            scrollTop: function(newVal, oldVal) {
-                newVal > this.winHeight && (this.mapBlock = false, this.winHeight = 0);
-                // console.log(newVal, this.mapBlock)
-            }
         },
         onUnload() {
             clearInterval(this.timer)
@@ -696,14 +685,6 @@
             height: 100%;
             overflow-x: hidden;
             overflow-y: scroll;
-        }
-        .map_details {
-            height: 820rpx;
-            transition: all 0.2s ease;
-            map {
-                height: 100%;
-                width: 100%;
-            }
         }
         .order_details_top {
             margin-bottom: 20rpx;
@@ -762,6 +743,9 @@
                     }
                     .info_text {
                         flex: 1;
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
                         .company {
                             font-size: 28rpx;
                             color: #555;
@@ -796,19 +780,34 @@
                 li {
                     width: 184rpx;
                     height: 64rpx;
-                    background-color: #fff;
+                    background: #fff;
                     color: #1a1a1a;
-                    border-radius: 6rpx;
                     font-size: 26rpx;
                     margin-left: 20rpx;
                     line-height: 64rpx;
                     text-align: center;
-                    border: 1px solid #999;
                     box-sizing: border-box;
-                    &.btn_other {
-                        background-color: #ff4d3a;
-                        border: 1px solid #ff4d3a;
-                        color: #fff;
+                    position: relative;
+                    background-color: #fff;
+                    border-radius: 6rpx;
+                    &:before {
+                        content: '';
+                        position: absolute;
+                        top: -50%;
+                        bottom: -50%;
+                        left: -50%;
+                        right: -50%;
+                        -webkit-transform: scale(0.5);
+                        transform: scale(0.5);
+                        border: 1px solid #999;
+                        border-radius: 6rpx;
+                    }
+                }
+                .btn_other {
+                    color: #fff;
+                    background-color: #ff4d3a;
+                    &:before {
+                        border: 0;
                     }
                 }
             } //地图线条
@@ -836,7 +835,7 @@
                 display: flex;
                 justify-content: flex-start;
                 align-items: center;
-                padding: 33rpx 0;
+                padding: 28rpx 0;
                 margin: 0 35rpx;
                 position: relative;
                 &::after {
@@ -864,7 +863,8 @@
                     white-space: nowrap;
                     text-overflow: ellipsis;
                     color: #383838;
-                    font-size: 26rpx;
+                    font-size: 32rpx;
+                    font-weight: 700;
                 }
                 .small {
                     margin-left: 10rpx;
@@ -917,11 +917,16 @@
                         }
                     }
                     .sum {
-                        font-size: 28rpx;
-                        color: #999;
+                        display: flex;
+                        align-items: center;
+                        font-size: 30rpx;
+                        color: #1d1d1d;
                         line-height: 28rpx;
+                        height: 28rpx;
                         span {
-                            font-size: 24rpx;
+                            font-size: 22rpx;
+                            margin-right: 6rpx;
+                            transform: translateY(2rpx);
                         }
                     }
                 }
@@ -932,19 +937,26 @@
                 align-items: center;
                 padding: 27rpx 0;
                 margin: 0 35rpx;
-                .bor_t;
                 .consume_l {
                     font-size: 28rpx;
                     white-space: nowrap;
-                    color: #1d1d1d;
+                    color: #1a1a1a;
+                    display: flex;
+                    align-items: center;
+                    i {
+                        margin-right: 8rpx;
+                    }
                 }
                 .consume_r {
-                    font-size: 28rpx;
+                    display: flex;
+                    align-items: center;
+                    font-size: 30rpx;
                     white-space: nowrap;
-                    color: #999;
+                    color: #1d1d1d;
                     span {
-                        font-size: 24rpx;
-                        display: inline-block;
+                        font-size: 22rpx;
+                        margin-right: 6rpx;
+                        transform: translateY(2rpx);
                     }
                     &.color_text {
                         color: #ff4d3a;
@@ -955,7 +967,6 @@
                     i {
                         font-size: 24rpx;
                         color: #ff4d3a;
-                        display: inline-block;
                         margin-right: 16rpx;
                     }
                 }
@@ -970,19 +981,22 @@
                 .consume_l {
                     font-size: 28rpx;
                     white-space: nowrap;
-                    color: #1d1d1d;
+                    color: #1a1a1a;
                 }
                 .consume_r {
+                    display: flex;
+                    align-items: center;
                     font-size: 36rpx;
                     white-space: nowrap;
-                    color: #1d1d1d;
+                    color: #ff4d3a;
                     span {
                         font-size: 24rpx;
+                        margin-right: 6rpx;
+                        transform: translateY(2rpx);
                     }
                     i {
                         font-size: 24rpx;
-                        color: #b2b2b2;
-                        display: inline-block;
+                        color: #666;
                         margin-right: 16rpx;
                     }
                 }
@@ -998,7 +1012,7 @@
                     align-items: center;
                     justify-content: center;
                     background: #f5f5f5;
-                    padding: 20rpx;
+                    height: 84rpx;
                     border-radius: 8rpx;
                     .icon_info {
                         width: 30rpx;
@@ -1006,8 +1020,8 @@
                         margin-right: 10rpx;
                     }
                     p {
-                        font-size: 24rpx;
-                        color: #666;
+                        font-size: 28rpx;
+                        color: #444;
                     }
                 }
                 .shop_wx {
@@ -1022,11 +1036,24 @@
             padding: 0 35rpx;
             .distribution,
             .order_info {
-                padding: 20rpx 0;
-                .bor_t;
+                padding: 28rpx 0;
+                position: relative;
+                &:after {
+                    content: '';
+                    display: block;
+                    width: 100%;
+                    height: 0;
+                    border-bottom: 1px solid #ebebeb;
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    transform: scaleY(0.5);
+                    transform-origin: 0 0;
+                }
                 p {
-                    font-size: 36rpx;
+                    font-size: 30rpx;
                     color: #010101;
+                    font-weight: 700;
                 }
             }
             .options {
@@ -1034,7 +1061,6 @@
                 justify-content: space-between;
                 align-items: center;
                 padding: 27rpx 0;
-                .bor_t;
                 &.other {
                     align-items: flex-start;
                 }
@@ -1044,13 +1070,13 @@
                     text-align: left;
                     white-space: nowrap;
                     margin-right: 30rpx;
-                    color: #000;
+                    color: #666;
                 }
                 &>p:nth-of-type(2) {
                     font-size: 28rpx;
                     flex: 1;
                     text-align: right;
-                    color: #999;
+                    color: #444;
                     display: -webkit-box !important;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -1067,24 +1093,25 @@
                         font-size: 28rpx;
                         flex: 1;
                         text-align: right;
-                        color: #999;
+                        color: #444;
                         margin-right: 0;
                         margin-right: 20rpx;
                     }
                     span {
-                        font-size: 28rpx;
-                        color: #ff4d3a;
-                        padding-left: 25rpx;
+                        font-size: 24rpx;
+                        color: #444;
+                        padding: 0 10rpx;
                         position: relative;
-                        &:after {
+                        &:before {
                             content: '';
-                            display: block;
-                            width: 1rpx;
-                            height: 16rpx;
-                            background: #d2d2d2;
                             position: absolute;
-                            left: 0;
-                            top: 14rpx;
+                            top: -50%;
+                            bottom: -50%;
+                            left: -50%;
+                            right: -50%;
+                            -webkit-transform: scale(0.5);
+                            transform: scale(0.5);
+                            border: 1px solid #999; // border-radius: 6rpx;
                         }
                     }
                 }
@@ -1312,8 +1339,8 @@
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.6);
             z-index: 10;
             transition: all 0.1s ease;
@@ -1374,6 +1401,49 @@
                     color: #fff;
                     background-color: #ff4d3a;
                 }
+            }
+        }
+        .map_mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            transform: translateY(100%);
+            transition: all 0.4s ease;
+            map {
+                width: 100%;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+            }
+            .close_map {
+                position: absolute;
+                bottom: 60rpx;
+                left: 50%;
+                transform: translateX(-50%);
+                .icon_close_map {
+                    width: 96rpx;
+                    height: 96rpx;
+                }
+            }
+            .map_none {
+                height: 0;
+            }
+        }
+        .map_mask_active {
+            transform: translateY(0%);
+        }
+        .order_btn {
+            position: absolute;
+            right: 36rpx;
+            bottom: 188rpx;
+            display: flex;
+            flex-direction: column;
+            i {
+                margin-top: 40rpx;
             }
         }
     }

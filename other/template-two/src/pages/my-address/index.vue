@@ -1,35 +1,54 @@
 <template>
-    <div class="my_address set-flex set-ver" v-if="block">
-        <div class="pageTitle pl36">我的地址</div>
-        <p class="no_address" v-if="noAddress">您还没有地址，可点击底部按钮进行添加</p>
-        <ul class="my_address_list" v-if="addressList.length">
-            <li v-for="(v,i) in addressList" :key="i" :data-index="i" @touchstart="touchS" @touchmove="touchM" @touchend="touchE" :style="{marginLeft:v.leftVal}">
-                <div class="address_item_left set-align" @click="setAddress(v)">
-                    <i class="icon " v-if='type==1' :class="checkId==v.Id?'icon_checked':'icon_check'"></i>
-                    <div class="address_item_info">
-                        <p class="name">{{v.LinkMan}} {{v.LinkManMobile}}</p>
+    <div class="my_address set-flex set-ver fade_in" v-if="block">
+        <div class="address_con">
+            <div class="pageTitle pl36">我的地址</div>
+            <div v-if="noAddress" class="no_address">
+                <i class="icon icon_no_address"></i>
+                <p class="no_address_text">您还没有地址<br/>可点击底部按钮进行添加</p>
+            </div>
+            <ul class="my_address_list" v-if="addressList.length">
+                <li v-for="(v,i) in addressList" :key="i" :data-index="i">
+                    <div class="address_item_top" @click="setAddress(v,i)">
+                        <div class="user_name_tel">
+                            <div class="item_top_left">
+                                <i class="icon" v-if='type==1' :class="checkId==v.Id?'icon_checked':'icon_check'"></i>
+                                <p>{{v.LinkMan}}</p>
+                            </div>
+                            <p class="name">{{v.LinkManMobile}}</p>
+                        </div>
                         <p class="pos">{{v.AddressTitle}}{{v.UserNote}}</p>
-                        <p class="local_address">{{v.textInfo}}</p>
                     </div>
-                </div>
-                <div class="edit_box" @click='goEdit(v)'><i class="icon  icon_edit"></i></div>
-                <div class="list_item_del" @click='delAddress(v)' :style="{right:-delBtnWidth+'px',width:delBtnWidth+'px'}" :data-item="v">删除</div>
-            </li>
-        </ul>
-        <ul class="my_address_list" v-if="uuptList.length">
-            <li v-for="(v,i) in uuptList" :key="i" :data-index="i">
-                <div class="address_item_left set-align" @click="setAddress(v)">
-                    <i class="icon " v-if='type==1' :class="checkId==v.Id?'icon_checked':'icon_check'"></i>
-                    <div class="address_item_info">
-                        <p class="name">{{v.LinkMan}} {{v.LinkManMobile}}</p>
-                        <p class="pos">{{v.AddressTitle}}{{v.UserNote}}</p>
-                        <p class="local_address">{{v.textInfo}}</p>
+                    <div class="edit_item_bot">
+                        <div class="edit_box" @click='delAddress(v)'><i class="icon icon_delete"></i></div>
+                        <div class="edit_box" @click='goEdit(v)'><i class="icon icon_edit"></i></div>
                     </div>
+                </li>
+            </ul>
+        </div>
+        <div class="address_mask" v-if="maskOnoff">
+            <div class="mask_con">
+                <h3>UU跑腿地址</h3>
+                <ul class="my_address_list" v-if="uuptList.length">
+                    <li v-for="(v,i) in uuptList" :key="i" :data-index="i" @click="setAddress(v,i)" style="margin:0;" :class="{select_bg:uuIndex==i}">
+                        <div class="address_item_top">
+                            <div class="user_name_tel">
+                                <div class="item_top_left">
+                                    <p>{{v.LinkMan}}</p>
+                                </div>
+                                <p class="name">{{v.LinkManMobile}}</p>
+                            </div>
+                            <p class="pos">{{v.AddressTitle}}{{v.UserNote}}</p>
+                        </div>
+                    </li>
+                </ul>
+                <div class="uu_address_bottom">
+                    <p class="set-flex set-align set-center" @click="maskOnoff=false">取消</p>
+                    <p class="set-flex set-align set-center" @click="uuAddress">确定</p>
                 </div>
-            </li>
-        </ul>
+            </div>
+        </div>
         <div class="address_bottom">
-            <p @click="synchronize" class="set-flex set-align set-center"><i class="icon icon_synchro"></i>同步UU跑腿地址</p>
+            <p @click="synchronize" class="set-flex set-align set-center"><i class="icon icon_synchro"></i>使用UU跑腿地址</p>
             <p @click="addAddress" class="set-flex set-align set-center"><i class="icon icon_addAddress"></i>添加新地址</p>
         </div>
     </div>
@@ -39,7 +58,7 @@
     export default {
         data() {
             return {
-                checkId: '',
+                checkId: -1,
                 addressList: [],
                 startX: 0,
                 delBtnWidth: 60,
@@ -48,7 +67,9 @@
                 uupt: true,
                 uuptList: [],
                 block: false,
-                noAddress: false
+                noAddress: false,
+                maskOnoff: false,
+                uuIndex: -1, //跑腿地址索引
             }
         },
         onLoad() {
@@ -60,8 +81,10 @@
         },
         onShow() {
             this.type = this.$root.$mp.query.type;
+            this.block = this.maskOnoff = false;
             this.uupt = true;
-            this.checkId = '';
+            this.uuIndex = -1;
+            this.checkId = this.$root.$mp.query.addressId || wx.getStorageSync('selectAddress').Id || -1;
             this.noAddress = false;
             this.addressList = this.uuptList = [];
             this.addressInfo();
@@ -84,17 +107,13 @@
                     wx.hideLoading();
                     res.Body.forEach(e => {
                         e.AddressTitle = e.AddressTitle.split('($)').join(' ');
-                        e.textInfo = '本地地址';
                         e.type = 1;
                     });
                     this.addressList = res.Body;
-                    !this.addressList.length && (this.noAddress = true);
+                    this.noAddress = this.addressList.length ? false : true;
                     if (this.type == 1) {
-                        this.checkId = this.$root.$mp.query.addressId;
-                    } else {
-                        if (res.Body.length > 0) {
-                            this.checkId = res.Body[0].Id;
-                        }
+                        !this.addressList.length && wx.removeStorageSync('selectAddress');
+                        this.checkId = this.$root.$mp.query.addressId || wx.getStorageSync('selectAddress').Id || -1;
                     }
                 }).catch(err => {
                     console.log(err)
@@ -103,33 +122,31 @@
             },
             //同步UU跑腿地址
             synchronize() {
-                if (this.uupt) {
-                    this.util.post({
-                        url: '/api/Customer/PersonerCenter/PaotuiAddresses',
-                        data: {}
-                    }).then(res => {
-                        if (!res.Body.length) {
-                            this.msg('您还没有UU跑腿的地址哦')
-                        } else {
-                            let id = 0;
-                            res.Body.forEach(e => {
-                                id--;
-                                // e.AddressTitle = `${e.AddressNote} ${e.AddressTitle}`;
-                                e.textInfo = '跑腿地址';
-                                e.Id = id;
-                                e.type = 2;
-                            })
-                            this.msg('已同步UU跑腿地址')
-                            this.uuptList.push(...res.Body);
-                            this.uuptList.length && (this.noAddress = false);
-                            this.uupt = false;
-                        }
-                    }).catch(err => {
-                        console.log(err)
-                    })
-                } else {
-                    this.msg('已经同步过了哦')
-                }
+                // if (this.uupt) {
+                this.util.post({
+                    url: '/api/Customer/PersonerCenter/PaotuiAddresses',
+                    data: {}
+                }).then(res => {
+                    if (!res.Body.length) {
+                        this.msg('您还没有UU跑腿的地址哦')
+                    } else {
+                        this.uuIndex = -1;
+                        this.maskOnoff = true;
+                        res.Body.forEach(e => {
+                            e.Id = 0;
+                            e.type = 2;
+                            e.LinkMan = e.LinkMan == "" ? '未填写' : e.LinkMan;
+                        })
+                        // this.msg('已同步UU跑腿地址')
+                        this.uuptList = res.Body;
+                        // this.uupt = false;
+                    }
+                }).catch(err => {
+                    console.log(err)
+                })
+                // } else {
+                //     this.msg('已经同步过了哦')
+                // }
             },
             goEdit(item) {
                 wx.setStorageSync('address', {
@@ -153,26 +170,36 @@
             },
             //删除某条地址
             delAddress(v) {
-                if (v.textInfo == '本地地址') {
-                    this.util.post({
-                        url: '/api/Customer/PersonerCenter/DeleteAddress',
-                        data: {
-                            AddressId: v.Id
+                wx.showModal({
+                    title: '删除确认',
+                    content: '确定删除该收获地址吗？',
+                    confirmText: '删除',
+                    cancelText: '取消',
+                    confirmColor: '#ff4d3a',
+                    success: res => {
+                        if (res.confirm) {
+                            this.util.post({
+                                url: '/api/Customer/PersonerCenter/DeleteAddress',
+                                data: {
+                                    AddressId: v.Id
+                                }
+                            }).then(res => {
+                                if (res.State == 1) {
+                                    this.msg('删除成功')
+                                    setTimeout(_ => {
+                                        this.addressInfo();
+                                    }, 400)
+                                } else {
+                                    this.msg(res.Msg);
+                                }
+                            }).catch(err => {
+                                this.msg(err);
+                            })
+                        } else if (res.cancel) {
+                            console.log('取消')
                         }
-                    }).then(res => {
-                        if (res.State == 1) {
-                            setTimeout(_ => {
-                                this.addressInfo();
-                            }, 400)
-                        } else {
-                            this.msg(res.Msg);
-                        }
-                    }).catch(err => {
-                        this.msg(err);
-                    })
-                } else {
-                    this.msg('UU跑腿地址暂不支持删除')
-                }
+                    }
+                })
             },
             touchS(e) {
                 if (e.touches.length == 1) {
@@ -217,40 +244,10 @@
                     }
                 }
             },
-            setAddress(item) {
+            setAddress(item, index) {
                 if (this.type == 1) {
                     if (item.type == 2) {
-                        this.util.post({
-                                url: '/api/Customer/PersonerCenter/UpdateAddress',
-                                data: {
-                                    Id: 0,
-                                    AddressTitle: item.AddressTitle,
-                                    AddressNote: item.AddressNote,
-                                    AddressLoc: item.AddressLoc,
-                                    UserNote: item.UserNote,
-                                    LinkMan: item.LinkMan,
-                                    LinkManMobile: item.LinkManMobile,
-                                    LinkManSex: item.LinkManSex,
-                                    CityName: item.CityName,
-                                    CountyName: item.CountyName,
-                                    Type: 2
-                                }
-                            })
-                            .then(res => {
-                                if (res.State == -1010 || res.State == 1) {
-                                    this.checkId = res.Body.AddressId;
-                                    setTimeout(_ => {
-                                        item.AddressTitle = item.AddressTitle.split(' ').join('($)');
-                                        item.Id = res.Body.AddressId;
-                                        wx.setStorageSync('selectAddress', item)
-                                        wx.navigateBack({
-                                            delta: 1
-                                        })
-                                    }, 200)
-                                }
-                            }).catch(err => {
-                                this.msg(err.Msg)
-                            })
+                        this.uuIndex = index;
                     } else {
                         this.checkId = item.Id;
                         setTimeout(_ => {
@@ -261,6 +258,49 @@
                             })
                         }, 200)
                     }
+                } else {
+                    this.uuIndex = index;
+                }
+            },
+            uuAddress() {
+                if (this.uuIndex > -1) {
+                    let item = this.uuptList[this.uuIndex];
+                    this.util.post({
+                            url: '/api/Customer/PersonerCenter/UpdateAddress',
+                            data: {
+                                Id: 0,
+                                AddressTitle: item.AddressTitle,
+                                AddressNote: item.AddressNote,
+                                AddressLoc: item.AddressLoc,
+                                UserNote: item.UserNote,
+                                LinkMan: item.LinkMan,
+                                LinkManMobile: item.LinkManMobile,
+                                LinkManSex: item.LinkManSex,
+                                CityName: item.CityName,
+                                CountyName: item.CountyName,
+                                Type: 2
+                            }
+                        })
+                        .then(res => {
+                            if (res.State == -1010 || res.State == 1) {
+                                if (res.State == -1010) {
+                                    this.msg(res.Msg)
+                                } else {
+                                    this.checkId = res.Body.AddressId;
+                                    this.maskOnoff = false;
+                                    if (this.type == 1) {
+                                        item.AddressTitle = item.AddressTitle.split(' ').join('($)');
+                                        item.Id = res.Body.AddressId;
+                                        wx.setStorageSync('selectAddress', item)
+                                    }
+                                    this.addressInfo();
+                                }
+                            }
+                        }).catch(err => {
+                            this.msg(err.Msg)
+                        })
+                } else {
+                    this.msg('您还没有选择地址哦')
                 }
             }
         },
@@ -269,27 +309,38 @@
 </script>
 
 <style lang="less">
+    page {
+        background-color: #f5f5f5;
+    }
     .my_address {
         position: relative;
         height: 100%;
-        background: #fff;
-        padding-bottom: 110rpx;
+        padding-bottom: 104rpx;
         box-sizing: border-box;
+    }
+    .address_con {
+        height: 100%;
         overflow-y: scroll;
         overflow-x: hidden;
         .pl36 {
             padding-left: 36rpx;
+            background-color: #fff;
         }
-        .my_address_list {
-            li {
-                box-sizing: border-box;
-                width: 100%;
-                transition: margin-left 0.6s ease;
-                padding: 20rpx 36rpx;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
+    }
+    .my_address_list {
+        li {
+            box-sizing: border-box;
+            margin-bottom: 20rpx;
+            background-color: #fff;
+            .edit_box {
+                padding: 12rpx;
+                line-height: 1;
+                margin: 0 24rpx;
+            }
+            .address_item_top {
                 position: relative;
+                margin: 0 36rpx;
+                padding: 30rpx 0;
                 &:after {
                     content: '';
                     display: block;
@@ -302,88 +353,168 @@
                     bottom: 0;
                     left: 0;
                 }
-                // &:last-child {
-                //     &::after {
-                //         display: none;
-                //     }
-                // }
-                .edit_box {
-                    padding: 12rpx;
-                    line-height: 1;
-                }
-                .address_item_left {
+                .user_name_tel {
                     display: flex;
-                    flex: 1;
-                    justify-content: flex-start;
-                    width: 100%;
-                    .icon {
-                        margin-right: 15rpx;
-                    }
-                    .address_item_info {
-                        flex: 1;
-                        padding-right: 30rpx;
-                        width: 100%;
-                        .pos {
-                            font-size: 28rpx;
-                            color: #1a1a1a;
-                            line-height: 36rpx;
-                            padding: 5rpx 0;
-                        }
-                        .name {
-                            color: #666;
-                            font-size: 26rpx;
-                        }
-                        .local_address {
-                            color: #666;
-                            font-size: 20rpx;
-                        }
-                    }
-                }
-                .list_item_del {
-                    position: absolute;
-                    top: 0;
-                    bottom: 0;
-                    display: flex;
+                    justify-content: space-between;
                     align-items: center;
-                    justify-content: center;
-                    color: #fff;
-                    background: #ff4d3a;
-                    font-size: 24rpx;
+                    .item_top_left {
+                        display: flex;
+                        justify-content: flex-start;
+                        align-items: center;
+                        i {
+                            margin-right: 20rpx;
+                        }
+                    }
+                    p {
+                        font-size: 30rpx;
+                        color: #1a1a1a;
+                    }
                 }
+                .pos {
+                    margin-top: 10rpx;
+                    font-size: 26rpx;
+                    color: #666;
+                    display: -webkit-box;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    word-break: break-all;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 2;
+                }
+            }
+            .edit_item_bot {
+                padding: 20rpx 36rpx;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+        } // li:nth-last-of-type(1){
+        //     margin-bottom: 0;
+        // }
+    }
+    .address_bottom {
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        height: 104rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-top: 1rpx solid #ededde;
+        background: #fff;
+        padding: 0 36rpx;
+        box-sizing: border-box;
+        z-index: 10;
+        p {
+            height: 80rpx;
+            width: 50%;
+            text-align: center;
+            line-height: 50rpx;
+            font-size: 26rpx;
+            box-sizing: border-box;
+            border-radius: 6rpx;
+            .icon {
+                margin-right: 10rpx;
             }
         }
-        .address_bottom {
-            width: 100%;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            height: 104rpx;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-top: 1rpx solid #ededde;
-            background: #ffffff;
-            p {
-                height: 50rpx;
-                width: 50%;
-                text-align: center;
-                line-height: 50rpx;
-                font-size: 26rpx;
-                .icon {
-                    margin-right: 10rpx;
-                }
-            }
-            p:nth-of-type(2) {
-                border-left: 1rpx solid #cdcdcd;
-                box-sizing: border-box;
-            }
+        p:nth-of-type(1) {
+            margin-right: 24rpx;
+            color: #ff8b03;
+            border: 1px solid #ff8b03;
+        }
+        p:nth-of-type(2) {
+            background-color: #ff4d3a;
+            color: #fff;
+            border: 1px solid #ff4d3a;
         }
     }
     .no_address {
-        font-size: 26rpx;
-        padding-top: 50rpx;
-        color: #666;
+        position: absolute;
+        top: 120rpx;
+        left: 0;
+        right: 0;
+        bottom: 104rpx;
         text-align: center;
-        transform: translateX(-2%);
+        background-color: #fff;
+        i {
+            margin-top: 250rpx;
+        }
+        .no_address_text {
+            font-size: 24rpx;
+            color: #999;
+        }
+    }
+    .address_mask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 10;
+        transition: all 0.1s ease;
+        display: flex;
+        .mask_con {
+            margin: auto;
+            width: 600rpx;
+            height: 840rpx;
+            border-radius: 8rpx;
+            background-color: #fff;
+            overflow: hidden;
+            position: relative;
+            h3 {
+                text-align: center;
+                font-size: 36rpx;
+                color: #1a1a1a;
+                padding: 46rpx 0 20rpx;
+                line-height: 40rpx;
+                height: 40rpx;
+            }
+            ul {
+                height: 630rpx;
+                overflow-x: hidden;
+                overflow-y: scroll;
+                li {
+                    background-color: #fff;
+                }
+                .select_bg {
+                    background-color: #fff4f2;
+                }
+            }
+            .uu_address_bottom {
+                width: 100%;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                height: 104rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-top: 1rpx solid #ededde;
+                background: #fff;
+                padding: 0 36rpx;
+                box-sizing: border-box;
+                p {
+                    height: 72rpx;
+                    width: 50%;
+                    text-align: center;
+                    line-height: 50rpx;
+                    font-size: 26rpx;
+                    box-sizing: border-box;
+                    border-radius: 6rpx;
+                }
+                p:nth-of-type(1) {
+                    margin-right: 24rpx;
+                    color: #1a1a1a;
+                    border: 1px solid #999;
+                }
+                p:nth-of-type(2) {
+                    background-color: #ff4d3a;
+                    color: #fff;
+                    border: 1px solid #ff4d3a;
+                }
+            }
+        }
     }
 </style>

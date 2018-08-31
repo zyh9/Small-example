@@ -10,8 +10,8 @@
                     <img :src="item.ShopLogo+'?x-oss-process=image/resize,w_100/format,jpg'" alt="" class="icon fade_in">
                     <div class="shop_name_right">
                         <div class="shop_name">
-                            <p class="name_info">{{item.ShopName}}</p>
-                            <i class="icon icon_right direction" v-if="open"></i>
+                            <p class="name_info">{{item.ShopName}}<i class="icon icon_right direction" v-if="open"></i></p>
+                            <p class="create_time">{{item.CreateTime}}</p>
                         </div>
                         <p class="shop_info">{{item.stateText}}</p>
                     </div>
@@ -24,15 +24,15 @@
                         </li>
                     </ul>
                     <div class="order_time_price">
-                        <p class="time">{{item.CreateTime}}</p>
+                        <!-- <p class="time">{{item.CreateTime}}</p> -->
                         <p class="order_money">总价:<span><i>¥</i>{{item.OrderMoney}}</span></p>
                     </div>
                 </div>
-                <div class="lis_bottom">
+                <div class="lis_bottom" v-if="item.State==0||item.State==10||item.State<0||item.State==4">
                     <ul class="lis_bottom_btn">
                         <!-- 取消订单：商家未接单，商家已接单未发货 -->
                         <!-- <li v-if='item.State==0||item.State==1||(item.State==2&&item.CancelApplyState ==0)' @click="cancelOrder(item)">取消订单</li>
-                                    <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li> -->
+                                                                                                            <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li> -->
                         <li class="btn_other" v-if='item.State==0' @click="OrderRePay(item)">继续支付</li>
                         <!-- 再来一单  -->
                         <li @click="againOrder(item)" v-if='item.State==10||item.State<0'>再来一单</li>
@@ -65,25 +65,25 @@
                 title: '加载中',
                 mask: true
             })
+            this.newOrder = [];
         },
-        onReady() { //页面渲染就会触发
+        onReady() {},
+        onShow() {
+            this.open = this.$root.$mp.query.open == 1 ? true : false;
             this.page = 1;
             this.quest = true;
-            this.newOrder = [];
             this.nomore = false;
-            // this.orderInfo()
-            this.open = this.$mp.query.open == 1 ? true : false;
-        },
-        onShow() {
+            this.orderInfo(this.page)
             // console.log(this.$store.state.mutations.newOrder ? '有新订单支付' : '正常进入列表')
             // if (this.$store.state.mutations.newOrder) {
             //     wx.startPullDownRefresh();
             //     this.$store.dispatch('newOrder', false)
             // }
-            wx.startPullDownRefresh();
+            // wx.startPullDownRefresh();
         },
         onPullDownRefresh() { //下拉刷新
             this.page = 1;
+            this.quest = true;
             this.nomore = false;
             this.orderInfo(this.page)
         },
@@ -121,7 +121,6 @@
                 }).then(res => {
                     wx.hideLoading()
                     this.block = true;
-                    wx.stopPullDownRefresh()
                     if (res.Body.length == 0 && this.page == 1) {
                         this.msg('您还没有订单哦')
                     } else if (!res.Body.length && this.page > 1) {
@@ -136,14 +135,13 @@
                             e.stateText = this.orderLabels(e)
                         })
                         this.newOrder = res.Body;
-                        this.quest = true;
-                        this.nomore = false;
                     } else {
                         res.Body.forEach(e => {
                             e.stateText = this.orderLabels(e)
                         })
                         this.newOrder.push(...res.Body)
                     }
+                    wx.stopPullDownRefresh();
                 }).catch(err => {
                     wx.hideLoading();
                     // this.msg(err.Msg)
@@ -377,7 +375,7 @@
         .order_item {
             background: #fff;
             margin-top: 20rpx;
-            padding: 32rpx 0 20rpx;
+            padding: 32rpx 36rpx 20rpx;
             &:first-child {
                 margin-top: 0;
                 padding-top: 50rpx;
@@ -385,11 +383,10 @@
             .lis_top {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                padding: 0 35rpx 32rpx;
+                justify-content: space-between; // padding: 0 35rpx 32rpx;
                 .icon {
-                    width: 40rpx;
-                    height: 40rpx;
+                    width: 72rpx;
+                    height: 72rpx;
                     margin-right: 20rpx;
                     border-radius: 10rpx;
                 }
@@ -401,8 +398,8 @@
                     .shop_name {
                         flex: 1;
                         display: flex;
-                        align-items: center;
-                        justify-content: flex-start;
+                        align-items: top;
+                        flex-direction: column;
                         .name_info {
                             font-size: 30rpx;
                             color: #333;
@@ -410,7 +407,7 @@
                             overflow: hidden;
                             white-space: nowrap;
                             text-overflow: ellipsis;
-                            font-weight: 900;
+                            font-weight: 700;
                         }
                         .direction {
                             width: 24rpx;
@@ -418,29 +415,34 @@
                             margin-left: 12rpx;
                             transform: translateY(1rpx);
                         }
+                        .create_time {
+                            margin-top: 6rpx;
+                            font-size: 24rpx;
+                            color: #939393;
+                            transform: translateY(1rpx);
+                        }
                     }
                 }
                 .shop_info {
                     color: #5e5e5e;
                     font-size: 28rpx;
+                    transform: translateY(-20rpx);
                 }
             }
             .lis_center {
-                margin-left: 56rpx;
-                margin: 0 35rpx 0 92rpx;
-                position: relative;
-                &::after {
-                    content: '';
-                    display: block;
-                    width: 100%;
-                    height: 0;
-                    border-top: 1px solid #ebebeb;
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    transform: scaleY(0.5);
-                    transform-origin: 0 0;
-                }
+                margin-left: 92rpx;
+                position: relative; // &::after {
+                //     content: '';
+                //     display: block;
+                //     width: 100%;
+                //     height: 0;
+                //     border-top: 1px solid #ebebeb;
+                //     position: absolute;
+                //     top: 0;
+                //     left: 0;
+                //     transform: scaleY(0.5);
+                //     transform-origin: 0 0;
+                // }
                 .order_shop_list {
                     padding-top: 20rpx;
                     .list_lis_info {
@@ -460,7 +462,7 @@
                 .order_time_price {
                     display: flex;
                     align-items: center;
-                    justify-content: space-between;
+                    justify-content: flex-end;
                     padding: 12rpx 0 33rpx;
                     .time {
                         font-size: 24rpx;
@@ -487,7 +489,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: flex-end;
-                padding: 20rpx 35rpx 0;
+                padding-top: 20rpx;
                 position: relative;
                 &::after {
                     content: '';
@@ -514,16 +516,29 @@
                         height: 64rpx;
                         background: #fff;
                         color: #1a1a1a;
-                        border-radius: 6rpx;
                         font-size: 26rpx;
                         margin-left: 20rpx;
                         line-height: 64rpx;
                         text-align: center;
-                        border: 1px solid #999;
                         box-sizing: border-box;
-                        &.btn_other {
+                        position: relative;
+                        &:before {
+                            content: '';
+                            position: absolute;
+                            top: -50%;
+                            bottom: -50%;
+                            left: -50%;
+                            right: -50%;
+                            -webkit-transform: scale(0.5);
+                            transform: scale(0.5);
+                            border: 1px solid #999;
+                            border-radius: 6rpx;
+                        }
+                    }
+                    .btn_other {
+                        color: #ff4d3a;
+                        &:before {
                             border: 1px solid #ff4d3a;
-                            color: #ff4d3a;
                         }
                     }
                 }

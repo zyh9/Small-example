@@ -158,11 +158,6 @@
           this.SectionThird = this.IndexInfoList.TemplateData.SectionThird && this.IndexInfoList.TemplateData.SectionThird.length ? this.IndexInfoList.TemplateData.SectionThird : [];
         }).catch(err => {
           this.msg(err.Msg)
-          setTimeout(_ => {
-            wx.redirectTo({
-              url: '/pages/my-store/main'
-            })
-          }, 1000)
         })
       },
       shopPageInfo(pg) {

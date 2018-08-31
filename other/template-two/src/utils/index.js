@@ -92,12 +92,17 @@ const post = (opt = {}) => {
 }
 
 //地理位置获取
-const qqMapInfo = _ => {
+const qqMapInfo = none => {
   return new Promise((resolve, reject) => {
-    wx.showLoading({
-      title: '加载中',
-      mask: true,
-    })
+    if(none == undefined){
+      wx.showLoading({
+        title: '加载中',
+        mask: true,
+      })
+    }
+    //在进入小程序之前做删除之前缓存操作
+    wx.getStorageSync('shopInfo')&&wx.removeStorageSync('shopInfo');
+    wx.getStorageSync('QQmap')&&wx.removeStorageSync('QQmap');
     wx.getLocation({
       type: 'wgs84',
       success: res => {
@@ -112,9 +117,6 @@ const qqMapInfo = _ => {
               city: ok.result.address_component.city,
               latitude: res.latitude,
               longitude: res.longitude
-            }
-            if (wx.getStorageSync('QQmap')) {
-              wx.removeStorageSync('QQmap');
             }
             wx.setStorageSync('QQmap', pos)
             //调用wxLogin接口
@@ -132,8 +134,27 @@ const qqMapInfo = _ => {
       },
       fail: err => {
         wx.hideLoading();
-        reject('error');
-        model();
+        //无定位判断
+        if(wx.getStorageSync('QQmap')&&!wx.getStorageSync('QQmap').mapGet){
+          reject('位置信息获取失败，启用无定位搜索');
+        }else{
+          wx.getSetting({
+            success: ok => {
+              if(!(ok.authSetting['scope.userLocation'])){
+                //小程序位置信息权限关闭
+                console.log('小程序定位未开启')
+                model(1);
+              }else{
+                console.log('手机定位未开启')
+                model(2);
+              }
+            },
+            fail: error => {
+                console.log('权限获取失败')
+            }
+          })
+          reject('位置信息获取失败');
+        }
       }
     })
   })
@@ -223,6 +244,7 @@ const FmtTime = (date, fmt) => {
 //获取地理位置信息
 const getLoc = _ => {
   return new Promise((resolve, reject) => {
+    wx.getStorageSync('QQmap')&&wx.removeStorageSync('QQmap');
     wx.getLocation({
       type: 'wgs84',
       success: res => {
@@ -237,9 +259,6 @@ const getLoc = _ => {
               city: ok.result.address_component.city,
               latitude: res.latitude,
               longitude: res.longitude
-            }
-            if (wx.getStorageSync('QQmap')) {
-              wx.removeStorageSync('QQmap');
             }
             wx.setStorageSync('QQmap', pos)
             resolve(wx.getStorageSync('QQmap'))
@@ -276,19 +295,33 @@ const downImg = val => {
 }
 
 //地理位置授权
-const model = _ => {
+const model = val => {
   wx.showModal({
-    title: '提示',
-    content: '配送需要您的地理位置',
+    title: '定位失败',
+    content: `未获取到你的地理位置，请检查${val==1?'小程序':'微信APP'}是否已关闭定位权限，或尝试重新打开小程序`,
+    // showCancel:false,
     success: res => {
       if (res.confirm) {
         console.log('用户点击确定')
-        wx.redirectTo({
-          url: '/pages/wx-auth/main?type=1'
+        if(val==1){
+          wx.redirectTo({
+            url: '/pages/wx-auth/main?type=1'
+          })
+        }
+        wxLogin().then(res => {
+          resolve(res)
+        }).catch(err => {
+          reject(err)
         })
       } else if (res.cancel) {
         console.log('用户点击取消')
-        model();
+        // model(val);
+        //调用wxLogin接口
+        wxLogin().then(res => {
+          resolve(res)
+        }).catch(err => {
+          reject(err)
+        })
       }
     }
   })
@@ -332,4 +365,4 @@ const phModel = _ => {
   })
 }
 
-export default { get, post, openTime, qqMapInfo, FmtTime, getLoc, downImg, QQMap, phModel, loginModel };
+export default { get, post, openTime, qqMapInfo, FmtTime, getLoc, downImg, QQMap, phModel, loginModel, wxLogin};

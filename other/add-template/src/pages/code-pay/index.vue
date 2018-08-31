@@ -21,7 +21,6 @@
         data() {
             return {
                 val: '',
-                mapInfo: {},
                 ShopId: '', //店铺id
                 scene: '', //二维码信息获取
                 block: false,
@@ -37,23 +36,24 @@
             this.payOnoff = true;
             this.val = '';
             this.ShopTemplateId = '';
-            if (this.scene) {//扫码支付
+            if (this.scene) { //扫码支付
                 this.block = false;
                 wx.showLoading({
                     title: '加载中',
                     mask: true
                 })
                 // this.block = true;
-                this.util.qqMapInfo().then(res => {
-                    console.log(res)
-                    this.mapInfo = wx.getStorageSync('QQmap')
+                this.util.wxLogin().then(res => {
+                    // console.log(res)
                     if (this.scene) {
                         this.sceneInfo()
+                    } else {
+                        this.msg('信息获取错误')
                     }
                 }).catch(err => {
                     console.log(err)
                 })
-            } else {//会员页点击
+            } else { //会员页点击
                 this.block = true;
                 let obj = this.$root.$mp.query;
                 this.ShopName = obj.shopName;
