@@ -2,7 +2,7 @@
   <div class="after_sale">
     <p class="after_sale_title">申请原因</p>
     <div class="con">
-      <textarea placeholder="请输入申请原因" maxlength="150" class="note_text" auto-focus="true" v-model="value" />
+      <textarea placeholder="请输入申请原因" maxlength="150" class="note_text" :show-confirm-bar="false" focus="true" v-model="value" />
       <span>{{value.length}}/150</span>
     </div>
     <p class="after_sale_title">上传凭证(3)</p>
@@ -86,7 +86,7 @@
         position: absolute;
         right: 16rpx;
         bottom: 16rpx;
-        font-size: 28rpx;
+        font-size: 22rpx;
       }
     }
     .img_list {

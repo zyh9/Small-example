@@ -2,7 +2,7 @@
     <div class="add_note">
         <p class="note_title">添加备注</p>
         <div class="con">
-            <textarea placeholder="请输入备注信息" maxlength="150" class="note_text" auto-focus="true" v-model="value" />
+            <textarea placeholder="请输入备注信息" maxlength="150" class="note_text" :show-confirm-bar="false" focus="true" v-model="value" />
             <span>{{value.length}}/150</span>
         </div>
         <div class="submit_note" @click="submitNote">保存</div>
