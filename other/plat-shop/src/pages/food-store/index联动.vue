@@ -293,6 +293,7 @@
                 lisHeight: 0,
                 scrollTop: 0,
                 selectedId: 'id0',
+                rightToTopList: {}, //右侧分类top值list
             }
         },
         onShareAppMessage(res) {
@@ -320,6 +321,7 @@
             })
         },
         onReady() { //进入页面触发，回退不触发
+            this.rightToTopList = {};
             this.selectedId = 'id0';
             this.leftToTop = 0;
             this.scrollTop = 0;
@@ -347,6 +349,11 @@
                 this.shopInfoSum().catch(err => {
                     wx.hideLoading();
                     this.msg(err.Msg)
+                    setTimeout(_ => {
+                        wx.switchTab({
+                            url: '/pages/nearby-shop/main'
+                        })
+                    }, 1000)
                 })
             } else {
                 console.log('不走分享')
@@ -355,6 +362,11 @@
                     // console.log(err)
                     wx.hideLoading();
                     this.msg(err.Msg)
+                    setTimeout(_ => {
+                        wx.switchTab({
+                            url: '/pages/nearby-shop/main'
+                        })
+                    }, 1000)
                 })
             }
         },
@@ -542,14 +554,17 @@
                     //缓存length不存在，直接清除
                     !cartListSum.length && wx.removeStorageSync('cartListSum');
                 }
-                setTimeout(_ => {
-                    let query = wx.createSelectorQuery();
-                    query.select('.list_item_r').boundingClientRect()
-                    query.exec(res => {
-                        this.lisHeight = Math.round(res[0].height);
-                        this.getRightToTop(this.lisHeight)
-                    })
-                }, 200)
+                // setTimeout(_ => {
+                //     let query = wx.createSelectorQuery();
+                //     query.select('.list_item_r').boundingClientRect()
+                //     query.exec(res => {
+                //         this.lisHeight = Math.round(res[0].height);
+                //         console.log(this.lisHeight)
+                //         this.getRightToTop(this.lisHeight)
+                //     })
+                // }, 200)
+                this.lisHeight = 108;
+                this.getRightToTop(this.lisHeight)
                 return;
                 // console.log(this.shopPageIndex)
                 //获取分类以及分页
@@ -596,28 +611,19 @@
                 this.selected = index;
                 this.selectedId = this.allShopInfoList[index].id;
                 // return;
-                let obj = this.getRightToTop(this.lisHeight)
-                let leftItemHeight;
-                setTimeout(_ => {
-                    let query = wx.createSelectorQuery();
-                    query.select('.list_item_l').boundingClientRect()
-                    query.exec(res => {
-                        leftItemHeight = Math.round(res[0].height);
-                        // console.log(leftItemHeight)
-                        for (let i = 0; i < this.allShopInfoList.length; i++) {
-                            let top = obj[this.allShopInfoList[i].id];
-                            let bot = obj[this.allShopInfoList[i + 1] ? this.allShopInfoList[i + 1].id : 'id9999'];
-                            if (this.scrollTop < bot && this.scrollTop >= top) {
-                                if (this.allShopInfoList[index].GoodsInfo.length * this.lisHeight > this.winHeight) {
-                                    // console.log('点击高度大于内容区')
-                                    this.selectedId = this.allShopInfoList[index].id;
-                                } else {
-                                    // console.log('点击高度小于内容区')
-                                }
-                            }
+                for (let i = 0; i < this.allShopInfoList.length; i++) {
+                    let top = this.rightToTopList[this.allShopInfoList[i].id];
+                    let bot = this.rightToTopList[this.allShopInfoList[i + 1] ? this.allShopInfoList[i + 1].id : 'id9999'];
+                    if (this.scrollTop < bot && this.scrollTop >= top) {
+                        if (this.allShopInfoList[index].GoodsInfo.length * this.lisHeight > this.winHeight) {
+                            // console.log('点击高度大于内容区')
+                            this.selectedId = this.allShopInfoList[index].id;
+                        } else {
+                            // console.log('点击高度小于内容区')
+                            this.selectedId = null;
                         }
-                    })
-                }, 20)
+                    }
+                }
             },
             //单项分类商品信息获取  index默认为0  select={}
             shopPageInfo(id, index = 0, select = {
@@ -1415,36 +1421,37 @@
                     totop += (barHeight + this.allShopInfoList[i - 1].GoodsInfo.length * item_height)
                     obj[this.allShopInfoList[i] ? this.allShopInfoList[i].id : 'id9999'] = totop // 这个的目的是 例如有两类，最后需要 0-1 1-2 2-3 的数据，所以需要一个不存在的 'last' 项，此项即为第一类加上第二类的高度。
                 }
-                return obj
+                this.rightToTopList = obj;
+                console.log(obj, 111)
             },
             rightScroll(e) { // 监听右侧的滚动事件与 getRightToTop 的循环作对比 从而判断当前可视区域为第几类，从而渲染左侧的对应类
                 this.scrollTop = e.mp.detail.scrollTop;
-                let obj = this.getRightToTop(this.lisHeight)
                 // console.log(obj, 'scrollTop' + this.scrollTop)
                 // return
-                let leftItemHeight;
-                setTimeout(_ => {
-                    let query = wx.createSelectorQuery();
-                    query.select('.list_item_l').boundingClientRect()
-                    query.exec(res => {
-                        leftItemHeight = Math.round(res[0].height);
-                        // console.log(leftItemHeight)
-                        for (let i = 0; i < this.allShopInfoList.length; i++) {
-                            let top = obj[this.allShopInfoList[i].id];
-                            let bot = obj[this.allShopInfoList[i + 1] ? this.allShopInfoList[i + 1].id : 'id9999'];
-                            if (this.scrollTop < bot && this.scrollTop >= top) {
-                                if (this.allShopInfoList[i].GoodsInfo.length * this.lisHeight > this.winHeight) {
-                                    // console.log('高度大于内容区')
-                                    this.selected = i;
-                                    this.leftToTop = leftItemHeight * i;
-                                } else {
-                                    // console.log('高度小于内容区')
-                                }
-                                // console.log(this.allShopInfoList[i].id, this.selected)
-                            }
+                // let leftItemHeight;
+                // setTimeout(_ => {
+                //     let query = wx.createSelectorQuery();
+                //     query.select('.list_item_l').boundingClientRect()
+                //     query.exec(res => {
+                //         leftItemHeight = Math.round(res[0].height);
+                //         // console.log(leftItemHeight)
+                //     })
+                // }, 200)
+                for (let i = 0; i < this.allShopInfoList.length; i++) {
+                    let top = this.rightToTopList[this.allShopInfoList[i].id];
+                    let bot = this.rightToTopList[this.allShopInfoList[i + 1] ? this.allShopInfoList[i + 1].id : 'id9999'];
+                    if (this.scrollTop < bot && this.scrollTop >= top) {
+                        if (this.allShopInfoList[i].GoodsInfo.length * this.lisHeight > this.winHeight) {
+                            // console.log('高度大于内容区')
+                            this.selected = i;
+                            this.leftToTop = 59 * i;
+                            // this.selectedId = this.allShopInfoList[i].id;
+                        } else {
+                            // console.log('高度小于内容区')
                         }
-                    })
-                }, 200)
+                        // console.log(this.allShopInfoList[i].id, this.selected)
+                    }
+                }
             },
         },
         computed: {

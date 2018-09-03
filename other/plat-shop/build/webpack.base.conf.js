@@ -1,5 +1,6 @@
 var path = require('path')
 var fs = require('fs')
+var webpack = require('webpack')
 var utils = require('./utils')
 var config = require('../config')
 var vueLoaderConfig = require('./vue-loader.conf')
@@ -115,6 +116,13 @@ module.exports = {
         to: path.resolve(__dirname, '../dist/static'),
         ignore: ['.*']
       }
-    ])
+    ]),
+    new webpack.optimize.UglifyJsPlugin({
+      // compress:{
+      //   warnings: false,
+      //   drop_debugger: true,
+      //   drop_console: true
+      // }
+    })
   ]
 }
