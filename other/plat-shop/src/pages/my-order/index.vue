@@ -6,11 +6,14 @@
         </div>
         <ul class="my_order_list">
             <li class="order_item" v-for="(item,index) in newOrder" :key="index">
-                <div class="lis_top" @click='goShop(item)'>
+                <!-- @click='goShop(item)' -->
+                <div class="lis_top">
                     <img :src="item.ShopLogo+'?x-oss-process=image/resize,w_100/format,jpg'" alt="" class="icon fade_in">
                     <div class="shop_name_right">
                         <div class="shop_name">
-                            <p class="name_info">{{item.ShopName}}<i class="icon icon_right direction" v-if="open"></i></p>
+                            <p class="name_info">{{item.ShopName}}
+                                <!-- <i class="icon icon_right direction" v-if="open"></i> -->
+                            </p>
                             <p class="create_time">{{item.CreateTime}}</p>
                         </div>
                         <p class="shop_info">{{item.stateText}}</p>
@@ -32,7 +35,7 @@
                     <ul class="lis_bottom_btn">
                         <!-- 取消订单：商家未接单，商家已接单未发货 -->
                         <!-- <li v-if='item.State==0||item.State==1||(item.State==2&&item.CancelApplyState ==0)' @click="cancelOrder(item)">取消订单</li>
-                                                                                                            <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li> -->
+                                                                                                                    <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li> -->
                         <li class="btn_other" v-if='item.State==0' @click="OrderRePay(item)">继续支付</li>
                         <!-- 再来一单  -->
                         <li @click="againOrder(item)" v-if='item.State==10||item.State<0'>再来一单</li>
@@ -56,7 +59,7 @@
                 quest: true,
                 nomore: false,
                 block: false,
-                open: false
+                // open: false
             }
         },
         onLoad() {
@@ -69,7 +72,7 @@
         },
         onReady() {},
         onShow() {
-            this.open = this.$root.$mp.query.open == 1 ? true : false;
+            // this.open = this.$root.$mp.query.open == 1 ? true : false;
             this.page = 1;
             this.quest = true;
             this.nomore = false;
@@ -144,13 +147,13 @@
                     wx.stopPullDownRefresh();
                 }).catch(err => {
                     wx.hideLoading();
-                    // this.msg(err.Msg)
-                    console.log(err)
+                    this.msg(err.Msg)
+                    // console.log(err)
                 })
             },
             orderDetails(id) {
                 wx.navigateTo({
-                    url: `/pages/order-details/main?orderId=${id}&type=2`
+                    url: `/pages/order-details/main?orderId=${id}&type=2&open=${this.$root.$mp.query.open}`
                 })
             },
             /* 订单状态文字 */

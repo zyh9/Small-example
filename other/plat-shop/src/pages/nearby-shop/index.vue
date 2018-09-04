@@ -378,12 +378,12 @@
         height: 100%;
         display: flex;
         align-items: center;
-        flex-direction: column;
+        justify-content: center;
         .no_pos_con {
-            padding-top: 300rpx;
             display: flex;
             align-items: center;
             flex-direction: column;
+            transform: translateY(-30%);
             p {
                 font-size: 24rpx;
                 color: #999;

@@ -56,11 +56,13 @@
                     </div>
                     <i class="icon icon_tel"></i>
                 </div>
+                <div class="bor_block"></div>
             </div>
             <div class="order_details_con">
-                <div class="shop_info_sum">
+                <div class="shop_info_sum" @click="goShop">
                     <!-- <img class="fade_in" :src="orderInfo.ShopLogo+'?x-oss-process=image/resize,w_100/format,jpg'" alt=""> -->
                     <p>{{orderInfo.ShopName}}</p>
+                    <i class="icon icon_right direction" v-if="open"></i>
                 </div>
                 <ul class="con_order_list">
                     <li v-for="(v,i) in orderInfo.OrderGoods" :key="i" class="con_list_item">
@@ -155,7 +157,7 @@
             </div>
         </div>
         <div class="order_btn">
-            <i class="icon icon_look_map" @click="mapOnoff=true" v-if="(orderInfo.ExpressType== 1||orderInfo.ExpressType== 3)&&orderInfo.State>=4&&orderInfo.State<10"></i>
+            <i class="icon icon_look_map" @click="blockMap" v-if="(orderInfo.ExpressType== 1||orderInfo.ExpressType== 3)&&orderInfo.State>=4&&orderInfo.State<10"></i>
             <i class="icon icon_go_index" v-if="goIndexBlock" @click="goIndex"></i>
         </div>
         <div class="mask" v-if='isTracking||saleMask' @click='isTracking=false,saleMask=false'></div>
@@ -206,7 +208,7 @@
                 </div>
             </div>
         </div>
-        <div class="cancel_mask" v-if="false">
+        <div class="cancel_mask" v-if="cancelMask">
             <div class="cancel_con">
                 <h3>取消确认</h3>
                 <p>跑男已接单，此时取消将扣除跑男上门费，剩余费用将退回</p>
@@ -218,9 +220,12 @@
             </div>
         </div>
         <div class="map_mask fade_in" :class="{map_mask_active:mapOnoff}">
-            <map id="myMap" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points="" :style="{height:winHeight+'px'}"></map>
+            <map id="myMap" show-location="true" :longitude="longitude" :latitude="latitude" scale="15" :markers="markers" include-points="" :style="{height:winHeight+'px'}"></map>
             <cover-view class="close_map" @click="mapOnoff=false">
                 <cover-image class="icon_close_map" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/black-close.png" />
+            </cover-view>
+            <cover-view class="map_pos" @click="mapPos">
+                <cover-image class="icon_map_pos" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/map-pos.png" />
             </cover-view>
         </div>
     </div>
@@ -255,6 +260,9 @@
                 winHeight: 0, //高度
                 scrollTop: 0, //滚动距离
                 goIndexBlock: false, //回到首页按钮
+                cancelMask: false,
+                open: false,
+                mapCtx: {},
             }
         },
         onLoad() {
@@ -266,6 +274,8 @@
             this.forOrder = false;
             this.mapOnoff = false;
             this.goIndexBlock = false;
+            this.open = this.$root.$mp.query.open == 1 ? true : false;
+            this.mapCtx = wx.createMapContext('myMap')
         },
         onReady() {
             if (this.$mp.query.from && this.$mp.query.from == 1) {
@@ -460,10 +470,9 @@
                             })
                         })
                     }, 200)
+                } else {
+                    this.mapOnoff = false; //地图去除
                 }
-                // else {
-                //     this.mapErr = false;
-                // }
             },
             distance(lat1, lng1, lat2, lng2) {
                 var radLat1 = lat1 * Math.PI / 180.0;
@@ -495,10 +504,13 @@
                         // console.log(this.util.downImg)
                         // this.mapOnoff = true;
                         this.forOrder = true;
-                        this.requireImg(this.orderInfo.ExpressType, this.orderInfo.State).catch(err => {
-                            this.msg('地图信息获取失败')
-                        })
+                        if (this.orderInfo.PaotuiInfo.DriverLastLoc) { //跑男坐标存在
+                            this.requireImg(this.orderInfo.ExpressType, this.orderInfo.State).catch(err => {
+                                this.msg('地图信息获取失败')
+                            })
+                        }
                     } else {
+                        this.forOrder = false; //轮询去除
                         this.mapOnoff = false; //地图去除
                     }
                     //订单跟踪信息 (不包含商家自送)
@@ -536,6 +548,10 @@
             },
             //取消订单
             cancelOrder() {
+                // console.log(this.orderInfo.State)
+                if (this.orderInfo.State < 4) { //跑男未接单
+                    console.log('跑男未接单')
+                }
                 if (this.orderInfo.CancelApplyState == 1) {
                     this.msg('已申请取消，请耐心等待商户处理');
                     return
@@ -632,6 +648,29 @@
                 wx.redirectTo({
                     url: `/pages/my-store/main?ShopId=${this.orderInfo.ShopID}&temp=${this.orderInfo.ShopTemplateId}`
                 })
+            },
+            blockMap() {
+                if (this.orderInfo.PaotuiInfo.DriverLastLoc) {
+                    this.mapOnoff = true;
+                } else {
+                    this.msg('跑男坐标获取失败')
+                }
+            },
+            goShop() {
+                if (this.open == false) return;
+                if (this.orderInfo.ShopTemplateId == 1) {
+                    wx.navigateTo({
+                        url: `/pages/food-store/main?ShopId=${this.orderInfo.ShopID}&type=1`
+                    })
+                } else {
+                    wx.navigateTo({
+                        url: `/pages/business/main?ShopId=${this.orderInfo.ShopID}&type=1`
+                    })
+                }
+            },
+            mapPos() {
+                //需要配合map组件的show-location使用
+                this.mapCtx.moveToLocation();
             }
         },
         components: {},
@@ -687,10 +726,14 @@
             overflow-y: scroll;
         }
         .order_details_top {
-            margin-bottom: 20rpx;
             background: #fff;
             overflow: hidden;
             position: relative;
+            .bor_block {
+                height: 20rpx;
+                width: 100%;
+                background-color: #ebebeb;
+            }
             .title {
                 font-size: 36rpx;
                 color: #000;
@@ -870,6 +913,12 @@
                     margin-left: 10rpx;
                     width: 25rpx;
                     height: 25rpx;
+                }
+                .direction {
+                    width: 24rpx;
+                    height: 24rpx;
+                    margin-left: 12rpx;
+                    transform: translateY(-1rpx);
                 }
             }
             .con_order_list {
@@ -1429,8 +1478,14 @@
                     height: 96rpx;
                 }
             }
-            .map_none {
-                height: 0;
+            .map_pos {
+                position: absolute;
+                bottom: 60rpx;
+                left: 36rpx;
+                .icon_map_pos {
+                    width: 90rpx;
+                    height: 90rpx;
+                }
             }
         }
         .map_mask_active {

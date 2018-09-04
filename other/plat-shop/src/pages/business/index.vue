@@ -4,7 +4,7 @@
       <div class="business_top">
         <div class="search" @click="search">
           <i class="icon icon_search_3"></i>
-          <p class="text">搜索</p>
+          <p class="text">搜索店铺内商品</p>
         </div>
         <div class="classify" @click="openType">
           <i class="icon icon_classify"></i>

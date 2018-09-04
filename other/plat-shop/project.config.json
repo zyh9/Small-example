@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": -1,
+			"current": 25,
 			"list": [
 				{
 					"id": 1,
@@ -78,7 +78,7 @@
 					"id": 7,
 					"name": "商品详情测试跳转",
 					"pathName": "pages/product-details/main",
-					"query": "scene=1884768077383689"
+					"query": "scene=188476807738368"
 				},
 				{
 					"id": -1,
@@ -181,6 +181,12 @@
 					"name": "中间页",
 					"pathName": "pages/my-store/main",
 					"query": ""
+				},
+				{
+					"id": 25,
+					"name": "商品不存在",
+					"pathName": "pages/product-details/main",
+					"query": "GoodId=1890753440417286&ShopId=1802573623346180"
 				}
 			]
 		}

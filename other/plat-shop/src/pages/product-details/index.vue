@@ -44,9 +44,19 @@
             </div>
         </div>
         <div class="no_shop" v-if="noShopInfo">
-            <i class="icon icon_discont_shop"></i>
-            <p>此商品已下架</p>
-            <div class="open_shop" @click="openShop">进店铺逛逛</div>
+            <div class="no_shop_con">
+                <i class="icon icon_discont_shop"></i>
+                <div v-if="blockType==1">
+                    <p>该商品已经下架<br/>返回去看看其他的吧</p>
+                </div>
+                <div v-if="blockType==2">
+                    <p>此商品已下架</p>
+                    <div class="open_shop" @click="openShop">
+                        <i class="icon icon_white_shop"></i>
+                        <span>进店铺逛逛</span>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- 分享方式 -->
         <div class="share_mask" v-if="isActive" @click="isActive = false"></div>
@@ -122,6 +132,7 @@
                 botTips: '',
                 ShopTemplateId: '',
                 noShopInfo: false,
+                blockType: 0, //显示类型
             }
         },
         onShareAppMessage(res) {
@@ -151,6 +162,7 @@
                 title: '加载中',
                 mask: true
             })
+            this.blockType = 0;
             this.noShopInfo = false;
             this.formatLi = 0;
             this.formatMask = false;
@@ -629,6 +641,11 @@
                         wx.hideLoading();
                         if (err.State == -1011 || err.State == -1012 || err.State == -1023) {
                             console.log('商品不存在')
+                            if (this.$mp.query.type == 1) {
+                                this.blockType = 1;
+                            } else {
+                                this.blockType = 2;
+                            }
                             this.block = true;
                             this.noShopInfo = true;
                         }
@@ -670,7 +687,12 @@
                 }
             },
             openShop() {
-                let ShopId = wx.getStorageSync('ShopId');
+                let ShopId = wx.getStorageSync('ShopId') || this.$root.$mp.query.ShopId || this.ShopId;
+                // console.log(ShopId)
+                if (!!ShopId && (!this.$root.$mp.query.temp || !this.ShopTemplateId)) {
+                    this.msg('店铺信息获取失败')
+                    return;
+                }
                 if (this.$root.$mp.query.temp == 1 || this.ShopTemplateId == 1) {
                     wx.redirectTo({
                         url: `/pages/food-store/main?ShopId=${ShopId}`
@@ -1220,25 +1242,41 @@
         }
     }
     .no_shop {
-        padding-top: 200rpx;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        background-color: #fff;
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
+        .no_shop_con {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateY(-30%);
+        }
         p {
             font-size: 22rpx;
-            color: #ccc;
+            color: #999;
             margin: 20rpx 0 80rpx;
         }
         .open_shop {
-            width: 180rpx;
+            width: 210rpx;
             height: 64rpx;
             background-color: #ff4d3a;
             border-radius: 6rpx;
             font-size: 24rpx;
             color: #fff;
             text-align: center;
-            line-height: 64rpx;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            i {
+                margin-right: 6rpx;
+            }
         }
     }
 </style>

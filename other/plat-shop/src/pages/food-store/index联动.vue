@@ -1623,16 +1623,18 @@
                 z-index: 2;
                 background: #fff;
                 display: flex;
+                justify-content: center;
+                align-items: center;
                 .no_shop_con {
                     width: 200rpx;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    margin: 137rpx auto 0;
+                    transform: translateY(-30%);
                     p {
                         margin-top: 20rpx;
                         font-size: 22rpx;
-                        color: #ccc;
+                        color: #999;
                         white-space: nowrap;
                     }
                 }

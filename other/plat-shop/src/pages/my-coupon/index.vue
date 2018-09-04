@@ -46,9 +46,11 @@
             <div class="noMore">没有更多优惠券了</div>
         </div>
         <div class="noData" v-if='noOffer&&yesOffer'>
-            <img src="../../../static/noCoupon.png" alt="">
-            <p v-if='type==1'>您还没有领取任何优惠券<br>关注店铺活动获得更多优惠哟</p>
-            <p v-else>您还没有领取本店任何优惠券<br>快返回首页去看看有哪些优惠吧</p>
+            <div class="no_data_con">
+                <img src="../../../static/noCoupon.png" alt="">
+                <p v-if='type==1'>您还没有领取任何优惠券<br>关注店铺活动获得更多优惠哟</p>
+                <p v-else>您还没有领取本店任何优惠券<br>快返回首页去看看有哪些优惠吧</p>
+            </div>
         </div>
         <cover-view v-if='isHandler&&(nullCouponList.length||couponList.length)' class="btn" @click="nonuse">不使用优惠券</cover-view>
     </div>
@@ -131,7 +133,8 @@
                     }
                 } else if (this.type == 1) {
                     let {
-                        ShopID,ShopTemplateId
+                        ShopID,
+                        ShopTemplateId
                     } = v;
                     if (ShopTemplateId == 1) {
                         wx.navigateTo({
@@ -469,14 +472,20 @@
             left: 0;
             width: 100%;
             height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .no_data_con {
+                transform: translateY(-30%);
+            }
             img {
                 width: 200rpx;
                 height: 200rpx;
-                margin: 103rpx auto 10rpx;
+                margin: 0 auto 10rpx;
             }
             p {
                 font-size: 22rpx;
-                color: #ccc;
+                color: #999;
                 line-height: 36rpx;
                 text-align: center;
             }

@@ -2,8 +2,10 @@
   <div class="cart">
     <div class="cart_con">
       <div class="no_cart_product" v-if="tips">
-        <i class="icon icon_no_cart"></i>
-        <p>购物车还是空的哦~</p>
+        <div class="no_cart_product_con">
+          <i class="icon icon_no_cart"></i>
+          <p>购物车还是空的哦~</p>
+        </div>
       </div>
       <ul class="cart_list" v-if="cartListItem.length">
         <li v-for="(v,i) in cartListItem" :key="i">
@@ -695,15 +697,25 @@
     }
   }
   .no_cart_product {
+    position: absolute;
     width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    .no_cart_product_con {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform: translateY(-30%);
+    }
     p {
       padding-top: 14rpx;
       text-align: center;
       font-size: 22rpx;
-      color: #ccc;
+      color: #999;
     }
   }
 </style>

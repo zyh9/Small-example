@@ -3,8 +3,10 @@
         <div class="address_con">
             <div class="pageTitle pl36">我的地址</div>
             <div v-if="noAddress" class="no_address">
-                <i class="icon icon_no_address"></i>
-                <p class="no_address_text">您还没有地址<br/>可点击底部按钮进行添加</p>
+                <div class="no_address_con">
+                    <i class="icon icon_no_address"></i>
+                    <p class="no_address_text">您还没有地址<br/>可点击底部按钮进行添加</p>
+                </div>
             </div>
             <ul class="my_address_list" v-if="addressList.length">
                 <li v-for="(v,i) in addressList" :key="i" :data-index="i">
@@ -437,8 +439,14 @@
         bottom: 104rpx;
         text-align: center;
         background-color: #fff;
-        i {
-            margin-top: 250rpx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .no_address_con {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateY(-30%);
         }
         .no_address_text {
             font-size: 24rpx;
