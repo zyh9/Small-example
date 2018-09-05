@@ -5,7 +5,7 @@
 		"pages/join-uu/main",
 		"pages/search-shop/main",
 		"pages/search-product/main",
-    "pages/business/main",
+		"pages/business/main",
 		"pages/shop-user/main",
 		"pages/my-vip/main",
 		"pages/inp-info/main",
@@ -53,27 +53,27 @@
 	},
 	"tabBar": {
 		"backgroundColor": "#fff",
-    "selectedColor": "#090102",
-    "color": "#b2b2b2",
-    "list": [
-      {
-        "selectedIconPath": "static/tabBar/index-active.png",
-        "iconPath": "static/tabBar/index.png",
-        "pagePath": "pages/nearby-shop/main",
-        "text": "UU小店"
-      },
-      {
-        "selectedIconPath": "static/tabBar/user-active.png",
-        "iconPath": "static/tabBar/user.png",
-        "pagePath": "pages/my-user/main",
-        "text": "我的"
-      },
-      {
-        "selectedIconPath": "static/tabBar/join-active.png",
-        "iconPath": "static/tabBar/join.png",
-        "pagePath": "pages/join-uu/main",
-        "text": "入驻UU"
-      }
-    ]
+		"selectedColor": "#090102",
+		"color": "#b2b2b2",
+		"list": [
+			{
+				"selectedIconPath": "static/tabBar/index-active.png",
+				"iconPath": "static/tabBar/index.png",
+				"pagePath": "pages/nearby-shop/main",
+				"text": "UU小店"
+			},
+			{
+				"selectedIconPath": "static/tabBar/user-active.png",
+				"iconPath": "static/tabBar/user.png",
+				"pagePath": "pages/my-user/main",
+				"text": "我的"
+			},
+			{
+				"selectedIconPath": "static/tabBar/join-active.png",
+				"iconPath": "static/tabBar/join.png",
+				"pagePath": "pages/join-uu/main",
+				"text": "入驻UU"
+			}
+		]
 	}
 }

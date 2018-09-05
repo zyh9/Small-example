@@ -30,64 +30,22 @@
                     }
                 },
                 wecropper: null,
-                type: '',
                 isStep: false,
                 isNext: true,
                 winHeight: 0
             }
         },
         onLoad() {
-            if(this.$mp.query.type == 3) {
-                this.cropperOpt = {
-                    width: windowWidth,
-                    height: windowHeight,
-                    scale: 2.5,
-                    zoom: 8,
-                    cut: {
-                        x: (windowWidth - 339) / 2,
-                        y: (windowHeight - 160) / 2,
-                        width: 339,
-                        height: 160
-                    }
-                }
-            }else if(this.$mp.query.type == 5) {
-                this.cropperOpt = {
-                    width: windowWidth,
-                    height: windowHeight,
-                    scale: 2.5,
-                    zoom: 8,
-                    cut: {
-                        x: (windowWidth - 339) / 2,
-                        y: (windowHeight - 100) / 2,
-                        width: 339,
-                        height: 100
-                    }
-                }
-            }else if(this.$mp.query.type == 6) {
-                this.cropperOpt = {
-                    width: windowWidth,
-                    height: windowHeight,
-                    scale: 2.5,
-                    zoom: 8,
-                    cut: {
-                        x: (windowWidth - 339) / 2,
-                        y: (windowHeight - 190) / 2,
-                        width: 339,
-                        height: 190
-                    }
-                }
-            }else{
-                this.cropperOpt = {
-                    width: windowWidth,
-                    height: windowHeight,
-                    scale: 2.5,
-                    zoom: 8,
-                    cut: {
-                        x: (windowWidth - 300) / 2,
-                        y: (windowHeight - 300) / 2,
-                        width: 300,
-                        height: 300
-                    }
+            this.cropperOpt = {
+                width: windowWidth,
+                height: windowHeight,
+                scale: 2.5,
+                zoom: 8,
+                cut: {
+                    x: (windowWidth - 300) / 2,
+                    y: (windowHeight - 300) / 2,
+                    width: 300,
+                    height: 300
                 }
             }
             this.wecropper = new WeCropper(this.cropperOpt)
@@ -167,7 +125,6 @@
                     return
                 }
                 this.isNext = false;
-                const that = this;
                 wx.showLoading({
                     title: '生成中',
                 })
@@ -175,30 +132,21 @@
                     if (src) {
                         // console.log(src)
                         wx.uploadFile({
-                            url: this.util.baseUrl + '/api/Merchant/File/ImageUpload',
+                            url: this.util.baseUrl + '/api/Customer/File/ImageUpload',
                             filePath: src,
                             name: 'ImageFile',
                             formData: {
-                                'ImageType': 2
+                                'ImageType': 1, //售后上传
                             },
                             header: {
-                                appid: '2',
+                                appid: '1',
                                 token: wx.getStorageSync('loginInfo').Token || '',
                                 qrcode: wx.getStorageSync('scene') || ''
                             },
                             success: res => {
+                                // console.log(res)
                                 let tempFilePaths = JSON.parse(res.data).Body.ImageUrl;
-                                wx.setStorageSync('cutImg' + that.type, tempFilePaths);
-                                //3轮播图  4导航图  5广告图
-                                if(this.$mp.query.type == 3) {
-                                    wx.setStorageSync('cutImg',{index:this.$mp.query.bannerIndex,url:tempFilePaths})
-                                }
-                                if(this.$mp.query.type == 4) {
-                                    wx.setStorageSync('cutImg',{index:this.$mp.query.navIndex,url:tempFilePaths})
-                                }
-                                if(this.$mp.query.type == 5) {
-                                    wx.setStorageSync('cutImg',{index:this.$mp.query.adIndex,url:tempFilePaths})
-                                }
+                                wx.setStorageSync('cutImg', tempFilePaths);
                                 setTimeout(_ => {
                                     this.isNext = true;
                                     wx.hideLoading()

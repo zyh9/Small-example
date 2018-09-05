@@ -8,6 +8,7 @@
                 <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
                 <ul class="lis_bottom_btn">
                     <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)' @click="cancelOrder">取消订单</li>
+                    <li v-if="orderInfo.State==10&&applyBtn" @click="saleMask=true">申请售后</li>
                     <li @click='againOrder' v-if='orderInfo.State==10||orderInfo.State<0' :class="{btn_other:orderInfo.State==10}">再来一单</li>
                     <li class="btn_other" v-if="orderInfo.State==4" @click="okOrder">确认收货</li>
                     <li v-if='orderInfo.State==2&&orderInfo.CancelApplyState==1' @click="cancelOrder">已申请取消</li>
@@ -176,10 +177,10 @@
         <div class="after_sale" :class="{after_sale_active:saleMask}" v-if="saleMask">
             <div class="after_sale_item">
                 <div class="after_sale_title">
-                    <p>售后申请</p>
+                    <p>申请售后</p>
                 </div>
                 <ul class="after_sale_list">
-                    <li class="after_sale_lis" v-for="(v,i) in saleList" :key="i">
+                    <li class="after_sale_lis" v-for="(v,i) in saleList" :key="i" @click="Application(i)">
                         <i class="icon icon_red_tel" v-if="i==0"></i>
                         <i class="icon icon_refund" v-if="i==1"></i>
                         <p>{{v.text}}</p>
@@ -263,10 +264,11 @@
                 cancelMask: false,
                 open: false,
                 mapCtx: {},
+                applyBtn: false, //售后申请按钮状态
             }
         },
         onLoad() {
-            this.block = false;
+            this.block = this.applyBtn = false;
             wx.showLoading({
                 title: '加载中',
                 mask: true
@@ -277,7 +279,7 @@
             this.open = this.$root.$mp.query.open == 1 ? true : false;
             this.mapCtx = wx.createMapContext('myMap')
         },
-        onReady() {
+        onShow() {
             if (this.$mp.query.from && this.$mp.query.from == 1) {
                 //服务通知进入
                 this.goIndexBlock = true;
@@ -469,7 +471,7 @@
                                 }
                             })
                         })
-                    }, 200)
+                    }, 500)
                 } else {
                     this.mapOnoff = false; //地图去除
                 }
@@ -497,6 +499,13 @@
                     this.orderInfo = Object.assign({}, res.Body, {
                         stateText: this.orderLabels(res.Body.State, res.Body.CancelApplyState, res.Body.ExpressType)
                     })
+                    let timeVal = Math.floor((new Date().getTime() - new Date(this.orderInfo.FinishTime).getTime()) / 1000); //单位：秒
+                    let day = 60 ** 2 * 24;
+                    if (timeVal > day) { //是否显示售后
+                        this.applyBtn = false;
+                    } else {
+                        this.applyBtn = true;
+                    }
                     this.orderInfo.orderSumPrice = (Math.round(this.orderInfo.PaotuiMoneyOff * 10000) + Math.round(this.orderInfo.CouponAmountMoney * 10000)) / 10000;
                     // console.log(this.orderInfo.orderSumPrice)
                     //地图所需信息 （不包含快递和商家自送）
@@ -671,6 +680,15 @@
             mapPos() {
                 //需要配合map组件的show-location使用
                 this.mapCtx.moveToLocation();
+            },
+            Application(i) {
+                if (i == 0) {
+                    this.tel(this.orderInfo.ShopMobile)
+                } else {
+                    wx.navigateTo({
+                        url: `/pages/after-sale/main?OrderId=${this.orderInfo.OrderID}`
+                    })
+                }
             }
         },
         components: {},

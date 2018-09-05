@@ -19,7 +19,9 @@
         </div>
       </div>
     </div>
-    <div class="pay_btn" :class="{payOk:val}" @click="payCode">{{checkedIndex==0?'余额支付':'微信支付'}}</div>
+    <form @submit="formSubmit" report-submit>
+      <button formType="submit" class="pay_btn" plain="true">{{checkedIndex==0?'余额支付':'微信支付'}}</button>
+    </form>
     <div class="vip_mask" @click="vipMask=false" v-if="vipMask"></div>
     <div class="vip_con" v-if="vipMask">
       <div class="pay_title">
@@ -146,6 +148,17 @@
           this.checkedIndex = 1;
         }
       },
+      formSubmit(e) {
+        let formId = e.target.formId;
+        console.log(formId)
+        this.util.uploadFormId(formId).then(res => {
+          // console.log(res)
+          this.payCode()
+        }).catch(err => {
+          // console.log(err)
+          this.payCode()
+        })
+      },
       payCode() {
         if (this.checkedIndex == 0) { //余额支付
           this.vipMask = true;
@@ -153,7 +166,7 @@
           if (this.uuPayInfo.OrderId) {
             this.wxPay()
           } else {
-            this.scanCode('', 1)//线下微信支付
+            this.scanCode('', 1) //线下微信支付
           }
         }
       },
@@ -222,7 +235,7 @@
           if (this.uuPayInfo.OrderId) {
             this.vipPay(res.Body.Token)
           } else {
-            this.scanCode(res.Body.Token, 2)//线下余额支付
+            this.scanCode(res.Body.Token, 2) //线下余额支付
           }
         }).catch(err => {
           this.msg(err.Msg)
@@ -445,6 +458,7 @@
       left: 36rpx;
       right: 36rpx;
       bottom: 36rpx;
+      border: 0;
     }
     .vip_mask {
       position: absolute;

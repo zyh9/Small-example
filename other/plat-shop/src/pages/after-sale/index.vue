@@ -7,10 +7,10 @@
     </div>
     <p class="after_sale_title">上传凭证(3)</p>
     <ul class="img_list">
-      <li class="img_lis" v-if="false">
-        <img src="" alt="">
+      <li class="img_lis" v-for="(v,i) in imgUrlList" :key="i" v-if="v!=''">
+        <img :src="v" alt="" class="fade_in">
       </li>
-      <li class="img_lis add" @click="addImg">
+      <li class="img_lis add" @click="addImg" v-if="uploadImg">
         <img src="../../../static/upload.png" alt="">
       </li>
     </ul>
@@ -22,35 +22,61 @@
   export default {
     data() {
       return {
-        value: ''
+        value: '',
+        imgUrlList: [],
+        uploadImg: true,
       }
     },
     onLoad() {
       this.value = '';
-      if (wx.getStorageSync('note')) {
-        this.value = wx.getStorageSync('note');
+    },
+    onShow() {
+      let imgUrl = wx.getStorageSync('cutImg') || '';
+      if (wx.getStorageSync('cutImg')) {
+        this.imgUrlList[this.imgUrlList.length] = imgUrl;
+      } else {
+        this.imgUrlList = [];
       }
+      // console.log(this.imgUrlList)
+      let len = this.imgUrlList.filter(e => e != '');
+      // console.log(len.length, 111)
+      this.uploadImg = len.length < 3 ? true : false;
     },
     methods: {
       submit() {
-        wx.setStorageSync('note', this.value)
-        wx.navigateBack({
-          delta: 1
+        this.util.post({
+          url: '/api/Customer/Order/ApplyRefund',
+          data: {
+            OrderId: this.$mp.query.OrderId || '',
+            RefundReason: this.value,
+            RefundImage1: this.imgUrlList[0] || '',
+            RefundImage2: this.imgUrlList[1] || '',
+            RefundImage3: this.imgUrlList[2] || ''
+          }
+        }).then(res => {
+          this.msg('申请成功，请等待商家受理');
+          setTimeout(_ => {
+            wx.navigateBack({
+              delta: 1
+            })
+          }, 800)
+        }).catch(err => {
+          this.msg(err.Msg)
         })
       },
-      addImg(){
+      addImg() {
         wx.navigateTo({
-          url:'/pages/upload-img/main'
+          url: '/pages/upload-img/main'
         })
       }
     },
-    components: {},
-    computed: {
-      note: function() {
-        return wx.getStorageSync('note') ? wx.getStorageSync('note') : this.value
-      }
-    },
-    watch: {}
+    computed: {},
+    watch: {},
+    onUnload() {
+      //删除图片缓存信息
+      wx.getStorageSync('cutImg') && wx.removeStorageSync('cutImg');
+      this.imgUrlList = [];
+    }
   }
 </script>
 
@@ -94,11 +120,12 @@
       justify-content: flex-start;
       flex-wrap: wrap;
       margin-bottom: 70rpx;
-      .img_lis{
+      .img_lis {
         margin-right: 26rpx;
-        img{
+        img {
           width: 140rpx;
           height: 140rpx;
+          border-radius: 6rpx;
         }
       }
     }

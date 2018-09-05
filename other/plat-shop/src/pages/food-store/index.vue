@@ -216,7 +216,10 @@
                 <canvas canvas-id='myCanvas'></canvas>
                 <div class="shareCover">
                     <img @click='shareClose' class="icon icon_close" src="https://otherfiles-ali.uupt.com/Stunner/FE/C/icon_close.png" />
-                    <img @click='saveImg' class="saveBtn" src="../../../static/saveImg.png" />
+                    <div class="shareBtn">
+                        <img @click='saveImg' class="saveBtn_l" src="../../../static/saveImg.png" />
+                        <img @click='refresh' class="saveBtn_r" src="../../../static/refresh.png" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -699,7 +702,8 @@
                     data: {
                         CodeType: 2,
                         CodeValue: String(wx.getStorageSync('shopInfo').ShopId) || '',
-                        RequestType: 2
+                        RequestType: 2,
+                        RefreshType: 0 //0 不重新生成 1 重新生成
                     }
                 }).then(res => {
                     this.QrCodeUrl = res.Body.QrCodeUrl;
@@ -832,6 +836,29 @@
                             }
                         })
                     }
+                })
+            },
+            //刷新太阳码
+            refresh() {
+                wx.showLoading({
+                    title: '再次生成中',
+                    mask: true
+                })
+                this.util.post({
+                    url: '/api/Customer/Common/CreateWxOpenQrCode',
+                    data: {
+                        CodeType: 2,
+                        CodeValue: String(wx.getStorageSync('shopInfo').ShopId) || '',
+                        RequestType: 2,
+                        RefreshType: 1 //0 不重新生成 1 重新生成
+                    }
+                }).then(res => {
+                    this.QrCodeUrl = res.Body.QrCodeUrl;
+                    this.requireImg().catch(err => {
+                        this.msg('图片地址获取失败')
+                    })
+                }).catch(err => {
+                    this.msg(err.Msg)
                 })
             },
             tel() {
@@ -2351,13 +2378,23 @@
             right: -18rpx;
             z-index: 100;
         }
-        .saveBtn {
+        .shareBtn {
             position: absolute;
             bottom: 30rpx;
             left: 30rpx;
-            width: 556rpx;
+            width: 558rpx;
             height: 88rpx;
             z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            .saveBtn_l {
+                width: 400rpx;
+                height: 88rpx;
+            }
+            .saveBtn_r {
+                width: 140rpx;
+                height: 88rpx;
+            }
         }
         .main {
             border-radius: 10rpx;
