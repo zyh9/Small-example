@@ -18,7 +18,6 @@ export default {
   data() {
     return {};
   },
-  mounted() {},
   methods: {
     editPass() {
       wx.redirectTo({

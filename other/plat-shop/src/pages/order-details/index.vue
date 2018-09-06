@@ -7,7 +7,8 @@
                 </h3>
                 <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
                 <ul class="lis_bottom_btn">
-                    <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)' @click="cancelOrder">取消订单</li>
+                    <!-- <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)||orderInfo.State==3||orderInfo.State==4' @click="cancelOrder">取消订单</li> -->
+                    <li v-if='orderInfo.CanCancel&&orderInfo.CancelApplyState==0' @click="cancelOrder">取消订单</li>
                     <li v-if="orderInfo.State==10&&applyBtn" @click="saleMask=true">申请售后</li>
                     <li @click='againOrder' v-if='orderInfo.State==10||orderInfo.State<0' :class="{btn_other:orderInfo.State==10}">再来一单</li>
                     <li class="btn_other" v-if="orderInfo.State==4" @click="okOrder">确认收货</li>
@@ -212,11 +213,16 @@
         <div class="cancel_mask" v-if="cancelMask">
             <div class="cancel_con">
                 <h3>取消确认</h3>
-                <p>跑男已接单，此时取消将扣除跑男上门费，剩余费用将退回</p>
-                <span class="deduct">本次将扣取上门费：15元</span>
+                <div v-if="orderInfo.State < 4">
+                    <p class="center">确认取消此订单？</p>
+                </div>
+                <div v-if="orderInfo.State == 4">
+                    <p>跑男已接单，此时取消将扣除跑男上门费，剩余费用将退回</p>
+                    <span class="deduct">本次将扣取上门费：{{orderInfo.CancelPenaltyMoney}}元</span>
+                </div>
                 <div class="btn_sum">
-                    <div class="btn btn_left">确认取消</div>
-                    <div class="btn btn_right">再想想</div>
+                    <div class="btn btn_left" @click="okCancel">确认取消</div>
+                    <div class="btn btn_right" @click="cancelMask=false">再想想</div>
                 </div>
             </div>
         </div>
@@ -287,7 +293,7 @@
             clearInterval(this.timer);
             this.timer = null;
             this.isTracking = false;
-            this.saleMask = false;
+            this.saleMask = this.cancelMask = false;
             this.tips = '';
             this.orderDetails()
         },
@@ -557,14 +563,21 @@
             },
             //取消订单
             cancelOrder() {
-                // console.log(this.orderInfo.State)
-                if (this.orderInfo.State < 4) { //跑男未接单
-                    console.log('跑男未接单')
-                }
                 if (this.orderInfo.CancelApplyState == 1) {
                     this.msg('已申请取消，请耐心等待商户处理');
                     return
                 }
+                // console.log(this.orderInfo.State)
+                if (this.orderInfo.State < 4) { //跑男未接单
+                    console.log('跑男未接单')
+                } else { //跑男已接单
+                    console.log('跑男已接单')
+                }
+                this.cancelMask = true;
+            },
+            //确认取消
+            okCancel() {
+                this.cancelMask = false;
                 this.util.post({
                     url: '/api/Customer/Order/CancelOrder',
                     data: {
@@ -1431,6 +1444,9 @@
                     color: #444;
                     font-size: 28rpx;
                     line-height: 48rpx;
+                }
+                .center {
+                    text-align: center;
                 }
                 .deduct {
                     margin-top: 16rpx;

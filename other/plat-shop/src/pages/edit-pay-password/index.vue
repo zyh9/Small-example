@@ -42,7 +42,6 @@
             this.newPassword = '';
             this.againPassword = '';
         },
-        mounted() {},
         methods: {
             next() {
                 if (this.oldPassword.length == 6) {

@@ -42,6 +42,8 @@
             };
         },
         onShow() {
+            this.type = this.$mp.query.type; // 1:绑定银行卡进入；2：忘记密码进入
+            this.shopInfo = wx.getStorageSync('shopInfo');
             if (wx.getStorageSync('purseInfo').ManagerPhone) {
                 this.tel = wx.getStorageSync('purseInfo').ManagerPhone;
             }
@@ -52,10 +54,6 @@
             this.countdownInfo = '获取验证码';
             this.createTiem = null;
             this.isSend = true;
-        },
-        mounted() {
-            this.type = this.$mp.query.type; /* 1:绑定银行卡进入；2：忘记密码进入 */
-            this.shopInfo = wx.getStorageSync('shopInfo');
         },
         methods: {
             sendCode() {
@@ -100,7 +98,7 @@
                 })
             },
             submit() {
-                if(this.tel.length<11){
+                if (this.tel.length < 11) {
                     this.msg('请输入手机号');
                     return;
                 }

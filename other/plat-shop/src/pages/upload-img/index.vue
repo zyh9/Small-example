@@ -74,22 +74,21 @@
             this.uploadTap()
         },
         onShow() {
-            this.type = this.$mp.query.type;
             this.isStep = false;
             this.isNext = true;
-        },
-        mounted() {
-            let query = wx.createSelectorQuery();
-            query.select('.canvas').boundingClientRect()
-            query.exec(res => {
-                let height = res[0].height;
-                wx.getSystemInfo({
-                    success: res => {
-                        //减去上方的高度
-                        this.winHeight = res.windowHeight - height;
-                    }
+            setTimeout(_ => {
+                let query = wx.createSelectorQuery();
+                query.select('.canvas').boundingClientRect()
+                query.exec(res => {
+                    let height = res[0].height;
+                    wx.getSystemInfo({
+                        success: res => {
+                            //减去上方的高度
+                            this.winHeight = res.windowHeight - height;
+                        }
+                    })
                 })
-            })
+            }, 200)
         },
         methods: {
             touchStart(e) {

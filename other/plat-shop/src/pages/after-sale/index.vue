@@ -8,7 +8,10 @@
     <p class="after_sale_title">上传凭证(3)</p>
     <ul class="img_list">
       <li class="img_lis" v-for="(v,i) in imgUrlList" :key="i" v-if="v!=''">
-        <img :src="v" alt="" class="fade_in">
+        <img :src="v+'?x-oss-process=image/resize,w_200/format,jpg'" alt="" class="fade_in">
+        <div class="del_img" @click="delImg(i)">
+          <i class="icon icon_del_img"></i>
+        </div>
       </li>
       <li class="img_lis add" @click="addImg" v-if="uploadImg">
         <img src="../../../static/upload.png" alt="">
@@ -34,8 +37,6 @@
       let imgUrl = wx.getStorageSync('cutImg') || '';
       if (wx.getStorageSync('cutImg')) {
         this.imgUrlList[this.imgUrlList.length] = imgUrl;
-      } else {
-        this.imgUrlList = [];
       }
       // console.log(this.imgUrlList)
       let len = this.imgUrlList.filter(e => e != '');
@@ -44,30 +45,41 @@
     },
     methods: {
       submit() {
-        this.util.post({
-          url: '/api/Customer/Order/ApplyRefund',
-          data: {
-            OrderId: this.$mp.query.OrderId || '',
-            RefundReason: this.value,
-            RefundImage1: this.imgUrlList[0] || '',
-            RefundImage2: this.imgUrlList[1] || '',
-            RefundImage3: this.imgUrlList[2] || ''
-          }
-        }).then(res => {
-          this.msg('申请成功，请等待商家受理');
-          setTimeout(_ => {
-            wx.navigateBack({
-              delta: 1
-            })
-          }, 800)
-        }).catch(err => {
-          this.msg(err.Msg)
-        })
+        if (this.value == "") {
+          this.msg('你还没有输入申请原因哦')
+        } else {
+          this.util.post({
+            url: '/api/Customer/Order/ApplyRefund',
+            data: {
+              OrderId: this.$mp.query.OrderId || '',
+              RefundReason: this.value,
+              RefundImage1: this.imgUrlList[0] || '',
+              RefundImage2: this.imgUrlList[1] || '',
+              RefundImage3: this.imgUrlList[2] || ''
+            }
+          }).then(res => {
+            this.msg('申请成功，请等待商家受理');
+            setTimeout(_ => {
+              wx.navigateBack({
+                delta: 1
+              })
+            }, 800)
+          }).catch(err => {
+            this.msg(err.Msg)
+          })
+        }
       },
       addImg() {
+        wx.removeStorageSync('cutImg');
         wx.navigateTo({
           url: '/pages/upload-img/main'
         })
+      },
+      delImg(i) {
+        this.imgUrlList.splice(i, 1);
+        let len = this.imgUrlList.filter(e => e != '');
+        // console.log(len.length, 111)
+        this.uploadImg = len.length < 3 ? true : false;
       }
     },
     computed: {},
@@ -122,10 +134,28 @@
       margin-bottom: 70rpx;
       .img_lis {
         margin-right: 26rpx;
+        position: relative;
         img {
-          width: 140rpx;
-          height: 140rpx;
-          border-radius: 6rpx;
+          width: 155rpx;
+          height: 155rpx;
+        }
+        .del_img {
+          padding: 10rpx;
+          position: absolute;
+          top: -17rpx;
+          right: -17rpx;
+          width: 34rpx;
+          height: 34rpx;
+          i {
+            display: block;
+          }
+        }
+      }
+      .add {
+        img {
+          padding: 36rpx;
+          border: 1px solid #ebebeb;
+          box-sizing: border-box;
         }
       }
     }

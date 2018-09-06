@@ -558,6 +558,11 @@ input::-webkit-input-placeholder {
   height: 96rpx;
   background-image: url('../../static/black-close.png');
 }
+.icon_del_img {
+  width: 34rpx ;
+  height: 34rpx;
+  background-image: url('../../static/del-img.png');
+}
 @keyframes fadeIn {
   0% {
     opacity: 0;
