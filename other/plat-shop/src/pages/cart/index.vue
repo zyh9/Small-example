@@ -565,12 +565,11 @@
             margin: 0 12rpx;
           }
         }
-      }
-      li:nth-last-child(1) {
-        &:after {
-          display: none !important;
-        }
-      }
+      } // li:nth-last-child(1) {
+      //   &:after {
+      //     display: none !important;
+      //   }
+      // }
     }
     .cart_top {
       position: absolute;

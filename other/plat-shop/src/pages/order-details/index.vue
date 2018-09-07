@@ -6,17 +6,18 @@
                     <i v-if='orderInfo.State>3||orderInfo.State<0' class="icon icon_arrowRight"></i>
                 </h3>
                 <p class='tip' v-if='orderInfo.State>=4&&orderInfo.State<10'>{{tips}}</p>
+                <p class='tip mb0'>{{textInfo}}</p>
                 <ul class="lis_bottom_btn">
                     <!-- <li v-if='orderInfo.State==0||orderInfo.State==1||(orderInfo.State==2&&orderInfo.CancelApplyState==0)||orderInfo.State==3||orderInfo.State==4' @click="cancelOrder">取消订单</li> -->
-                    <li v-if='orderInfo.CanCancel&&orderInfo.CancelApplyState==0' @click="cancelOrder">取消订单</li>
-                    <li v-if="orderInfo.State==10&&applyBtn" @click="saleMask=true">申请售后</li>
-                    <li @click='againOrder' v-if='orderInfo.State==10||orderInfo.State<0' :class="{btn_other:orderInfo.State==10}">再来一单</li>
+                    <li v-if='orderInfo.CanCancel&&orderInfo.State<5' @click="cancelOrder">取消订单</li>
+                    <li v-if="orderInfo.State==10&&applyBtn&&!orderInfo.RefundInfo" @click="saleMask=true">申请售后</li>
+                    <li class="btn_other" @click='againOrder' v-if='(orderInfo.State==10||orderInfo.State<0)'>再来一单</li>
                     <li class="btn_other" v-if="orderInfo.State==4" @click="okOrder">确认收货</li>
-                    <li v-if='orderInfo.State==2&&orderInfo.CancelApplyState==1' @click="cancelOrder">已申请取消</li>
+                    <!-- <li v-if='orderInfo.State==2&&orderInfo.CancelApplyState==1' @click="cancelOrder">已申请取消</li> -->
                     <li class="btn_other" v-if='orderInfo.State==0' @click='OrderRePay'>继续支付</li>
                 </ul>
                 <!-- 跑腿配送 -->
-                <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==1&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
+                <div class="uu_man_info" v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==1&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
                     <div class="info_left">
                         <img :src="orderInfo.PaotuiInfo.DriverPhoto?orderInfo.PaotuiInfo.DriverPhoto:'https://otherfiles-ali.uupt.com/Stunner/FE/C/man.png'" alt="" class="left_icon">
                         <div class="info_text">
@@ -24,7 +25,7 @@
                             <p class="uu_man_name">{{orderInfo.PaotuiInfo.DriverName}}为您服务</p>
                         </div>
                     </div>
-                    <i class="icon icon_tel"></i>
+                    <i class="icon icon_tel" @click='tel(orderInfo.PaotuiInfo.DriverMobile)'></i>
                 </div>
                 <!-- 快递配送 -->
                 <div class="uu_man_info" v-if='orderInfo.ExpressInfo!=null&&orderInfo.ExpressType==2&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
@@ -38,7 +39,7 @@
                     </div>
                 </div>
                 <!-- 达达配送 -->
-                <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==3&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
+                <div class="uu_man_info" v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==3&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
                     <div class="info_left">
                         <i class="icon icon_dada left_icon"></i>
                         <div class="info_text">
@@ -46,17 +47,17 @@
                             <p class="uu_man_name">{{orderInfo.PaotuiInfo.DriverName}}为您服务</p>
                         </div>
                     </div>
-                    <i class="icon icon_tel"></i>
+                    <i class="icon icon_tel" @click='tel(orderInfo.PaotuiInfo.DriverMobile)'></i>
                 </div>
                 <!-- 商家自送 -->
-                <div class="uu_man_info" @click='tel(orderInfo.PaotuiInfo.DriverMobile)' v-if='orderInfo.PaotuiInfo!=null&&orderInfo.ExpressType==4&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
+                <div class="uu_man_info" v-if='orderInfo.ExpressType==4&&(orderInfo.State==4||orderInfo.State==5||orderInfo.State==10)'>
                     <div class="info_left">
                         <i class="icon icon_shop_set left_icon"></i>
                         <div class="info_text">
                             <p class="uu_man_name">商家自送</p>
                         </div>
                     </div>
-                    <i class="icon icon_tel"></i>
+                    <i class="icon icon_tel" @click='tel(orderInfo.ShopMobile)'></i>
                 </div>
                 <div class="bor_block"></div>
             </div>
@@ -271,6 +272,7 @@
                 open: false,
                 mapCtx: {},
                 applyBtn: false, //售后申请按钮状态
+                textInfo: '', //展示文字
             }
         },
         onLoad() {
@@ -299,55 +301,81 @@
         },
         methods: {
             /* 订单状态文字 */
-            orderLabels(state, CancelApplyState, ExpressType) {
+            orderLabels(RefundMoneyState, RefundInfo, state, CancelApplyState, ExpressType) {
+                //退款状态  订单状态 取消状态 配送类型
                 // console.log(ExpressType)
                 let text = '';
-                switch (state) {
+                this.textInfo = '';
+                if (RefundInfo) {
+                    switch (RefundInfo.State) {
+                        case 0:
+                            text = '您已申请退款';
+                            break;
+                        case -1:
+                            text = '订单已完成';
+                            this.textInfo = RefundInfo.DealReason;
+                            break;
+                        case 1:
+                            text = this.stateJudge(RefundMoneyState, RefundInfo, state, CancelApplyState, ExpressType);
+                            break;
+                    }
+                } else {
+                    text = this.stateJudge(RefundMoneyState, RefundInfo, state, CancelApplyState, ExpressType);
+                }
+                return text;
+            },
+            stateJudge(RefundMoneyState, RefundInfo, state, CancelApplyState, ExpressType) {
+                let text = '';
+                switch (RefundMoneyState) {
                     case 0:
-                        text = '待支付';
-                        break;
-                    case 1:
-                        text = '等待商家接单';
-                        break;
-                    case 2:
-                        switch (CancelApplyState) {
+                        switch (state) {
                             case 0:
-                                text = '商家已接单';
+                                text = '待支付';
                                 break;
                             case 1:
-                                /* 用户发起申请 */
-                                text = '已申请取消，待商家确认';
+                                text = '等待商家接单';
+                                break;
+                            case 2:
+                                switch (CancelApplyState) {
+                                    case 0:
+                                        text = '商家已接单';
+                                        break;
+                                    case 1:
+                                        //用户发起申请
+                                        text = '已申请取消，待商家确认';
+                                        break;
+                                }
+                                break;
+                            case 3:
+                                text = '正在配货';
+                                break;
+                            case 4:
+                                text = ExpressType == 2 || ExpressType == 4 ? '已发货' : '跑男已接单';
+                                break;
+                            case 5:
+                                text = '跑男已取货';
+                                break;
+                            case 10:
+                                text = '已完成';
                                 break;
                             case -1:
-                                text = '商家已接单';
+                            case -2:
+                            case -3:
+                            case -4:
+                            case -5:
+                            case -6:
+                            case -7:
+                            case -8:
+                            case -9:
+                                text = '已取消';
                                 break;
-                                // case 2:
-                                // /* 商户同意取消 */
-                                // break;
                         }
                         break;
-                    case 3:
-                        text = '正在配货';
+                    case 1:
+                        text = '退款中';
                         break;
-                    case 4:
-                        text = ExpressType == 2 || ExpressType == 4 ? '已发货' : '跑男已接单';
-                        break;
-                    case 5:
-                        text = '跑男已取货';
-                        break;
-                    case 10:
-                        text = '已完成';
-                        break;
-                    case -1:
-                    case -2:
-                    case -3:
-                    case -4:
-                    case -5:
-                    case -6:
-                    case -7:
-                    case -8:
-                    case -9:
-                        text = '已取消';
+                    case 9:
+                        text = '已退款';
                         break;
                 }
                 return text;
@@ -503,7 +531,7 @@
                     wx.hideLoading();
                     this.block = true;
                     this.orderInfo = Object.assign({}, res.Body, {
-                        stateText: this.orderLabels(res.Body.State, res.Body.CancelApplyState, res.Body.ExpressType)
+                        stateText: this.orderLabels(res.Body.RefundMoneyState, res.Body.RefundInfo, res.Body.State, res.Body.CancelApplyState, res.Body.ExpressType)
                     })
                     let timeVal = Math.floor((new Date().getTime() - new Date(this.orderInfo.FinishTime).getTime()) / 1000); //单位：秒
                     let day = 60 ** 2 * 24;
@@ -563,7 +591,7 @@
             },
             //取消订单
             cancelOrder() {
-                if (this.orderInfo.CancelApplyState == 1) {
+                if (this.orderInfo.CancelApplyState == -1) {
                     this.msg('已申请取消，请耐心等待商户处理');
                     return
                 }
@@ -577,14 +605,18 @@
             },
             //确认取消
             okCancel() {
-                this.cancelMask = false;
                 this.util.post({
                     url: '/api/Customer/Order/CancelOrder',
                     data: {
                         OrderId: this.$mp.query.orderId
                     }
                 }).then(res => {
-                    this.orderDetails();
+                    if (res.State == -1010) {
+                        this.msg(res.Msg)
+                    } else {
+                        this.cancelMask = false;
+                        this.orderDetails();
+                    }
                 }).catch(err => {
                     this.msg(err.Msg)
                 })
@@ -785,6 +817,9 @@
                 color: #adadad;
                 line-height: 30rpx;
                 margin-bottom: 6rpx;
+            }
+            .mb0 {
+                margin-bottom: 0;
             }
             .uu_man_info {
                 display: flex;

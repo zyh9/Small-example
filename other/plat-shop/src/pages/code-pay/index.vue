@@ -56,6 +56,7 @@
             } else { //会员页点击
                 this.block = true;
                 let obj = this.$root.$mp.query;
+                // console.log(obj)
                 this.ShopName = obj.shopName;
                 this.ShopId = obj.shopId;
                 this.ShopTemplateId = obj.temp;
@@ -105,46 +106,7 @@
                 // return
                 if (this.val) {
                     if (this.authMoney(this.val) && Number(this.val) > 0) {
-                        // if (this.payOnoff) {
-                        //     this.payOnoff = false;
-                        //     this.util.post({
-                        //         url: '/api/Customer/Browse/CustomerPayment',
-                        //         data: {
-                        //             ShopId: this.ShopId || '',
-                        //             Money: this.val || ''
-                        //         }
-                        //     }).then(res => {
-                        //         wx.requestPayment({
-                        //             timeStamp: res.Body.wxPayInfo.timeStamp,
-                        //             nonceStr: res.Body.wxPayInfo.nonceStr,
-                        //             package: res.Body.wxPayInfo.package,
-                        //             signType: res.Body.wxPayInfo.signType,
-                        //             paySign: res.Body.wxPayInfo.paySign,
-                        //             success: payres => {
-                        //                 this.payOnoff = true;
-                        //                 console.log(payres)
-                        //                 wx.redirectTo({
-                        //                     url: `/pages/pay-ok/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}&temp=${this.ShopTemplateId}`
-                        //                 })
-                        //             },
-                        //             fail: error => {
-                        //                 this.payOnoff = true;
-                        //                 console.log(error.errMsg)
-                        //                 if (error.errMsg == 'requestPayment:fail cancel') {
-                        //                     this.msg('您已取消支付')
-                        //                 } else { //支付失败
-                        //                     wx.redirectTo({
-                        //                         url: `/pages/pay-error/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}`
-                        //                     })
-                        //                 }
-                        //             }
-                        //         })
-                        //     }).catch(err => {
-                        //         this.payOnoff = true;
-                        //         console.log(err)
-                        //         this.msg(err.Msg)
-                        //     })
-                        // }
+                       
                         wx.redirectTo({
                             url: `/pages/uu-pay/main?money=${this.val}&shopName=${this.ShopName}&shopId=${this.ShopId}&temp=${this.ShopTemplateId}`
                         })

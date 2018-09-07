@@ -129,8 +129,10 @@
             },
             vipCodePay() {
                 if (this.info.AccountMoney > 0) {
+                    let shopInfo = wx.getStorageSync('shopInfo');
+                    // console.log(shopInfo.ShopName,shopInfo.ShopId,shopInfo.ShopTemplateId)
                     wx.navigateTo({
-                        url: `/pages/code-pay/main?shopName=${wx.getStorageSync('shopInfo').ShopName}&shopId=${wx.getStorageSync('shopInfo').ShopId}&temp=${wx.getStorageSync('shopInfo').ShopTemplateId}`
+                        url: `/pages/code-pay/main?shopId=${shopInfo.ShopId}&temp=${shopInfo.ShopTemplateId}&shopName=${String(shopInfo.ShopName)}`
                     })
                 } else {
                     this.msg('卡内余额为0，请充值')

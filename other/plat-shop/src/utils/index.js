@@ -16,7 +16,7 @@ const commonHeader = _ => {
   //headers每次必传数据存放位置
   return {
     v: '1.1.8.3',
-    appid: '1',
+    appid: '11',
     token: wx.getStorageSync('loginInfo').Token || '',
     qrcode: wx.setStorageSync('scene', this.scene) || ''
   }
@@ -375,4 +375,4 @@ const uploadFormId = formId =>{
   })
 }
 
-export default { get, post, openTime, qqMapInfo, FmtTime, getLoc, downImg, QQMap, phModel, loginModel, wxLogin, baseUrl, uploadFormId};
+export default { get, post, openTime, qqMapInfo, FmtTime, getLoc, downImg, QQMap, phModel, loginModel, wxLogin, baseUrl, uploadFormId, commonHeader};

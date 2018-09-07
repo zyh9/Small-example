@@ -35,7 +35,7 @@
                     <ul class="lis_bottom_btn">
                         <!-- 取消订单：商家未接单，商家已接单未发货 -->
                         <!-- <li v-if='item.State==0||item.State==1||(item.State==2&&item.CancelApplyState ==0)' @click="cancelOrder(item)">取消订单</li>
-                                                                                                                    <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li> -->
+                                                                                                                        <li v-if='item.State==2&&item.CancelApplyState ==1' @click="cancelOrder(item)">已申请取消</li> -->
                         <li class="btn_other" v-if='item.State==0' @click="OrderRePay(item)">继续支付</li>
                         <!-- 再来一单  -->
                         <li @click="againOrder(item)" v-if='item.State==10||item.State<0'>再来一单</li>
@@ -203,40 +203,6 @@
                 wx.navigateTo({
                     url: `/pages/uu-pay/main?OrderId=${item.OrderId}&shopId=${item.ShopId}`
                 })
-                // this.util.post({
-                //         url: '/api/Customer/Order/OrderRePay',
-                //         data: {
-                //             OrderId: item.OrderId,
-                //         }
-                //     })
-                //     .then(res => {
-                //         if (res.State == 1) {
-                //             wx.requestPayment({
-                //                 timeStamp: res.Body.timeStamp,
-                //                 nonceStr: res.Body.nonceStr,
-                //                 package: res.Body.package,
-                //                 signType: res.Body.signType,
-                //                 paySign: res.Body.paySign,
-                //                 success: payres => {
-                //                     setTimeout(_ => {
-                //                         wx.navigateTo({
-                //                             url: '/pages/order-details/main?orderId=' + item.OrderId
-                //                         })
-                //                     }, 300)
-                //                 },
-                //                 fail: err => {
-                //                     this.msg('您已取消支付')
-                //                     setTimeout(_ => {
-                //                         wx.navigateTo({
-                //                             url: '/pages/order-details/main?orderId=' + item.OrderId
-                //                         })
-                //                     }, 300)
-                //                 }
-                //             })
-                //         }
-                //     }).catch(err => {
-                //         this.msg(err.Msg)
-                //     })
             },
             //取消订单
             cancelOrder(item) {

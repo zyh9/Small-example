@@ -23,6 +23,7 @@
                 </div>
                 <div class="good_type" v-if="goodsInfo.GoodType==-1&&goodsInfo.RealStock>0&&goodsInfo.RealStock<=10">仅剩{{goodsInfo.RealStock}}份</div>
                 <div class="good_type" v-if="goodsInfo.GoodType!=-1&&!isRule&&goodsInfo.RealStock>0&&goodsInfo.RealStock<=10">仅剩{{goodsInfo.RealStock}}份</div>
+                <div class="pad_height"></div>
                 <div class="main">
                     <div class="introduction" v-if="goodsInfo.GoodBrief">
                         <div class="item">商品简介</div>
@@ -777,7 +778,6 @@
             }
             .price_sum {
                 position: relative;
-                padding-bottom: 30rpx;
                 .discount_shop {
                     display: flex;
                     .original_price {
@@ -835,8 +835,8 @@
                 }
                 .select_rule {
                     position: absolute;
-                    right: 27rpx;
-                    bottom: 46rpx;
+                    right: 0;
+                    bottom: 16rpx;
                     font-size: 24rpx;
                     color: #fff;
                     height: 42rpx;
@@ -859,7 +859,10 @@
                 font-weight: normal;
                 display: flex;
                 align-items: center;
-                margin-bottom: 30rpx;
+            }
+            .pad_height {
+                height: 30rpx;
+                width: 100%;
             }
             .main {
                 .introduction {

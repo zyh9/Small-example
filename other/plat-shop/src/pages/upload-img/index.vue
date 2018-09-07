@@ -137,11 +137,7 @@
                             formData: {
                                 'ImageType': 1, //售后上传
                             },
-                            header: {
-                                appid: '1',
-                                token: wx.getStorageSync('loginInfo').Token || '',
-                                qrcode: wx.getStorageSync('scene') || ''
-                            },
+                            header: this.util.commonHeader(),
                             success: res => {
                                 // console.log(res)
                                 let tempFilePaths = JSON.parse(res.data).Body.ImageUrl;

@@ -17,7 +17,7 @@
         <img src="../../../static/upload.png" alt="">
       </li>
     </ul>
-    <div class="submit" @click="submit">保存</div>
+    <div class="submit" @click="submit">提交</div>
   </div>
 </template>
 
