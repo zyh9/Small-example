@@ -1160,3 +1160,31 @@
 		取值为text的意思，就是以区块内的文字作为裁剪区域向外裁剪，文字的背景即为区块的背景，文字之外的区域都将被裁剪掉。
 		
 		所以，我们最后写color: transparent; 让文字为透明色，就是让后面背景色显示出来。
+
+### 长按事件
+
+```javascript
+	//按下
+	gtouchstart(){
+		this.timer = setTimeout(this.longPress,800);   
+	},
+	//抬起
+	gtouchend(){   
+		clearTimeout(this.timer);//清除定时器   
+		if(this.timer!=0){ 
+			console.log("你这是点击");   
+		} 
+	},
+	//移动
+	gtouchmove(){   
+		clearTimeout(this.timer);//清除定时器   
+		this.timer = 0;
+		console.log('你移动手指了')
+	},
+	//长按
+	longPress(){   
+		clearTimeout(this.timer);//清除定时器   
+		this.timer = 0;   
+		console.log("长按事件触发");
+	}  
+```
