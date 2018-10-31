@@ -1,0 +1,12 @@
+{
+  "devDependencies": {
+    "@rollup/plugin-auto-install": "^1.0.2",
+    "rollup": "^0.66.6",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-run": "^1.1.0"
+  },
+  "dependencies": {
+    "vue": "^2.5.17"
+  }
+}
