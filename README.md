@@ -1188,3 +1188,7 @@
 		console.log("长按事件触发");
 	}  
 ```
+
+### 图片压缩网站（极致PNG压缩插件分享）
+
+[TinyPNG，请戳我](https://tinypng.com/)
