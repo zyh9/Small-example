@@ -1192,3 +1192,7 @@
 ### 图片压缩网站（极致PNG压缩插件分享）
 
 [TinyPNG，请戳我](https://tinypng.com/)
+
+### 如何优雅地无报错链式取值
+
+[github链接，请戳我](https://github.com/huruji/chain-get)
