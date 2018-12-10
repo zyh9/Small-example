@@ -1196,3 +1196,15 @@
 ### 如何优雅地无报错链式取值
 
 [github链接，请戳我](https://github.com/huruji/chain-get)
+
+### package.json中的波浪号（〜）和插入符号（^）有什么区别？
+
+		~的意思是匹配最近的小版本 比如~1.2.3将会匹配所有的1.2.x版本，但不匹配1.3.0
+
+		^的意思是最近的一个大版本 比如1.2.3 将会匹配 所有 1.x.x 包括1.3.0 但不包括2.0
+		
+> 提示：node的各种包都有版本控制，迭代都非常快，版本号用用三个数字分别用.分割来标记每个版本
+
+> 比如1.2.3 其中第三位3表示微小的变动，2表示比较大的变动，1表示升级
+
+[stackoverflow地址，请戳我](https://stackoverflow.com/questions/22343224/whats-the-difference-between-tilde-and-caret-in-package-json)
