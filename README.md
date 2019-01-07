@@ -1208,3 +1208,9 @@
 > 比如1.2.3 其中第三位3表示微小的变动，2表示比较大的变动，1表示升级
 
 [stackoverflow地址，请戳我](https://stackoverflow.com/questions/22343224/whats-the-difference-between-tilde-and-caret-in-package-json)
+
+### vscode占用cpu特别高是什么原因
+
+> vscode设置中有"search.followSymlinks"这个属性，将其改为：false
+
+[github链接，请戳我](https://github.com/Microsoft/vscode/issues/35659)
