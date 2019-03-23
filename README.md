@@ -1214,3 +1214,10 @@
 > vscode设置中有"search.followSymlinks"这个属性，将其改为：false
 
 [github链接，请戳我](https://github.com/Microsoft/vscode/issues/35659)
+
+### Settings Sync
+
+```javascript
+		"sync.gist": "106c7e293f98773d04fbe4985341f77c"
+		"github.gist": "9a7fa10a1124eecce85321370ce430481ce62920"
+```
