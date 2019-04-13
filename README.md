@@ -1223,3 +1223,7 @@
 ```
 
 [Visual Studio Code如何备份，请戳我](https://blog.csdn.net/txw0415/article/details/80424895)
+
+### 当 async/await 遇上 forEach
+
+[参考链接，请戳我](https://objcer.com/2017/10/12/async-await-with-forEach/)
