@@ -1219,11 +1219,6 @@
 
 ### Settings Sync
 
-```javascript
-	"sync.gist": "106c7e293f98773d04fbe4985341f77c"
-	"github.gist": "9a7fa10a1124eecce85321370ce430481ce62920"
-```
-
 [Visual Studio Code如何备份，请戳我](https://blog.csdn.net/txw0415/article/details/80424895)
 
 ### 当 async/await 遇上 forEach
