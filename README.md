@@ -1332,3 +1332,41 @@ function throttle(fn, delay) {
 ### 相关链接
 
 [30-seconds-of-code](https://github.com/30-seconds/30-seconds-of-code/tree/master/snippets)
+
+### 几款实用的谷歌浏览器插件
+
+> 1.鼠标悬停快速预览——GitHub Hovercard
+
+GitHub Hovercard是一款可以使用鼠标悬停快速浏览项目信息/用户信息/项目讨论的Chrome扩展，无论在GitHub的哪一个界面，只要鼠标停驻在链接上面，就可以快速查看有关信息，而无需点击进去。
+
+> 2.实现树状文件列表——Octotree
+
+Octotree这款插件就如同名字一样，在页面左端提供了一个树状的文件列表（类似Windows资源管理器的左栏），从而让所有文件的位置一目了然，并可以快速点击查看。
+
+> 3.直观衡量你的工作量——Isometric Contributions
+
+Isometric Contributions是一款可以将冷冰冰的数据转化为生动图形的Chrome扩展程序。它可以将你每天的contributions数目（可以理解为提交GitHub的数目）转化为颜色不一的立体柱状图，并给出自己的统计数据。
+
+> 4.用户头像展示——Avatars for Github
+
+一款从名字就能看出功能的Chrome拓展，它可以实现一个简单的功能：显示出GitHub用户的头像。貌似现在github新闻页已经可以显示头像了，所以就不再展示了。
+
+> 5.GitHub夜间主题——Stylus
+
+安装完Stylus插件之后，请移步至github仓库进行样式安装，以下是仓库链接：
+
+https://github.com/StylishThemes/Github-Dark
+
+> 6.文件大小展示——Enhanced Github
+
+这个插件可以显示仓库大小，每个文件的大小，下载链接和复制文件内容的选项。
+
+> 7.即时搜索——Awesome Autocomplete for GitHub
+
+将即时搜索功能添加到GitHub的搜索栏
+
+> 8.最强的浏览器插件——油猴
+
+插件安装地址：http://www.tampermonkey.net/
+
+获取安装脚本：https://greasyfork.org/zh-CN
