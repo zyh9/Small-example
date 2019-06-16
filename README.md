@@ -1370,3 +1370,7 @@ https://github.com/StylishThemes/Github-Dark
 插件安装地址：http://www.tampermonkey.net/
 
 获取安装脚本：https://greasyfork.org/zh-CN
+
+> 9.浏览器扩展——Refined GitHub
+
+显示 GitHub 仓库的静态资源的下载次数
