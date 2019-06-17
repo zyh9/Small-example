@@ -1371,6 +1371,6 @@ https://github.com/StylishThemes/Github-Dark
 
 获取安装脚本：https://greasyfork.org/zh-CN
 
-> 9.浏览器扩展——Refined GitHub
+> 9.下载次数——Refined GitHub
 
 显示 GitHub 仓库的静态资源的下载次数
