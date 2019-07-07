@@ -1392,3 +1392,7 @@ https://github.com/StylishThemes/Github-Dark
 ### 走进CSS的世界
 
 [A Single Div](https://a.singlediv.com/)
+
+### 缓存详解
+
+[缓存深入了解，请戳我](https://github.com/amandakelake/blog/issues/43)
