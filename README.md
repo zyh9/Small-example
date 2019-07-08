@@ -1396,3 +1396,7 @@ https://github.com/StylishThemes/Github-Dark
 ### 缓存详解
 
 [缓存深入了解，请戳我](https://github.com/amandakelake/blog/issues/43)
+
+### 深入理解TypeScript
+
+[github链接，请戳我](https://github.com/jkchao/typescript-book-chinese)
