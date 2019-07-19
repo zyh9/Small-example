@@ -1378,15 +1378,10 @@ https://github.com/StylishThemes/Github-Dark
 ### “30秒系列”专门收集30秒以内可以解答的问题，目前有以下6个库
 
 [30秒JS](https://github.com/30-seconds/30-seconds-of-code)
-
 [30秒CSS](https://30-seconds.github.io/30-seconds-of-css/)
-
 [30秒面试](https://30secondsofinterviews.org/)
-
 [30秒React](https://github.com/30-seconds/30-seconds-of-react)
-
 [30秒Python](https://github.com/kriadmin/30-seconds-of-python-code)
-
 [30秒PHP](https://github.com/appzcoder/30-seconds-of-php-code)
 
 ### 走进CSS的世界
@@ -1400,3 +1395,7 @@ https://github.com/StylishThemes/Github-Dark
 ### 深入理解TypeScript
 
 [github链接，请戳我](https://github.com/jkchao/typescript-book-chinese)
+
+### 30-days-of-react
+
+[30-days-of-react](https://github.com/fullstackreact/30-days-of-react)
