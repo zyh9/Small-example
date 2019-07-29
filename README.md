@@ -1455,7 +1455,9 @@ function getCookie(name) {
 	}
 ```
 
-### 滚动到页面顶部
+### 浏览器对象 BOM
+
+#### 滚动到页面顶部
 
 ```javascript
 	function scrollToTop() {
@@ -1469,7 +1471,7 @@ function getCookie(name) {
 	}
 ```
 
-### 复制文本
+#### 复制文本
 
 ```javascript
 	function copy(str) {
@@ -1491,13 +1493,24 @@ function getCookie(name) {
 	}
 ```
 
-### 获取url中的参数
+#### 获取url中的参数
 
 ```javascript
 	function getURLParameters(url) {
-	const params = url.match(/([^?=&]+)(=([^&]*))/g)
-	return params?params.reduce(
-		(a, v) => (a[v.slice(0, v.indexOf('='))] = v.slice(v.indexOf('=') + 1), a), {}
-	):[]
+		const params = url.match(/([^?=&]+)(=([^&]*))/g)
+		return params?params.reduce(
+			(a, v) => (a[v.slice(0, v.indexOf('='))] = v.slice(v.indexOf('=') + 1), a), {}
+		):[]
+	}
+```
+
+#### 获取滚动条位置
+
+```javascript
+	function getScrollPosition(el = window) {
+		return {
+			x: (el.pageXOffset !== undefined) ? el.pageXOffset : el.scrollLeft,
+			y: (el.pageYOffset !== undefined) ? el.pageYOffset : el.scrollTop
+		}
 	}
 ```
