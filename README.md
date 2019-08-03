@@ -1514,3 +1514,7 @@ function getCookie(name) {
 		}
 	}
 ```
+
+### 常用正则大全
+
+[github仓库地址，请戳我](https://github.com/any86/any-rule)
