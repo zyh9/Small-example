@@ -1517,4 +1517,14 @@ function getCookie(name) {
 
 ### 常用正则大全
 
-[github仓库地址，请戳我](https://github.com/any86/any-rule)
+[any-rule，请戳我](https://github.com/any86/any-rule)
+
+[learn-regex，请戳我](https://github.com/ziishaned/learn-regex)
+
+### 是否为页面底部
+
+```javascript
+	function bottomVisible() {
+		return document.documentElement.clientHeight + window.scrollY >= (document.documentElement.scrollHeight || document.documentElement.clientHeight)
+	}
+```
