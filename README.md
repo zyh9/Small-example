@@ -1528,3 +1528,35 @@ function getCookie(name) {
 		return document.documentElement.clientHeight + window.scrollY >= (document.documentElement.scrollHeight || document.documentElement.clientHeight)
 	}
 ```
+
+### 如何给“机场”测速？
+
+> SSRSpeed最新版：
+
+[https://github.com/NyanChanMeow/SSRSpeed/releases](https://github.com/NyanChanMeow/SSRSpeed/releases)  
+  
+> Python最新版：
+
+[https://www.python.org/downloads/](https://www.python.org/downloads/)  
+  
+> 测速方式1（生成测速图片）
+
+```javascript
+//pip安装
+python -m pip install --upgrade pip
+//安装其它依赖
+pip3 install -r requirements.txt
+//启动服务，针对订阅节点逐一测速
+python main.py -yu https:xxx
+```
+
+> 测速方式2(可视化测速)
+
+```javascript
+//安装其它依赖
+pip install -r requirements.txt
+//启动服务
+python web.py
+//打开可视化页面
+http://127.0.0.1:10870/
+```
