@@ -63,6 +63,7 @@ textarea {
 input::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
 	color: #ccc;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 /*消除圆角按钮（针对ios系统）*/
 input,
